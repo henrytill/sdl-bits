@@ -32,7 +32,7 @@ set(SDL_STATIC OFF)
 FetchContent_MakeAvailable(SDL2)
 
 set(SDL_BITS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(SDL_BITS_SOURCES ${SDL_BITS_SOURCE_DIR}/main.c)
+set(SDL_BITS_SOURCES ${SDL_BITS_SOURCE_DIR}/main.c ${SDL_BITS_SOURCE_DIR}/util.h)
 
 add_executable(main ${SDL_BITS_SOURCES})
 target_link_libraries(main SDL2::SDL2main SDL2::SDL2)
