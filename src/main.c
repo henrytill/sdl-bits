@@ -41,9 +41,19 @@ main(int argc, char *argv[])
 
 	fill_color = SDL_MapRGB(surface->format, 0xFF, 0xFF, 0xFF);
 
-	SDL_FillRect(surface, NULL, fill_color);
-	SDL_UpdateWindowSurface(window);
+	if (SDL_FillRect(surface, NULL, fill_color) != 0) {
+		fprintf(stderr, "SDL_FillRect: %s\n", SDL_GetError());
+		goto cleanup;
+	}
+
+	if (SDL_UpdateWindowSurface(window) != 0) {
+		fprintf(
+		    stderr, "SDL_UpdateWindowSurface: %s\n", SDL_GetError());
+		goto cleanup;
+	};
+
 	SDL_Delay(DELAY);
+
 	ret = 0;
 
 cleanup:
