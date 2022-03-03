@@ -10,8 +10,7 @@
 #define util_print_sdl_error()                                                 \
 	do {                                                                   \
 		const char *sdl_err = SDL_GetError();                          \
-		fprintf(                                                       \
-		    stderr, "ERROR: %s:%d:%s", __FILE__, __LINE__, __func__);  \
+		fprintf(stderr, "ERROR: %s:%d", __FILE__, __LINE__);           \
 		if (strlen(sdl_err) != 0) {                                    \
 			fprintf(stderr, ": %s", sdl_err);                      \
 		}                                                              \
