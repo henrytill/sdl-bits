@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(sdl-bits)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 90)
 
 # https://stackoverflow.com/questions/10671916/how-to-copy-dll-files-into-the-same-folder-as-the-executable-using-cmake
 if(WIN32)
