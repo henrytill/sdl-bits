@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 		if (SDL_UpdateWindowSurface(window) != 0) {
 			util_print_sdl_error();
 			goto cleanup;
-		};
+		}
 
 		loop_end    = SDL_GetTicks() - loop_start;
 		frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME, loop_end);
