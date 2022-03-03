@@ -3,16 +3,20 @@
 
 #include "util.h"
 
+/* Establishes loop conditionals */
+typedef enum loop_status_e { STOP = 0, RUN = 1 } loop_status_t;
+
 int
 main(int argc, char *argv[])
 {
-	const int      SCREEN_WIDTH   = 640;
-	const int      SCREEN_HEIGHT  = 480;
-	const uint32_t DELAY          = 2000;
-	int            ret            = 1;
-	SDL_Window    *window         = NULL;
-	SDL_Surface   *window_surface = NULL;
-	uint32_t       fill_color;
+	const int     SCREEN_WIDTH      = 640;
+	const int     SCREEN_HEIGHT     = 480;
+	int           ret               = 1;
+	loop_status_t event_loop_status = RUN;
+	SDL_Window   *window            = NULL;
+	SDL_Surface  *window_surface    = NULL;
+	SDL_Event     event;
+	uint32_t      fill_color;
 
 	(void)argc;
 	(void)argv;
@@ -46,12 +50,24 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	if (SDL_UpdateWindowSurface(window) != 0) {
-		util_print_sdl_error();
-		goto cleanup;
-	};
+	/* Main event loop */
+	while (event_loop_status == RUN) {
+		/* Handle events on the SDL event queue */
+		while (SDL_PollEvent(&event) != 0) {
+			switch (event.type) {
+			case SDL_QUIT:
+				event_loop_status = STOP;
+				break;
+			default:
+				break;
+			}
+		}
 
-	SDL_Delay(DELAY);
+		if (SDL_UpdateWindowSurface(window) != 0) {
+			util_print_sdl_error();
+			goto cleanup;
+		};
+	}
 
 	ret = 0;
 
