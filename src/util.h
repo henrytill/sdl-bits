@@ -7,7 +7,6 @@
 #include "SDL.h"
 
 /* Prints well-formatted SDL error */
-
 #define util_print_sdl_error()                                                 \
 	do {                                                                   \
 		const char *sdl_err = SDL_GetError();                          \
@@ -19,4 +18,4 @@
 		fprintf(stderr, "\n");                                         \
 	} while (0)
 
-#endif
+#endif /* SDL_BITS_UTIL_H */
