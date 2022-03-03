@@ -15,5 +15,6 @@ IndentCaseLabels: false
 IndentWidth: 8
 PointerAlignment: Right
 ReflowComments: true
+SortIncludes: false
 SpacesBeforeTrailingComments: 1
 UseTab: ForIndentation

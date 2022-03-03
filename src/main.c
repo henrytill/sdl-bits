@@ -1,18 +1,18 @@
 #include <stdio.h>
+#include <SDL.h>
 
-#include "SDL.h"
 #include "util.h"
 
 int
 main(int argc, char *argv[])
 {
-	const int      SCREEN_WIDTH  = 640;
-	const int      SCREEN_HEIGHT = 480;
-	const uint32_t DELAY         = 2000;
-	int            ret           = 1;
-	SDL_Window    *window        = NULL;
-	SDL_Surface   *surface       = NULL;
-	uint32_t       fill_color    = 0;
+	const int      SCREEN_WIDTH   = 640;
+	const int      SCREEN_HEIGHT  = 480;
+	const uint32_t DELAY          = 2000;
+	int            ret            = 1;
+	SDL_Window    *window         = NULL;
+	SDL_Surface   *window_surface = NULL;
+	uint32_t       fill_color;
 
 	(void)argc;
 	(void)argv;
@@ -33,15 +33,15 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	surface = SDL_GetWindowSurface(window);
-	if (surface == NULL) {
+	window_surface = SDL_GetWindowSurface(window);
+	if (window_surface == NULL) {
 		util_print_sdl_error();
 		goto cleanup;
 	}
 
-	fill_color = SDL_MapRGB(surface->format, 0xFF, 0xFF, 0xFF);
+	fill_color = SDL_MapRGB(window_surface->format, 0xFF, 0xFF, 0xFF);
 
-	if (SDL_FillRect(surface, NULL, fill_color) != 0) {
+	if (SDL_FillRect(window_surface, NULL, fill_color) != 0) {
 		util_print_sdl_error();
 		goto cleanup;
 	}
