@@ -9,14 +9,18 @@ typedef enum loop_status_e { STOP = 0, RUN = 1 } loop_status_t;
 int
 main(int argc, char *argv[])
 {
-	const int     SCREEN_WIDTH      = 640;
-	const int     SCREEN_HEIGHT     = 480;
-	int           ret               = 1;
-	loop_status_t event_loop_status = RUN;
-	SDL_Window   *window            = NULL;
-	SDL_Surface  *window_surface    = NULL;
-	SDL_Event     event;
-	uint32_t      fill_color;
+	const int      SCREEN_WIDTH      = 640;
+	const int      SCREEN_HEIGHT     = 480;
+	const uint32_t TARGET_FRAME_TIME = 16;
+	int            ret               = 1;
+	loop_status_t  event_loop_status = RUN;
+	SDL_Window    *window            = NULL;
+	SDL_Surface   *window_surface    = NULL;
+	SDL_Event      event;
+	uint32_t       fill_color;
+	uint32_t       loop_start;
+	uint32_t       loop_end;
+	uint32_t       frame_delay;
 
 	(void)argc;
 	(void)argv;
@@ -52,6 +56,8 @@ main(int argc, char *argv[])
 
 	/* Main event loop */
 	while (event_loop_status == RUN) {
+		loop_start = SDL_GetTicks();
+
 		/* Handle events on the SDL event queue */
 		while (SDL_PollEvent(&event) != 0) {
 			switch (event.type) {
@@ -67,6 +73,12 @@ main(int argc, char *argv[])
 			util_print_sdl_error();
 			goto cleanup;
 		};
+
+		loop_end    = SDL_GetTicks() - loop_start;
+		frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME, loop_end);
+		if (frame_delay > 0) {
+			SDL_Delay(frame_delay);
+		}
 	}
 
 	ret = 0;
