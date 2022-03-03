@@ -18,4 +18,12 @@
 		fprintf(stderr, "\n");                                         \
 	} while (0)
 
+/*
+ * Performs saturating subtraction
+ *
+ * Ref: http://locklessinc.com/articles/sat_arithmetic/
+ */
+uint32_t
+util_uint32_sat_sub(uint32_t x, uint32_t y);
+
 #endif /* SDL_BITS_UTIL_H */
