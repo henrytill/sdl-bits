@@ -18,18 +18,32 @@ endif()
 find_package(SDL2 CONFIG REQUIRED)
 
 set(SDL_BITS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(SDL_BITS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
+
 set(
-  SDL_BITS_SOURCES
-  ${SDL_BITS_SOURCE_DIR}/main.c
+  UTIL_SOURCES
   ${SDL_BITS_SOURCE_DIR}/util.h
   ${SDL_BITS_SOURCE_DIR}/util.c
 )
+add_library(util ${UTIL_SOURCES})
 
-add_executable(main ${SDL_BITS_SOURCES})
-target_link_libraries(main PRIVATE SDL2::SDL2 SDL2::SDL2main)
+set(
+  MAIN_SOURCES
+  ${SDL_BITS_SOURCE_DIR}/main.c
+)
+add_executable(main ${MAIN_SOURCES})
+target_link_libraries(main PRIVATE util SDL2::SDL2 SDL2::SDL2main)
 
 if(MSVC)
   target_compile_options(main PRIVATE /W4 /WX)
 else()
   target_compile_options(main PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+
+enable_testing()
+
+add_executable(util-buffer-test ${SDL_BITS_TEST_DIR}/util-buffer-test.c)
+target_include_directories(util-buffer-test PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
+target_link_libraries(util-buffer-test PRIVATE util)
+
+add_test(buffer_test, util-buffer-test)
