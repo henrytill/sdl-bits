@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	/* Main event loop */
+	/* Begin main event loop */
 	while (event_loop_status == RUN) {
 		loop_start = SDL_GetTicks();
 
@@ -69,17 +69,20 @@ main(int argc, char *argv[])
 			}
 		}
 
+		/* Update */
 		if (SDL_UpdateWindowSurface(window) != 0) {
 			util_print_sdl_error();
 			goto cleanup;
 		}
 
+		/* Calculate frame delay */
 		loop_end    = SDL_GetTicks() - loop_start;
 		frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME, loop_end);
 		if (frame_delay > 0) {
 			SDL_Delay(frame_delay);
 		}
 	}
+	/* End main event loop */
 
 	ret = 0;
 
