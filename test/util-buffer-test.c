@@ -38,8 +38,8 @@ main(int argc, char *argv[])
 
 	CHECKED_INIT(&buffer, 3);
 
-	assert(buffer.size == 3);
-	assert(buffer.curr == 0);
+	assert(buffer.cap == 3);
+	assert(buffer.size == 0);
 	assert(*(buffer.data + 0) == 0);
 	assert(*(buffer.data + 1) == 0);
 	assert(*(buffer.data + 2) == 0);
@@ -52,7 +52,7 @@ main(int argc, char *argv[])
 	CHECKED_PUSH(&buffer, 1);
 	CHECKED_PUSH(&buffer, 2);
 
-	assert(buffer.curr == 3);
+	assert(buffer.size == 3);
 
 	CHECKED_READ(&buffer, 0, 0);
 	CHECKED_READ(&buffer, 1, 1);
@@ -60,8 +60,8 @@ main(int argc, char *argv[])
 
 	CHECKED_PUSH(&buffer, 3);
 
-	assert(buffer.size == 6);
-	assert(buffer.curr == 4);
+	assert(buffer.cap == 6);
+	assert(buffer.size == 4);
 	assert(buffer.data != NULL);
 
 	CHECKED_READ(&buffer, 0, 0);
@@ -78,8 +78,8 @@ main(int argc, char *argv[])
 
 	CHECKED_DEINIT(&buffer);
 
+	assert(buffer.cap == 0);
 	assert(buffer.size == 0);
-	assert(buffer.curr == 0);
 	assert(buffer.data == NULL);
 
 	return 0;
