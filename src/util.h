@@ -30,14 +30,14 @@ util_uint32_sat_sub(uint32_t x, uint32_t y);
 
 /* A growable buffer */
 typedef struct util_buffer_s {
+	size_t cap;
 	size_t size;
-	size_t curr;
 	char  *data;
 } util_buffer_t;
 
 /* Initialize a growable buff */
 int
-util_buffer_init(util_buffer_t *buff, size_t size);
+util_buffer_init(util_buffer_t *buff, size_t cap);
 
 /* De-initialize a growable buff */
 int
