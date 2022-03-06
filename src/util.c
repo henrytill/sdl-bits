@@ -219,10 +219,7 @@ util_buffer2d_deinit(util_buffer2d_t **buff)
 }
 
 static int
-util_buffer2d_grow(util_buffer2d_t *buff,
-                   uint32_t         x_cap_hint,
-                   uint32_t         y_cap_hint,
-                   uint32_t         growth)
+util_buffer2d_grow(util_buffer2d_t *buff, uint32_t x_cap_hint, uint32_t y_cap_hint, uint32_t growth)
 {
 	char         **data_h    = NULL;
 	char          *row_h     = NULL;
@@ -256,19 +253,15 @@ util_buffer2d_grow(util_buffer2d_t *buff,
 	memset(data_h + x_cap, 0, (size_t)(new_x_cap - x_cap) * sizeof(char *));
 	/* Reallocate "rows" */
 	for (i = 0; i < new_x_cap; i++) {
-		row_h =
-		    realloc(*(data_h + i), (size_t)new_y_cap * sizeof(char));
+		row_h = realloc(*(data_h + i), (size_t)new_y_cap * sizeof(char));
 		if (row_h == NULL) {
 			return 1;
 		}
 		*(data_h + i) = row_h;
 		/* Zero out new cells */
-		memset((*(data_h + i) + y_cap),
-		       0,
-		       (size_t)(new_y_cap - y_cap) * sizeof(char));
+		memset((*(data_h + i) + y_cap), 0, (size_t)(new_y_cap - y_cap) * sizeof(char));
 		if (i >= buff->x_cap) {
-			memset(
-			    *(data_h + i), 0, (size_t)new_y_cap * sizeof(char));
+			memset(*(data_h + i), 0, (size_t)new_y_cap * sizeof(char));
 		}
 	}
 	/* Assign to data field if successful */
@@ -280,10 +273,7 @@ util_buffer2d_grow(util_buffer2d_t *buff,
 }
 
 int
-util_buffer2d_set(util_buffer2d_t *buff,
-                  uint32_t         x_index,
-                  uint32_t         y_index,
-                  char             item)
+util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char item)
 {
 	uint32_t x_cap_hint;
 	uint32_t y_cap_hint;
@@ -293,8 +283,7 @@ util_buffer2d_set(util_buffer2d_t *buff,
 	}
 	x_cap_hint = x_index + 1;
 	y_cap_hint = y_index + 1;
-	if (util_buffer2d_grow(
-	        buff, x_cap_hint, y_cap_hint, BUFFER_GROWTH_FACTOR) == 1) {
+	if (util_buffer2d_grow(buff, x_cap_hint, y_cap_hint, BUFFER_GROWTH_FACTOR) == 1) {
 		return 1;
 	}
 	*(*(buff->data + x_index) + y_index) = item;
@@ -302,10 +291,7 @@ util_buffer2d_set(util_buffer2d_t *buff,
 }
 
 int
-util_buffer2d_read(util_buffer2d_t *buff,
-                   uint32_t         x_index,
-                   uint32_t         y_index,
-                   char            *out)
+util_buffer2d_read(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char *out)
 {
 	if (buff == NULL || buff->data == NULL) {
 		return 1;

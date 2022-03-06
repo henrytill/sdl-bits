@@ -10,6 +10,7 @@ BasedOnStyle: LLVM
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBraces: Linux
+ColumnLimit: 100
 DerivePointerAlignment: false
 IndentCaseLabels: false
 IndentWidth: 8

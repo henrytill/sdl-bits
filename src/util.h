@@ -8,14 +8,14 @@
 #define BUFFER_GROWTH_FACTOR 2
 
 /* Prints well-formatted SDL error */
-#define util_print_sdl_error()                                                 \
-	do {                                                                   \
-		const char *sdl_err = SDL_GetError();                          \
-		fprintf(stderr, "ERROR: %s:%d", __FILE__, __LINE__);           \
-		if (strlen(sdl_err) != 0) {                                    \
-			fprintf(stderr, ": %s", sdl_err);                      \
-		}                                                              \
-		fprintf(stderr, "\n");                                         \
+#define util_print_sdl_error()                                                                     \
+	do {                                                                                       \
+		const char *sdl_err = SDL_GetError();                                              \
+		fprintf(stderr, "ERROR: %s:%d", __FILE__, __LINE__);                               \
+		if (strlen(sdl_err) != 0) {                                                        \
+			fprintf(stderr, ": %s", sdl_err);                                          \
+		}                                                                                  \
+		fprintf(stderr, "\n");                                                             \
 	} while (0)
 
 /*
@@ -70,17 +70,11 @@ util_buffer2d_deinit(util_buffer2d_t **buff);
 
 /* Set an item in a growable 2d buffer */
 int
-util_buffer2d_set(util_buffer2d_t *buff,
-                  uint32_t         x_index,
-                  uint32_t         y_index,
-                  char             item);
+util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char item);
 
 /* Read an item from a growable 2d buffer */
 int
-util_buffer2d_read(util_buffer2d_t *buff,
-                   uint32_t         x_index,
-                   uint32_t         y_index,
-                   char            *out);
+util_buffer2d_read(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char *out);
 
 /* Get the column capacity of a growable buffer */
 uint32_t
