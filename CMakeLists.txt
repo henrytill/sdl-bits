@@ -48,9 +48,14 @@ add_executable(test_util_buffer ${SDL_BITS_TEST_DIR}/util_buffer.c)
 target_include_directories(test_util_buffer PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
 target_link_libraries(test_util_buffer PRIVATE util)
 
+add_executable(test_util_buffer2d ${SDL_BITS_TEST_DIR}/util_buffer2d.c)
+target_include_directories(test_util_buffer2d PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
+target_link_libraries(test_util_buffer2d PRIVATE util)
+
 add_executable(test_util_uint32_sat_sub ${SDL_BITS_TEST_DIR}/util_uint32_sat_sub.c)
 target_include_directories(test_util_uint32_sat_sub PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
 target_link_libraries(test_util_uint32_sat_sub PRIVATE util)
 
 add_test(buffer test_util_buffer)
+add_test(buffer2d test_util_buffer2d)
 add_test(uint32_sat_sub test_util_uint32_sat_sub)
