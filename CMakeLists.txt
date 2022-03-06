@@ -52,5 +52,5 @@ add_executable(test_util_uint32_sat_sub ${SDL_BITS_TEST_DIR}/util_uint32_sat_sub
 target_include_directories(test_util_uint32_sat_sub PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
 target_link_libraries(test_util_uint32_sat_sub PRIVATE util)
 
-add_test(buffer, test_util_buffer)
-add_test(uint32_sat_sub, test_util_uint32_sat_sub)
+add_test(buffer test_util_buffer)
+add_test(uint32_sat_sub test_util_uint32_sat_sub)
