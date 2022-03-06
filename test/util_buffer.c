@@ -9,21 +9,20 @@
 
 #define CHECKED_PUSH(buff, item) TEST(util_buffer_push(buff, item) == 0)
 
-#define CHECKED_READ(buff, index, expected)                                    \
-	do {                                                                   \
-		char out;                                                      \
-		TEST(util_buffer_read(buff, index, &out) == 0);                \
-		TEST(out == (expected));                                      \
+#define CHECKED_READ(buff, index, expected)                                                        \
+	do {                                                                                       \
+		char out;                                                                          \
+		TEST(util_buffer_read(buff, index, &out) == 0);                                    \
+		TEST(out == (expected));                                                           \
 	} while (0)
 
-#define FAILED_READ(buff, index)                                               \
-	do {                                                                   \
-		char out;                                                      \
-		TEST(util_buffer_read(buff, index, &out) == 1);               \
+#define FAILED_READ(buff, index)                                                                   \
+	do {                                                                                       \
+		char out;                                                                          \
+		TEST(util_buffer_read(buff, index, &out) == 1);                                    \
 	} while (0)
 
-#define CHECKED_SET(buff, index, item)                                         \
-	TEST(util_buffer_set(buff, index, item) == 0)
+#define CHECKED_SET(buff, index, item) TEST(util_buffer_set(buff, index, item) == 0)
 
 #define CHECK_CAP(buff, expected) TEST(util_buffer_cap(buff) == (expected))
 
