@@ -68,14 +68,6 @@ util_buffer2d_init(util_buffer2d_t **buff, uint32_t x_cap, uint32_t y_cap);
 int
 util_buffer2d_deinit(util_buffer2d_t **buff);
 
-/* Set an item in a growable 2d buffer */
-int
-util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char item);
-
-/* Read an item from a growable 2d buffer */
-int
-util_buffer2d_read(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char *out);
-
 /* Get the column capacity of a growable buffer */
 uint32_t
 util_buffer2d_x_cap(util_buffer2d_t *buff);
@@ -83,5 +75,13 @@ util_buffer2d_x_cap(util_buffer2d_t *buff);
 /* Get the row capacity of a growable buffer */
 uint32_t
 util_buffer2d_y_cap(util_buffer2d_t *buff);
+
+/* Set an item in a growable 2d buffer */
+int
+util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char item);
+
+/* Read an item from a growable 2d buffer */
+int
+util_buffer2d_read(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char *out);
 
 #endif /* SDL_BITS_UTIL_H */
