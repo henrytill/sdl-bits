@@ -1,24 +1,21 @@
 #include "test.h"
 #include "util.h"
 
-#define CHECKED_INIT(buff, x_cap, y_cap)                                       \
-	TEST(util_buffer2d_init(buff, x_cap, y_cap) == 0)
+#define CHECKED_INIT(buff, x_cap, y_cap) TEST(util_buffer2d_init(buff, x_cap, y_cap) == 0)
 
-#define CHECKED_SET(buff, x_index, y_index, item)                              \
+#define CHECKED_SET(buff, x_index, y_index, item)                                                  \
 	TEST(util_buffer2d_set(buff, x_index, y_index, item) == 0)
 
-#define CHECKED_READ(buff, x_index, y_index, expected)                         \
-	do {                                                                   \
-		char out;                                                      \
-		TEST(util_buffer2d_read(buff, x_index, y_index, &out) == 0);   \
-		TEST(out == (expected));                                      \
+#define CHECKED_READ(buff, x_index, y_index, expected)                                             \
+	do {                                                                                       \
+		char out;                                                                          \
+		TEST(util_buffer2d_read(buff, x_index, y_index, &out) == 0);                       \
+		TEST(out == (expected));                                                           \
 	} while (0)
 
-#define CHECK_X_CAP(buff, expected)                                            \
-	TEST(util_buffer2d_x_cap(buff) == (expected))
+#define CHECK_X_CAP(buff, expected) TEST(util_buffer2d_x_cap(buff) == (expected))
 
-#define CHECK_Y_CAP(buff, expected)                                            \
-	TEST(util_buffer2d_y_cap(buff) == (expected))
+#define CHECK_Y_CAP(buff, expected) TEST(util_buffer2d_y_cap(buff) == (expected))
 
 int
 main(int argc, char *argv[])
