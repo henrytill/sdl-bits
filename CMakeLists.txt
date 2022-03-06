@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.16)
+# Highest version compatible with Steam Runtime container
+cmake_minimum_required(VERSION 3.13)
+
 project(sdl-bits)
 
 set(CMAKE_C_STANDARD 90)
