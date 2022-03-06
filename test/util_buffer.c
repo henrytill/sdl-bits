@@ -21,12 +21,19 @@
 		assert(out == (expected));                                     \
 	} while (0)
 
+#define FAILED_READ(buff, index)                                               \
+	do {                                                                   \
+		char out;                                                      \
+		assert(util_buffer_read(buff, index, &out) == 1);              \
+	} while (0)
+
 #define CHECKED_SET(buff, index, item)                                         \
 	assert(util_buffer_set(buff, index, item) == 0)
 
-#define CHECK_CAP(buff, expected) assert(util_buffer_cap(buff) == expected)
+#define CHECK_CAP(buff, expected) assert(util_buffer_cap(buff) == (expected))
 
-#define CHECK_COUNT(buff, expected) assert(util_buffer_count(buff) == expected)
+#define CHECK_COUNT(buff, expected)                                            \
+	assert(util_buffer_count(buff) == (expected))
 
 int
 main(int argc, char *argv[])
@@ -41,9 +48,6 @@ main(int argc, char *argv[])
 #endif
 
 	CHECKED_INIT(&buffer, 3);
-	CHECKED_READ(buffer, 0, 0);
-	CHECKED_READ(buffer, 1, 0);
-	CHECKED_READ(buffer, 2, 0);
 	CHECK_CAP(buffer, 3);
 	CHECK_COUNT(buffer, 0);
 
@@ -53,6 +57,7 @@ main(int argc, char *argv[])
 	CHECKED_READ(buffer, 0, 0);
 	CHECKED_READ(buffer, 1, 1);
 	CHECKED_READ(buffer, 2, 2);
+	FAILED_READ(buffer, 3);
 	CHECK_CAP(buffer, 3);
 	CHECK_COUNT(buffer, 3);
 
@@ -61,6 +66,7 @@ main(int argc, char *argv[])
 	CHECKED_READ(buffer, 1, 1);
 	CHECKED_READ(buffer, 2, 2);
 	CHECKED_READ(buffer, 3, 3);
+	FAILED_READ(buffer, 4);
 	CHECK_CAP(buffer, 6);
 	CHECK_COUNT(buffer, 4);
 
