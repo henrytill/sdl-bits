@@ -1,39 +1,33 @@
-#include <assert.h>
-
-#if defined(_MSC_VER) && defined(_DEBUG)
-#include <crtdbg.h>
-#endif
-
+#include "test.h"
 #include "util.h"
 
 /* Some helper macros */
 
-#define CHECKED_INIT(buff, size) assert(util_buffer_init(buff, size) == 0)
+#define CHECKED_INIT(buff, size) TEST(util_buffer_init(buff, size) == 0)
 
-#define CHECKED_DEINIT(buff) assert(util_buffer_deinit(buff) == 0)
+#define CHECKED_DEINIT(buff) TEST(util_buffer_deinit(buff) == 0)
 
-#define CHECKED_PUSH(buff, item) assert(util_buffer_push(buff, item) == 0)
+#define CHECKED_PUSH(buff, item) TEST(util_buffer_push(buff, item) == 0)
 
 #define CHECKED_READ(buff, index, expected)                                    \
 	do {                                                                   \
 		char out;                                                      \
-		assert(util_buffer_read(buff, index, &out) == 0);              \
-		assert(out == (expected));                                     \
+		TEST(util_buffer_read(buff, index, &out) == 0);                \
+		TEST(out == (expected));                                      \
 	} while (0)
 
 #define FAILED_READ(buff, index)                                               \
 	do {                                                                   \
 		char out;                                                      \
-		assert(util_buffer_read(buff, index, &out) == 1);              \
+		TEST(util_buffer_read(buff, index, &out) == 1);               \
 	} while (0)
 
 #define CHECKED_SET(buff, index, item)                                         \
-	assert(util_buffer_set(buff, index, item) == 0)
+	TEST(util_buffer_set(buff, index, item) == 0)
 
-#define CHECK_CAP(buff, expected) assert(util_buffer_cap(buff) == (expected))
+#define CHECK_CAP(buff, expected) TEST(util_buffer_cap(buff) == (expected))
 
-#define CHECK_COUNT(buff, expected)                                            \
-	assert(util_buffer_count(buff) == (expected))
+#define CHECK_COUNT(buff, expected) TEST(util_buffer_count(buff) == (expected))
 
 int
 main(int argc, char *argv[])
@@ -42,10 +36,6 @@ main(int argc, char *argv[])
 
 	(void)argc;
 	(void)argv;
-
-#if defined(_MSC_VER) && defined(_DEBUG)
-	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-#endif
 
 	CHECKED_INIT(&buffer, 3);
 	CHECK_CAP(buffer, 3);
@@ -79,7 +69,7 @@ main(int argc, char *argv[])
 	CHECK_COUNT(buffer, 4);
 
 	CHECKED_DEINIT(&buffer);
-	assert(buffer == NULL);
+	TEST(buffer == NULL);
 	CHECK_CAP(buffer, 0);
 	CHECK_COUNT(buffer, 0);
 

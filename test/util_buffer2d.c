@@ -1,29 +1,24 @@
-#include <assert.h>
-
-#if defined(_MSC_VER) && defined(_DEBUG)
-#include <crtdbg.h>
-#endif
-
+#include "test.h"
 #include "util.h"
 
 #define CHECKED_INIT(buff, x_cap, y_cap)                                       \
-	assert(util_buffer2d_init(buff, x_cap, y_cap) == 0)
+	TEST(util_buffer2d_init(buff, x_cap, y_cap) == 0)
 
 #define CHECKED_SET(buff, x_index, y_index, item)                              \
-	assert(util_buffer2d_set(buff, x_index, y_index, item) == 0)
+	TEST(util_buffer2d_set(buff, x_index, y_index, item) == 0)
 
 #define CHECKED_READ(buff, x_index, y_index, expected)                         \
 	do {                                                                   \
 		char out;                                                      \
-		assert(util_buffer2d_read(buff, x_index, y_index, &out) == 0); \
-		assert(out == (expected));                                     \
+		TEST(util_buffer2d_read(buff, x_index, y_index, &out) == 0);   \
+		TEST(out == (expected));                                      \
 	} while (0)
 
 #define CHECK_X_CAP(buff, expected)                                            \
-	assert(util_buffer2d_x_cap(buff) == (expected))
+	TEST(util_buffer2d_x_cap(buff) == (expected))
 
 #define CHECK_Y_CAP(buff, expected)                                            \
-	assert(util_buffer2d_y_cap(buff) == (expected))
+	TEST(util_buffer2d_y_cap(buff) == (expected))
 
 int
 main(int argc, char *argv[])
@@ -32,10 +27,6 @@ main(int argc, char *argv[])
 
 	(void)argc;
 	(void)argv;
-
-#if defined(_MSC_VER) && defined(_DEBUG)
-	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-#endif
 
 	CHECKED_INIT(&buffer, 3, 3);
 	CHECK_X_CAP(buffer, 3);
