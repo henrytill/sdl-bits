@@ -29,11 +29,11 @@ util_uint32_sat_sub(uint32_t x, uint32_t y);
 /* A growable buffer */
 typedef struct util_buffer_s util_buffer_t;
 
-/* Initialize a growable buff */
+/* Initialize a growable buffer */
 int
 util_buffer_init(util_buffer_t **buff, uint32_t cap);
 
-/* De-initialize a growable buff */
+/* De-initialize a growable buffer */
 int
 util_buffer_deinit(util_buffer_t **buff);
 
@@ -53,7 +53,7 @@ util_buffer_push(util_buffer_t *buff, char item);
 int
 util_buffer_set(util_buffer_t *buff, uint32_t index, char item);
 
-/* Read an item from a growable buff */
+/* Read an item from a growable buffer */
 int
 util_buffer_read(util_buffer_t *buff, uint32_t index, char *out);
 
