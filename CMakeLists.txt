@@ -34,7 +34,12 @@ set(
   ${SDL_BITS_SOURCE_DIR}/main.c
 )
 add_executable(main ${MAIN_SOURCES})
-target_link_libraries(main PRIVATE util SDL2::SDL2 SDL2::SDL2main)
+
+if(MINGW)
+  target_link_libraries(main PRIVATE util mingw32 SDL2::SDL2main SDL2::SDL2)
+else()
+  target_link_libraries(main PRIVATE util SDL2::SDL2main SDL2::SDL2)
+endif()
 
 if(MSVC)
   target_compile_options(main PRIVATE /W4 /WX)
