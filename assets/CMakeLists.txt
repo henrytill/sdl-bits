@@ -1,0 +1,19 @@
+find_package(Python3)
+
+set(TARGETS ucs-fonts dummy)
+
+foreach(TARGET ${TARGETS})
+  STRING(MAKE_C_IDENTIFIER ${TARGET} TARGET_NAME)
+
+  SET(OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET})
+
+  add_custom_command(
+    OUTPUT ${OUTPUT_PATH}
+    COMMAND ${Python3_EXECUTABLE} ARGS generate.py ${TARGET_NAME}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+  add_custom_target(${TARGET_NAME} ALL DEPENDS ${OUTPUT_PATH})
+
+  set_target_properties(${TARGET_NAME} PROPERTIES ADDITIONAL_CLEAN_FILES ${OUTPUT_PATH})
+endforeach()
