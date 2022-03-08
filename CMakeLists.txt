@@ -19,6 +19,8 @@ endif()
 
 find_package(SDL2 CONFIG REQUIRED)
 
+add_subdirectory(assets)
+
 set(SDL_BITS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SDL_BITS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
