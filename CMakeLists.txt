@@ -19,10 +19,30 @@ endif()
 
 find_package(SDL2 CONFIG REQUIRED)
 
+if(MSVC)
+  find_package(freetype CONFIG REQUIRED)
+else()
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(FREETYPE2 REQUIRED freetype2)
+endif()
+
 add_subdirectory(assets)
 
 set(SDL_BITS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SDL_BITS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
+
+set(
+  FONT_LOADER_SOURCES
+  ${SDL_BITS_SOURCE_DIR}/font_loader.c
+)
+add_executable(font_loader ${FONT_LOADER_SOURCES})
+
+if(MSVC)
+  target_link_libraries(font_loader PRIVATE freetype)
+else()
+  target_include_directories(font_loader PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+  target_link_libraries(font_loader PRIVATE ${FREETYPE2_LIBRARIES})
+endif()
 
 set(
   BMP_SOURCES
