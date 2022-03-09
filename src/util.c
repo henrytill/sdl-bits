@@ -30,20 +30,20 @@ util_buffer_init(util_buffer_t **buff, uint32_t cap)
 	util_buffer_t *buff_h = NULL;
 	char          *data_h = NULL;
 
-	/* Allocate buffer and assign to buff if successful */
+	// Allocate buffer and assign to buff if successful
 	buff_h = malloc(sizeof(util_buffer_t));
 	if (buff_h == NULL) {
 		return 1;
 	}
 	*buff = buff_h;
 
-	/* Allocate array */
+	// Allocate array
 	data_h = calloc(cap, sizeof(char));
 	if (data_h == NULL) {
 		return 1;
 	}
 
-	/* Assign */
+	// Assign
 	(*buff)->data  = data_h;
 	(*buff)->cap   = cap;
 	(*buff)->count = 0;
@@ -99,7 +99,7 @@ util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t growth)
 		return 0;
 	}
 
-	/* Update capacity */
+	// Update capacity
 	while (cap_hint > new_cap) {
 		new_cap *= growth;
 	}
@@ -107,16 +107,16 @@ util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t growth)
 		new_cap = UINT32_MAX;
 	}
 
-	/* Reallocate array */
+	// Reallocate array
 	data_h = realloc(buff->data, (size_t)new_cap * sizeof(char));
 	if (data_h == NULL) {
 		return 1;
 	}
 
-	/* Zero out new trailing cells */
+	// Zero out new trailing cells
 	memset(data_h + cap, 0, (size_t)(new_cap - cap) * sizeof(char));
 
-	/* Assign */
+	// Assign
 	buff->data = data_h;
 	buff->cap  = (uint32_t)new_cap;
 
@@ -185,20 +185,20 @@ util_buffer2d_init(util_buffer2d_t **buff, uint32_t x_cap, uint32_t y_cap)
 	char            *row_h;
 	uint32_t         i;
 
-	/* Allocate buffer and assign to buff if successful */
+	// Allocate buffer and assign to buff if successful
 	buff_h = malloc(sizeof(util_buffer2d_t));
 	if (buff_h == NULL) {
 		return 1;
 	}
 	*buff = buff_h;
 
-	/* Allocate base array */
+	// Allocate base array
 	data_h = calloc(x_cap, sizeof(char *));
 	if (data_h == NULL) {
 		return 1;
 	}
 
-	/* Allocate sub-arrays */
+	// Allocate sub-arrays
 	for (i = 0; i < x_cap; i++) {
 		row_h = calloc(y_cap, sizeof(char));
 		if (row_h == NULL) {
@@ -207,7 +207,7 @@ util_buffer2d_init(util_buffer2d_t **buff, uint32_t x_cap, uint32_t y_cap)
 		*(data_h + i) = row_h;
 	}
 
-	/* Assign */
+	// Assign
 	(*buff)->data  = data_h;
 	(*buff)->x_cap = x_cap;
 	(*buff)->y_cap = y_cap;
@@ -283,16 +283,16 @@ util_buffer2d_grow(util_buffer2d_t *buff, uint32_t x_cap_hint, uint32_t y_cap_hi
 		new_y_cap = UINT32_MAX;
 	}
 
-	/* Reallocate base array */
+	// Reallocate base array
 	data_h = realloc(buff->data, (size_t)new_x_cap * sizeof(char *));
 	if (data_h == NULL) {
 		return 1;
 	}
 
-	/* Nullify new trailing cells in base array */
+	// Nullify new trailing cells in base array
 	memset(data_h + x_cap, 0, (size_t)(new_x_cap - x_cap) * sizeof(char *));
 
-	/* Reallocate sub-arrays */
+	// Reallocate sub-arrays
 	for (i = 0; i < new_x_cap; i++) {
 		sub_h = realloc(*(data_h + i), (size_t)new_y_cap * sizeof(char));
 		if (sub_h == NULL) {
@@ -300,16 +300,16 @@ util_buffer2d_grow(util_buffer2d_t *buff, uint32_t x_cap_hint, uint32_t y_cap_hi
 		}
 		*(data_h + i) = sub_h;
 
-		/* Zero out new trailing cells in existing sub-arrays */
+		// Zero out new trailing cells in existing sub-arrays
 		memset(*(data_h + i) + y_cap, 0, (size_t)(new_y_cap - y_cap) * sizeof(char));
 
-		/* Zero out new sub-arrays */
+		// Zero out new sub-arrays
 		if (i >= x_cap) {
 			memset(*(data_h + i), 0, (size_t)new_y_cap * sizeof(char));
 		}
 	}
 
-	/* Assign */
+	// Assign
 	buff->data  = data_h;
 	buff->x_cap = (uint32_t)new_x_cap;
 	buff->y_cap = (uint32_t)new_y_cap;

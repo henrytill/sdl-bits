@@ -3,7 +3,7 @@
 
 #include "util.h"
 
-/* Establishes loop conditionals */
+// Establishes loop conditionals
 typedef enum loop_status_e { STOP = 0, RUN = 1 } loop_status_t;
 
 int
@@ -54,11 +54,11 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	/* Begin main event loop */
+	// Begin main event loop
 	while (event_loop_status == RUN) {
 		loop_start = SDL_GetTicks();
 
-		/* Handle events on the SDL event queue */
+		// Handle events on the SDL event queue
 		while (SDL_PollEvent(&event) != 0) {
 			switch (event.type) {
 			case SDL_QUIT:
@@ -69,20 +69,20 @@ main(int argc, char *argv[])
 			}
 		}
 
-		/* Update */
+		// Update
 		if (SDL_UpdateWindowSurface(window) != 0) {
 			util_print_sdl_error();
 			goto cleanup;
 		}
 
-		/* Calculate frame delay */
+		// Calculate frame delay
 		loop_end    = SDL_GetTicks() - loop_start;
 		frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME, loop_end);
 		if (frame_delay > 0) {
 			SDL_Delay(frame_delay);
 		}
 	}
-	/* End main event loop */
+	// End main event loop
 
 	ret = 0;
 
