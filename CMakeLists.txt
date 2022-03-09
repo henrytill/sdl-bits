@@ -25,6 +25,16 @@ set(SDL_BITS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SDL_BITS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 set(
+  BMP_SOURCES
+  ${SDL_BITS_SOURCE_DIR}/bmp.h
+  ${SDL_BITS_SOURCE_DIR}/bmp.c
+)
+add_library(bmp ${BMP_SOURCES})
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_link_libraries(bmp PRIVATE m)
+endif()
+
+set(
   UTIL_SOURCES
   ${SDL_BITS_SOURCE_DIR}/util.h
   ${SDL_BITS_SOURCE_DIR}/util.c
@@ -51,6 +61,10 @@ endif()
 
 enable_testing()
 
+add_executable(test_load_bmp ${SDL_BITS_TEST_DIR}/load_bmp.c)
+target_include_directories(test_load_bmp PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
+target_link_libraries(test_load_bmp PRIVATE bmp)
+
 add_executable(test_util_buffer ${SDL_BITS_TEST_DIR}/util_buffer.c ${SDL_BITS_TEST_DIR}/test.h)
 target_include_directories(test_util_buffer PRIVATE $<BUILD_INTERFACE:${SDL_BITS_SOURCE_DIR}>)
 target_link_libraries(test_util_buffer PRIVATE util)
@@ -66,3 +80,4 @@ target_link_libraries(test_util_uint32_sat_sub PRIVATE util)
 add_test(buffer test_util_buffer)
 add_test(buffer2d test_util_buffer2d)
 add_test(uint32_sat_sub test_util_uint32_sat_sub)
+add_test(NAME load_bmp WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND test_load_bmp)
