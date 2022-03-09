@@ -11,4 +11,4 @@
 		}                                                                                  \
 	} while (0)
 
-#endif /* SDL_BITS_TEST_H */
+#endif // SDL_BITS_TEST_H

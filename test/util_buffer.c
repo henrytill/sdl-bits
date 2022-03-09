@@ -1,7 +1,7 @@
 #include "test.h"
 #include "util.h"
 
-/* Some helper macros */
+// Some helper macros
 
 #define CHECKED_INIT(buff, size) TEST(util_buffer_init(buff, size) == 0)
 

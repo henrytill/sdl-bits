@@ -17,102 +17,102 @@ typedef enum bmp_dib_header_size_e {
 } bmp_dib_header_size_t;
 
 typedef struct bmp_file_header_s {
-	/* Header field */
+	// Header field
 	uint16_t type;
-	/* File size in bytes */
+	// File size in bytes
 	uint32_t size;
-	/* Reserved */
+	// Reserved
 	uint16_t reserved1;
-	/* Reserved */
+	// Reserved
 	uint16_t reserved2;
-	/* Offset to image data in bytes */
+	// Offset to image data in bytes
 	uint32_t offset;
-	/* Size of DIB header */
+	// Size of DIB header
 	uint32_t dib_header_size;
 } bmp_file_header_t;
 
 typedef struct bmp_bitmap_info_header_s {
-	/* Bitmap width in pixels */
+	// Bitmap width in pixels
 	int32_t width_px;
-	/* Bitmap height in pixels */
+	// Bitmap height in pixels
 	int32_t height_px;
-	/* Number of color planes */
+	// Number of color planes
 	uint16_t num_planes;
-	/* Bits per pixel */
+	// Bits per pixel
 	uint16_t bits_per_pixel;
-	/* Compression method */
+	// Compression method
 	uint32_t compression;
-	/* Image size in bytes */
+	// Image size in bytes
 	uint32_t image_size_bytes;
-	/* Horizontal resolution of the image in pixels per meter */
+	// Horizontal resolution of the image in pixels per meter
 	int32_t x_resolution_ppm;
-	/* Vertical resolution of the image in pixels per meter */
+	// Vertical resolution of the image in pixels per meter
 	int32_t y_resolution_ppm;
-	/* Number of colors in the color palette */
+	// Number of colors in the color palette
 	uint32_t num_colors;
-	/* Number of important colors used */
+	// Number of important colors used
 	uint32_t important_colors;
 } bmp_bitmap_info_header_t;
 
 typedef struct bmp_color_space_triple_s {
-	/* X coordinate of red endpoint */
+	// X coordinate of red endpoint
 	int32_t red_x;
-	/* Y coordinate of red endpoint */
+	// Y coordinate of red endpoint
 	int32_t red_y;
-	/* Z coordinate of red endpoint */
+	// Z coordinate of red endpoint
 	int32_t red_z;
-	/* X coordinate of green endpoint */
+	// X coordinate of green endpoint
 	int32_t green_x;
-	/* Y coordinate of green endpoint */
+	// Y coordinate of green endpoint
 	int32_t green_y;
-	/* Z coordinate of green endpoint */
+	// Z coordinate of green endpoint
 	int32_t green_z;
-	/* X coordinate of blue endpoint */
+	// X coordinate of blue endpoint
 	int32_t blue_x;
-	/* Y coordinate of blue endpoint */
+	// Y coordinate of blue endpoint
 	int32_t blue_y;
-	/* Z coordinate of blue endpoint */
+	// Z coordinate of blue endpoint
 	int32_t blue_z;
 } bmp_color_space_triple_t;
 
 typedef struct bmp_bitmap_v4_header_s {
-	/* Bitmap width in pixels */
+	// Bitmap width in pixels
 	int32_t width_px;
-	/* Bitmap height in pixels */
+	// Bitmap height in pixels
 	int32_t height_px;
-	/* Number of color planes */
+	// Number of color planes
 	uint16_t num_planes;
-	/* Bits per pixel */
+	// Bits per pixel
 	uint16_t bits_per_pixel;
-	/* Compression method */
+	// Compression method
 	uint32_t compression;
-	/* Image size in bytes */
+	// Image size in bytes
 	uint32_t image_size_bytes;
-	/* Horizontal resolution of the image in pixels per meter */
+	// Horizontal resolution of the image in pixels per meter
 	int32_t x_resolution_ppm;
-	/* Vertical resolution of the image in pixels per meter */
+	// Vertical resolution of the image in pixels per meter
 	int32_t y_resolution_ppm;
-	/* Number of colors in the color palette */
+	// Number of colors in the color palette
 	uint32_t num_colors;
-	/* Number of important colors used */
+	// Number of important colors used
 	uint32_t important_colors;
-	/* Red channel bit mask */
+	// Red channel bit mask
 	uint32_t red_mask;
-	/* Green channel bit mask */
+	// Green channel bit mask
 	uint32_t green_mask;
-	/* Blue channel bit mask */
+	// Blue channel bit mask
 	uint32_t blue_mask;
-	/* Alpha channel bit mask */
+	// Alpha channel bit mask
 	uint32_t alpha_mask;
-	/* Color space type */
+	// Color space type
 	uint32_t color_space_type;
-	/* Color space triple */
+	// Color space triple
 	bmp_color_space_triple_t color_space_triple;
-	/* Red gamma */
+	// Red gamma
 	uint32_t red_gamma;
-	/* Green gamma */
+	// Green gamma
 	uint32_t green_gamma;
-	/* Blue gamma */
+	// Blue gamma
 	uint32_t blue_gamma;
 } bmp_bitmap_v4_header_t;
 
@@ -134,4 +134,4 @@ bmp_row_size(uint16_t bits_per_pixel, int32_t width_px);
 
 #pragma pack(pop)
 
-#endif /* SDL_BITS_BMP_H */
+#endif // SDL_BITS_BMP_H
