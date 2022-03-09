@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #endif
 
+#ifdef _MSC_VER
 #pragma warning(disable : 4996)
+#endif
 
 #include "bmp.h"
 
@@ -68,6 +70,7 @@ main(int argc, char *argv[])
 	assert(pixel->blue == 255);
 	assert(pixel->green == 255);
 	assert(pixel->red == 255);
+	(void)pixel;
 
 	ret = 0;
 
