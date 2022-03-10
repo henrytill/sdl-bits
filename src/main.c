@@ -3,24 +3,25 @@
 
 #include "util.h"
 
+static const int      screen_width      = 640;
+static const int      screen_height     = 480;
+static const uint32_t target_frame_time = 16;
+
 // Establishes loop conditionals
 typedef enum loop_status_e { STOP = 0, RUN = 1 } loop_status_t;
 
 int
 main(int argc, char *argv[])
 {
-	const int      SCREEN_WIDTH      = 640;
-	const int      SCREEN_HEIGHT     = 480;
-	const uint32_t TARGET_FRAME_TIME = 16;
-	int            ret               = 1;
-	loop_status_t  event_loop_status = RUN;
-	SDL_Window    *window            = NULL;
-	SDL_Surface   *window_surface    = NULL;
-	SDL_Event      event;
-	uint32_t       fill_color;
-	uint32_t       loop_start;
-	uint32_t       loop_end;
-	uint32_t       frame_delay;
+	int           ret               = 1;
+	loop_status_t event_loop_status = RUN;
+	SDL_Window   *window            = NULL;
+	SDL_Surface  *window_surface    = NULL;
+	SDL_Event     event;
+	uint32_t      fill_color;
+	uint32_t      loop_start;
+	uint32_t      loop_end;
+	uint32_t      frame_delay;
 
 	(void)argc;
 	(void)argv;
@@ -33,8 +34,8 @@ main(int argc, char *argv[])
 	window = SDL_CreateWindow("Hello, world!",
 	                          SDL_WINDOWPOS_UNDEFINED,
 	                          SDL_WINDOWPOS_UNDEFINED,
-	                          SCREEN_WIDTH,
-	                          SCREEN_HEIGHT,
+	                          screen_width,
+	                          screen_height,
 	                          SDL_WINDOW_SHOWN);
 	if (window == NULL) {
 		util_print_sdl_error();
@@ -77,7 +78,7 @@ main(int argc, char *argv[])
 
 		// Calculate frame delay
 		loop_end    = SDL_GetTicks() - loop_start;
-		frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME, loop_end);
+		frame_delay = util_uint32_sat_sub(target_frame_time, loop_end);
 		if (frame_delay > 0) {
 			SDL_Delay(frame_delay);
 		}
