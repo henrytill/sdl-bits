@@ -8,6 +8,15 @@
 
 #include "util.h"
 
+static int
+util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t growth);
+
+static int
+util_buffer2d_grow(util_buffer2d_t *buff,
+                   uint32_t         x_cap_hint,
+                   uint32_t         y_cap_hint,
+                   uint32_t         growth);
+
 uint32_t
 util_uint32_sat_sub(uint32_t x, uint32_t y)
 {
