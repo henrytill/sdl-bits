@@ -13,8 +13,8 @@
 
 #include "bmp.h"
 
-static char *const bmp_file = "./assets/sample_24bit.bmp";
-static char *const mode     = "r";
+static char *const BMP_FILE = "./assets/sample_24bit.bmp";
+static char *const MODE     = "r";
 
 int
 main(int argc, char *argv[])
@@ -29,7 +29,7 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	file_h = fopen(bmp_file, mode);
+	file_h = fopen(BMP_FILE, MODE);
 	if (file_h == NULL) {
 		goto cleanup;
 	}
