@@ -135,5 +135,7 @@ main(int argc, char *argv[])
 	ret = 0;
 
 cleanup:
+	FT_Done_Face(face);
+	FT_Done_FreeType(library);
 	return ret;
 }
