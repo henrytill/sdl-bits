@@ -2,6 +2,12 @@
 #include <math.h>
 #include <stdint.h>
 
+#ifdef _MSC_VER
+#include <malloc.h>
+#else
+#include <stdlib.h>
+#endif
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -21,10 +27,11 @@ enum { WIDTH = 10, HEIGHT = 20 };
 static char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
 static const char  CHAR_CODE = 'Q';
 
-static unsigned char image[HEIGHT][WIDTH];
-
 static unsigned char
 get_bit(unsigned char x, unsigned int p);
+
+static int
+render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset);
 
 // p = 0 is MSB
 static unsigned char
@@ -37,19 +44,52 @@ get_bit(unsigned char x, unsigned int p)
 	return (x >> (CHAR_BIT + ~p)) & 1;
 }
 
-int
-main(int argc, char *argv[])
+static int
+render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 {
-	int            ret     = 1;
-	FT_Library     library = NULL;
-	FT_Face        face    = NULL;
-	FT_GlyphSlot   slot    = NULL;
-	unsigned char *buffer  = NULL;
+	unsigned char *buffer = NULL;
 	unsigned int   rows;
 	unsigned int   width;
 	unsigned char  datum;
 	unsigned int   pitch;
-	int            error;
+	size_t         x, y, p, i;
+	unsigned int   j;
+
+	(void)offset;
+
+	buffer = slot->bitmap.buffer;
+	rows   = slot->bitmap.rows;
+	width  = slot->bitmap.width;
+	pitch  = abs(slot->bitmap.pitch);
+
+	for (y = 0, p = 0; y < rows; y++, p += pitch) {
+		for (i = 0; i < pitch; i++) {
+			for (j = 0; j < CHAR_BIT; j++) {
+				datum = get_bit(*(buffer + p + i), j);
+
+				x = j + (i * CHAR_BIT);
+				if (x < width) {
+					*(*(target + y) + x) = datum;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+int
+main(int argc, char *argv[])
+{
+	int             ret     = 1;
+	FT_Library      library = NULL;
+	FT_Face         face    = NULL;
+	FT_GlyphSlot    slot    = NULL;
+	unsigned char **image   = NULL;
+	unsigned int    rows;
+	unsigned int    width;
+	unsigned char   datum;
+	int             error;
 
 	(void)argc;
 	(void)argv;
@@ -57,6 +97,12 @@ main(int argc, char *argv[])
 	setbuf(stdout, NULL);
 
 	assert(CHAR_BIT == EXPECTED_CHAR_BIT);
+
+	size_t i;
+	image = malloc(HEIGHT * sizeof(char *));
+	for (i = 0; i < HEIGHT; i++) {
+		*(image + i) = malloc(WIDTH * sizeof(char));
+	}
 
 	error = FT_Init_FreeType(&library);
 	if (error != 0) {
@@ -103,25 +149,12 @@ main(int argc, char *argv[])
 		fprintf(stderr, "pixel_mode was not FL_PIXEL_MODE_MONO");
 	}
 
-	buffer = slot->bitmap.buffer;
-	rows   = slot->bitmap.rows;
-	width  = slot->bitmap.width;
-	pitch  = abs(slot->bitmap.pitch);
+	render_char(slot, image, 0);
 
-	size_t       x, y, p, i;
-	unsigned int j;
-	for (y = 0, p = 0; y < rows; y++, p += pitch) {
-		for (i = 0; i < pitch; i++) {
-			for (j = 0; j < CHAR_BIT; j++) {
-				datum = get_bit(*(buffer + p + i), j);
+	rows  = slot->bitmap.rows;
+	width = slot->bitmap.width;
 
-				x = j + (i * CHAR_BIT);
-				if (x < width) {
-					image[y][x] = datum;
-				}
-			}
-		}
-	}
+	size_t x, y;
 
 	for (y = 0; y < rows; y++) {
 		printf("%2zd|", y);
