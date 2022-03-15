@@ -20,6 +20,13 @@
 
 #define EXPECTED_CHAR_BIT 8
 
+#define checked_fclose(file)                                                                       \
+	do {                                                                                       \
+		if ((file) != NULL) {                                                              \
+			fclose((file));                                                            \
+		}                                                                                  \
+	} while (0)
+
 #define print_error(error)                                                                         \
 	do {                                                                                       \
 		fprintf(stderr, "ERROR: %s:%d: %d", __FILE__, __LINE__, error);                    \
@@ -140,6 +147,7 @@ export_image(unsigned char **image, size_t image_width, size_t image_height)
 {
 	const bmp_pixel_ARGB32_t WHITE              = {0xFF, 0xFF, 0xFF, 0x00};
 	const bmp_pixel_ARGB32_t BLACK              = {0x00, 0x00, 0x00, 0xFF};
+	int                      ret                = 1;
 	FILE                    *file_h             = NULL;
 	bmp_color_space_triple_t color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	bmp_bitmap_v4_header_t   bitmap_v4_header;
@@ -154,7 +162,7 @@ export_image(unsigned char **image, size_t image_width, size_t image_height)
 
 	target_buff = calloc(target_buff_size, sizeof(bmp_pixel_ARGB32_t));
 	if (target_buff == NULL) {
-		return 1;
+		goto cleanup;
 	}
 
 	for (size_t y = image_height, i = 0; y-- > 0;) {
@@ -192,25 +200,30 @@ export_image(unsigned char **image, size_t image_width, size_t image_height)
 
 	file_h = fopen(TEST_BMP, MODE);
 	if (file_h == NULL) {
-		return 1;
+		goto cleanup;
 	}
 
 	writes = fwrite(&file_header, sizeof(bmp_file_header_t), 1, file_h);
 	if (writes != 1) {
-		return 1;
+		goto cleanup;
 	}
 
 	writes = fwrite(&bitmap_v4_header, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
 	if (writes != 1) {
-		return 1;
+		goto cleanup;
 	}
 
 	writes = fwrite(target_buff, image_size_bytes, 1, file_h);
 	if (writes != 1) {
-		return 1;
+		goto cleanup;
 	}
 
-	return 0;
+	ret = 0;
+
+cleanup:
+	checked_fclose(file_h);
+	free(target_buff);
+	return ret;
 }
 
 int
