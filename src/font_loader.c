@@ -138,6 +138,8 @@ draw_image(unsigned char **image, size_t image_width, size_t image_height)
 static int
 export_image(unsigned char **image, size_t image_width, size_t image_height)
 {
+	const bmp_pixel_ARGB32_t WHITE              = {0xFF, 0xFF, 0xFF, 0x00};
+	const bmp_pixel_ARGB32_t BLACK              = {0x00, 0x00, 0x00, 0xFF};
 	FILE                    *file_h             = NULL;
 	bmp_color_space_triple_t color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 	bmp_bitmap_v4_header_t   bitmap_v4_header;
@@ -147,8 +149,6 @@ export_image(unsigned char **image, size_t image_width, size_t image_height)
 	size_t                   image_size_bytes;
 	size_t                   writes;
 
-	(void)image;
-
 	target_buff_size = image_width * image_height;
 	image_size_bytes = target_buff_size * sizeof(bmp_pixel_ARGB32_t);
 
@@ -157,27 +157,11 @@ export_image(unsigned char **image, size_t image_width, size_t image_height)
 		return 1;
 	}
 
-#if 0
-	uint32_t target[8] = {0x7F0000FF,
-	                      0x7F00FF00,
-	                      0x7FFF0000,
-	                      0x7FFFFFFF,
-	                      0xFF0000FF,
-	                      0xFF00FF00,
-	                      0xFFFF0000,
-	                      0xFFFFFFFF};
-#endif
-
-	target_buff = (bmp_pixel_ARGB32_t[]){
-	    {0xFF, 0x00, 0x00, 0x7F},
-	    {0x00, 0xFF, 0x00, 0x7F},
-	    {0x00, 0x00, 0xFF, 0x7F},
-	    {0xFF, 0xFF, 0xFF, 0x7F},
-	    {0xFF, 0x00, 0x00, 0xFF},
-	    {0x00, 0xFF, 0x00, 0xFF},
-	    {0x00, 0x00, 0xFF, 0xFF},
-	    {0xFF, 0xFF, 0xFF, 0xFF},
-	};
+	for (size_t y = image_height, i = 0; y-- > 0;) {
+		for (size_t x = 0; x < image_width; x++, i++) {
+			*(target_buff + i) = *(*(image + y) + x) ? BLACK : WHITE;
+		}
+	}
 
 	bitmap_v4_header.width_px           = (int32_t)image_width;
 	bitmap_v4_header.height_px          = (int32_t)image_height;
@@ -310,7 +294,7 @@ main(int argc, char *argv[])
 
 	draw_image(image, image_width, image_height);
 
-	export_image(image, 4, 2);
+	export_image(image, image_width, image_height);
 
 cleanup:
 	FT_Done_Face(face);
