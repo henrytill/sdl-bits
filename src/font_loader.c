@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef _MSC_VER
 #include <malloc.h>
@@ -10,6 +11,8 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+
+#include "bmp.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
@@ -25,7 +28,10 @@
 enum { WIDTH = 10, HEIGHT = 20 };
 
 static char *const FONT_FILE  = "./assets/ucs-fonts/10x20.bdf";
-static char *const CHAR_CODES = "ABCDEFGHIJ";
+static char *const CHAR_CODES = "ABCDEFGHIJK";
+
+static char *const TEST_BMP = "test.bmp";
+static char *const MODE     = "wb";
 
 static unsigned char
 get_bit(unsigned char source, size_t pos);
@@ -38,6 +44,12 @@ free_image(unsigned char ***image, size_t height);
 
 static void
 render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset);
+
+static void
+draw_image(unsigned char **image, size_t image_width, size_t image_height);
+
+static int
+export_image(unsigned char **image, size_t image_width, size_t image_height);
 
 // pos = 0 is MSB
 static unsigned char
@@ -54,13 +66,13 @@ get_bit(unsigned char source, size_t pos)
 static int
 alloc_image(unsigned char ***image, size_t height, size_t width)
 {
-	*image = calloc(height, sizeof(char *));
+	*image = calloc(height, sizeof(unsigned char *));
 	if (*image == NULL) {
 		return 1;
 	}
 
 	for (size_t i = 0; i < height; i++) {
-		*(*image + i) = calloc(width, sizeof(char));
+		*(*image + i) = calloc(width, sizeof(unsigned char));
 		if (*(*image + i) == NULL) {
 			return 1;
 		}
@@ -109,6 +121,112 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 			}
 		}
 	}
+}
+
+static void
+draw_image(unsigned char **image, size_t image_width, size_t image_height)
+{
+	for (size_t y = 0; y < image_height; y++) {
+		printf("%2zd|", y);
+		for (size_t x = 0; x < image_width; x++) {
+			putchar(image[y][x] ? '*' : ' ');
+		}
+		printf("|\n");
+	}
+}
+
+static int
+export_image(unsigned char **image, size_t image_width, size_t image_height)
+{
+	FILE                    *file_h             = NULL;
+	bmp_color_space_triple_t color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+	bmp_bitmap_v4_header_t   bitmap_v4_header;
+	bmp_file_header_t        file_header;
+	bmp_pixel_ARGB32_t      *target_buff = NULL;
+	size_t                   target_buff_size;
+	size_t                   image_size_bytes;
+	size_t                   writes;
+
+	(void)image;
+
+	target_buff_size = image_width * image_height;
+	image_size_bytes = target_buff_size * sizeof(bmp_pixel_ARGB32_t);
+
+	target_buff = calloc(target_buff_size, sizeof(bmp_pixel_ARGB32_t));
+	if (target_buff == NULL) {
+		return 1;
+	}
+
+#if 0
+	uint32_t target[8] = {0x7F0000FF,
+	                      0x7F00FF00,
+	                      0x7FFF0000,
+	                      0x7FFFFFFF,
+	                      0xFF0000FF,
+	                      0xFF00FF00,
+	                      0xFFFF0000,
+	                      0xFFFFFFFF};
+#endif
+
+	target_buff = (bmp_pixel_ARGB32_t[]){
+	    {0xFF, 0x00, 0x00, 0x7F},
+	    {0x00, 0xFF, 0x00, 0x7F},
+	    {0x00, 0x00, 0xFF, 0x7F},
+	    {0xFF, 0xFF, 0xFF, 0x7F},
+	    {0xFF, 0x00, 0x00, 0xFF},
+	    {0x00, 0xFF, 0x00, 0xFF},
+	    {0x00, 0x00, 0xFF, 0xFF},
+	    {0xFF, 0xFF, 0xFF, 0xFF},
+	};
+
+	bitmap_v4_header.width_px           = (int32_t)image_width;
+	bitmap_v4_header.height_px          = (int32_t)image_height;
+	bitmap_v4_header.num_planes         = 1;
+	bitmap_v4_header.bits_per_pixel     = 32;
+	bitmap_v4_header.compression        = 0x0003;
+	bitmap_v4_header.image_size_bytes   = (uint32_t)image_size_bytes;
+	bitmap_v4_header.x_resolution_ppm   = 0;
+	bitmap_v4_header.y_resolution_ppm   = 0;
+	bitmap_v4_header.num_colors         = 0;
+	bitmap_v4_header.important_colors   = 0;
+	bitmap_v4_header.red_mask           = 0x00FF0000;
+	bitmap_v4_header.green_mask         = 0x0000FF00;
+	bitmap_v4_header.blue_mask          = 0x000000FF;
+	bitmap_v4_header.alpha_mask         = 0xFF000000;
+	bitmap_v4_header.color_space_type   = 0x57696E20;
+	bitmap_v4_header.color_space_triple = color_space_triple;
+	bitmap_v4_header.red_gamma          = 0;
+	bitmap_v4_header.green_gamma        = 0;
+	bitmap_v4_header.blue_gamma         = 0;
+
+	file_header.type            = 0x4D42;
+	file_header.size            = (uint32_t)(bmp_bitmap_v4_offset + image_size_bytes);
+	file_header.reserved1       = 0;
+	file_header.reserved2       = 0;
+	file_header.offset          = (uint32_t)bmp_bitmap_v4_offset;
+	file_header.dib_header_size = BITMAPV4HEADER;
+
+	file_h = fopen(TEST_BMP, MODE);
+	if (file_h == NULL) {
+		return 1;
+	}
+
+	writes = fwrite(&file_header, sizeof(bmp_file_header_t), 1, file_h);
+	if (writes != 1) {
+		return 1;
+	}
+
+	writes = fwrite(&bitmap_v4_header, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
+	if (writes != 1) {
+		return 1;
+	}
+
+	writes = fwrite(target_buff, image_size_bytes, 1, file_h);
+	if (writes != 1) {
+		return 1;
+	}
+
+	return 0;
 }
 
 int
@@ -190,13 +308,9 @@ main(int argc, char *argv[])
 		render_char(slot, image, i);
 	}
 
-	for (size_t y = 0; y < image_height; y++) {
-		printf("%2zd|", y);
-		for (size_t x = 0; x < image_width; x++) {
-			putchar(image[y][x] ? '*' : ' ');
-		}
-		printf("|\n");
-	}
+	draw_image(image, image_width, image_height);
+
+	export_image(image, 4, 2);
 
 cleanup:
 	FT_Done_Face(face);

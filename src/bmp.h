@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern const size_t bmp_bitmap_v4_offset;
+
 #pragma pack(push, 1)
 
 typedef enum bmp_dib_header_size_e {
@@ -129,9 +131,11 @@ typedef struct bmp_pixel_ARGB32_s {
 	uint8_t alpha;
 } bmp_pixel_ARGB32_t;
 
+#pragma pack(pop)
+
+const size_t bmp_bitmap_v4_offset = sizeof(bmp_file_header_t) + sizeof(bmp_bitmap_v4_header_t);
+
 size_t
 bmp_row_size(uint16_t bits_per_pixel, int32_t width_px);
-
-#pragma pack(pop)
 
 #endif // SDL_BITS_BMP_H
