@@ -32,10 +32,13 @@
 		fprintf(stderr, "ERROR: %s:%d: %d", __FILE__, __LINE__, error);                    \
 	} while (0)
 
-enum { WIDTH = 10, HEIGHT = 20 };
+enum {
+	FONT_WIDTH      = 10,
+	FONT_HEIGHT     = 20,
+	CHAR_CODES_SIZE = 94, // ('~' - '!') + 1
+};
 
-static char *const FONT_FILE  = "./assets/ucs-fonts/10x20.bdf";
-static char *const CHAR_CODES = "ABCDEFGHIJK";
+static char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
 
 static char *const TEST_BMP = "test.bmp";
 static char *const MODE     = "wb";
@@ -52,8 +55,10 @@ free_image(unsigned char ***image, size_t height);
 static void
 render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset);
 
+#ifdef DRAW_IMAGE
 static void
 draw_image(unsigned char **image, size_t image_width, size_t image_height);
+#endif
 
 static int
 export_image(unsigned char **image, size_t image_width, size_t image_height);
@@ -130,6 +135,7 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 	}
 }
 
+#ifdef DRAW_IMAGE
 static void
 draw_image(unsigned char **image, size_t image_width, size_t image_height)
 {
@@ -141,6 +147,7 @@ draw_image(unsigned char **image, size_t image_width, size_t image_height)
 		printf("|\n");
 	}
 }
+#endif
 
 static int
 export_image(unsigned char **image, size_t image_width, size_t image_height)
@@ -234,7 +241,7 @@ main(int argc, char *argv[])
 	FT_Face         face    = NULL;
 	FT_GlyphSlot    slot    = NULL;
 	unsigned char **image   = NULL;
-	size_t          char_codes_len;
+	char            char_codes[CHAR_CODES_SIZE];
 	size_t          image_width;
 	size_t          image_height;
 
@@ -243,12 +250,15 @@ main(int argc, char *argv[])
 
 	setbuf(stdout, NULL);
 
+	// https://stackoverflow.com/a/881968
 	assert(CHAR_BIT == EXPECTED_CHAR_BIT);
 
-	char_codes_len = strlen(CHAR_CODES);
+	for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
+		char_codes[i] = (char)(i + '!');
+	}
 
-	image_width  = WIDTH * char_codes_len;
-	image_height = HEIGHT;
+	image_width  = FONT_WIDTH * CHAR_CODES_SIZE;
+	image_height = FONT_HEIGHT;
 	error        = alloc_image(&image, image_height, image_width);
 	if (error != 0) {
 		fprintf(stderr, "could not allocate image");
@@ -271,14 +281,14 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	error = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
+	error = FT_Set_Pixel_Sizes(face, FONT_WIDTH, FONT_HEIGHT);
 	if (error != 0) {
 		print_error(error);
 		goto cleanup;
 	}
 
-	for (size_t i = 0; i < char_codes_len; i++) {
-		error = FT_Load_Char(face, CHAR_CODES[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+	for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
+		error = FT_Load_Char(face, char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (error != 0) {
 			print_error(error);
 			goto cleanup;
@@ -305,7 +315,9 @@ main(int argc, char *argv[])
 		render_char(slot, image, i);
 	}
 
+#ifdef DRAW_IMAGE
 	draw_image(image, image_width, image_height);
+#endif
 
 	export_image(image, image_width, image_height);
 
