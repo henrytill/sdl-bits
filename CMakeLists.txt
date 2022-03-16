@@ -1,5 +1,6 @@
 # Highest version compatible with Steam Runtime container
 cmake_minimum_required(VERSION 3.13)
+include(CheckSymbolExists)
 
 project(sdl-bits C)
 
@@ -50,7 +51,8 @@ set(SDL_BITS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 set(BMP_SOURCES ${SDL_BITS_SOURCE_DIR}/bmp.h ${SDL_BITS_SOURCE_DIR}/bmp.c)
 add_library(bmp ${BMP_SOURCES})
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+check_symbol_exists(ceil math.h HAVE_CEIL)
+if(NOT HAVE_CEIL)
   target_link_libraries(bmp PRIVATE m)
 endif()
 
