@@ -1,17 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
-
-#ifdef _MSC_VER
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
 
 #include "bmp.h"
+#include "test.h"
 
 static char *const BMP_FILE = "./assets/sample_24bit.bmp";
 static char *const MODE     = "r";
@@ -23,8 +19,12 @@ main(int argc, char *argv[])
 	FILE                     *file_h               = NULL;
 	bmp_file_header_t        *file_header_h        = NULL;
 	bmp_bitmap_info_header_t *bitmap_info_header_h = NULL;
-	size_t                    dib_header_size;
+	uint32_t                  dib_header_size;
+	uint32_t                  image_size_bytes;
+	char                     *image;
 	size_t                    reads;
+	int                       error;
+	fpos_t                    pos;
 
 	(void)argc;
 	(void)argv;
@@ -44,9 +44,23 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	dib_header_size = file_header_h->dib_header_size;
+	error = fgetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
+	reads = fread(&dib_header_size, sizeof(uint32_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	error = fsetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
 	if (dib_header_size != (size_t)BITMAPINFOHEADER) {
-		fprintf(stderr, "Unhandled DIB Header Size: %zu", dib_header_size);
+		fprintf(stderr, "Unexpected DIB Header Size: %d", dib_header_size);
 		goto cleanup;
 	}
 
@@ -60,17 +74,20 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	char *image_data = malloc(sizeof(char) * bitmap_info_header_h->image_size_bytes);
-	reads = fread(image_data, sizeof(char) * bitmap_info_header_h->image_size_bytes, 1, file_h);
+	image_size_bytes = bitmap_info_header_h->image_size_bytes;
+
+	image = calloc(image_size_bytes, sizeof(char));
+
+	reads = fread(image, image_size_bytes * sizeof(char), 1, file_h);
 	if (reads != 1) {
 		goto cleanup;
 	}
 
-	bmp_pixel_RGB24_t *pixel = (bmp_pixel_RGB24_t *)image_data + 1;
-	assert(pixel->blue == 255);
-	assert(pixel->green == 255);
-	assert(pixel->red == 255);
-	(void)pixel;
+	bmp_pixel_RGB24_t *pixel = (bmp_pixel_RGB24_t *)image;
+
+	TEST(pixel->blue == 0);
+	TEST(pixel->green == 0);
+	TEST(pixel->red == 255);
 
 	ret = 0;
 
