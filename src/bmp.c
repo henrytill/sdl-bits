@@ -22,7 +22,10 @@ bmp_row_size(uint16_t bits_per_pixel, int32_t width_px)
 }
 
 int
-bmp_write_bitmap_v4(bmp_pixel_ARGB32_t *target_buff, size_t image_width, size_t image_height, char *file)
+bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
+                    size_t                    image_width,
+                    size_t                    image_height,
+                    char                     *file)
 {
 	int                      ret                = 1;
 	FILE                    *file_h             = NULL;
