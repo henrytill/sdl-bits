@@ -9,3 +9,9 @@ else()
   target_include_directories(render_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS} $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
   target_link_libraries(render_font_to_file PRIVATE ${FREETYPE2_LIBRARIES} bmp)
 endif()
+
+# Executable: render_test_bitmap
+add_executable(render_test_bitmap render_test_bitmap.c)
+SET_COMPILER_OPTIONS(render_test_bitmap)
+target_include_directories(render_test_bitmap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
+target_link_libraries(render_test_bitmap PRIVATE bmp)

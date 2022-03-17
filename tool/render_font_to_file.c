@@ -25,8 +25,8 @@ enum {
 	CHAR_CODES_SIZE = 94, // ('~' - '!') + 1
 };
 
-static char *const              FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
-static char *const              TEST_BMP  = "test.bmp";
+static char *const              FONT_FILE = "./ucs-fonts/10x20.bdf";
+static char *const              BMP_FILE  = "./10x20.bmp";
 static const bmp_pixel_ARGB32_t WHITE     = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_pixel_ARGB32_t BLACK     = {0x00, 0x00, 0x00, 0xFF};
 
@@ -231,7 +231,7 @@ main(int argc, char *argv[])
 		}
 	}
 
-	bmp_write_bitmap_v4(target_buff, image_width, image_height, TEST_BMP);
+	bmp_write_bitmap_v4(target_buff, image_width, image_height, BMP_FILE);
 
 cleanup:
 	free(target_buff);
