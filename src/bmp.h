@@ -27,11 +27,11 @@ typedef struct bmp_file_header_s {
 	uint16_t reserved2;
 	// Offset to image data in bytes
 	uint32_t offset;
-	// Size of DIB header
-	uint32_t dib_header_size;
 } bmp_file_header_t;
 
 typedef struct bmp_bitmap_info_header_s {
+	// Size of DIB header
+	uint32_t dib_header_size;
 	// Bitmap width in pixels
 	int32_t width_px;
 	// Bitmap height in pixels
@@ -76,6 +76,8 @@ typedef struct bmp_color_space_triple_s {
 } bmp_color_space_triple_t;
 
 typedef struct bmp_bitmap_v4_header_s {
+	// Size of DIB header
+	uint32_t dib_header_size;
 	// Bitmap width in pixels
 	int32_t width_px;
 	// Bitmap height in pixels

@@ -62,6 +62,7 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 		return ret;
 	}
 
+	bitmap_v4_header.dib_header_size    = BITMAPV4HEADER;
 	bitmap_v4_header.width_px           = (int32_t)image_width;
 	bitmap_v4_header.height_px          = (int32_t)image_height;
 	bitmap_v4_header.num_planes         = 1;
@@ -82,12 +83,11 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 	bitmap_v4_header.green_gamma        = 0;
 	bitmap_v4_header.blue_gamma         = 0;
 
-	file_header.type            = 0x4D42;
-	file_header.size            = (uint32_t)file_size_bytes;
-	file_header.reserved1       = 0;
-	file_header.reserved2       = 0;
-	file_header.offset          = (uint32_t)bmp_bitmap_v4_offset;
-	file_header.dib_header_size = BITMAPV4HEADER;
+	file_header.type      = 0x4D42;
+	file_header.size      = (uint32_t)file_size_bytes;
+	file_header.reserved1 = 0;
+	file_header.reserved2 = 0;
+	file_header.offset    = (uint32_t)bmp_bitmap_v4_offset;
 
 	file_h = fopen(file, MODE);
 	if (file_h == NULL) {
