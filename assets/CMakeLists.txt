@@ -26,7 +26,7 @@ add_custom_command(
   OUTPUT ${FONT_BMP_OUTPUT_PATH}
   COMMAND render_font_to_file
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS render_font_to_file
+  DEPENDS render_font_to_file ucs_fonts
 )
 
 add_custom_target(font_bmp ALL DEPENDS ${FONT_BMP_OUTPUT_PATH})
