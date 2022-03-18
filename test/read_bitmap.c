@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bmp.h"
+#include "test.h"
+
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
 #endif
-
-#include "bmp.h"
-#include "test.h"
 
 static char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
