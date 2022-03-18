@@ -184,3 +184,70 @@ cleanup:
 	fclose(file_h);
 	return ret;
 }
+
+int
+bmp_read_bitmap_v4(char                   *file,
+                   bmp_file_header_t      *file_header_out,
+                   bmp_bitmap_v4_header_t *bitmap_v4_header_out,
+                   char                  **image_out)
+{
+	int      ret    = 1;
+	FILE    *file_h = NULL;
+	uint32_t dib_header_size;
+	uint32_t image_size_bytes;
+	size_t   reads;
+	int      error;
+	fpos_t   pos;
+
+	file_h = fopen(file, MODE_READ);
+	if (file_h == NULL) {
+		return ret;
+	}
+
+	reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	error = fgetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
+	reads = fread(&dib_header_size, sizeof(uint32_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	error = fsetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
+	if (dib_header_size != BITMAPV4HEADER) {
+		goto cleanup;
+	}
+
+	reads = fread(bitmap_v4_header_out, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	image_size_bytes = bitmap_v4_header_out->image_size_bytes;
+
+	*image_out = calloc(image_size_bytes, sizeof(char));
+	if (*image_out == NULL) {
+		goto cleanup;
+	}
+
+	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	ret = 0;
+
+cleanup:
+	fclose(file_h);
+	return ret;
+}

@@ -151,4 +151,10 @@ bmp_read_bitmap(char                     *file,
                 bmp_bitmap_info_header_t *bitmap_info_header_out,
                 char                    **image_out);
 
+int
+bmp_read_bitmap_v4(char                   *file,
+                   bmp_file_header_t      *file_header_out,
+                   bmp_bitmap_v4_header_t *bitmap_v4_header_out,
+                   char                  **image_out);
+
 #endif // SDL_BITS_BMP_H
