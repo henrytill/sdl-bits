@@ -1,6 +1,7 @@
 # Highest version compatible with Steam Runtime container
 cmake_minimum_required(VERSION 3.13)
 include(CheckSymbolExists)
+enable_testing()
 
 project(sdl-bits C)
 
