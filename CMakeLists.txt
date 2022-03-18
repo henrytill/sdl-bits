@@ -5,6 +5,7 @@ include(CheckSymbolExists)
 project(sdl-bits C)
 
 set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED True)
 
 # https://stackoverflow.com/a/58711983
 string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -29,25 +30,41 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# For dependency management, we use vcpkg.
+# If that's not available, we use the default package manager and pkg-config for Linux and MinGW.
+set(VCPKG_FOUND ${VCPKG_TOOLCHAIN} CACHE INTERNAL "")
+
+if((NOT VCPKG_FOUND) AND (UNIX OR MINGW))
+  find_package(PkgConfig REQUIRED)
+elseif(NOT VCPKG_FOUND)
+  message(FATAL_ERROR "Missing vcpkg toolchain file argument")
+endif()
+
+# Dependency: m
+if(UNIX)
+  list(APPEND CMAKE_REQUIRED_LIBRARIES "m")
+endif()
+
+check_symbol_exists(ceil math.h HAVE_CEIL)
+
 # Dependency: SDL
 find_package(SDL2 CONFIG REQUIRED)
 
 # Dependency: Freetype
-if(MSVC)
+if(VCPKG_FOUND)
   find_package(freetype CONFIG REQUIRED)
-else()
-  find_package(PkgConfig REQUIRED)
+elseif(PKG_CONFIG_FOUND)
   pkg_check_modules(FREETYPE2 REQUIRED freetype2)
 endif()
 
-# assets
+# Directory: assets
 add_subdirectory(assets)
 
-# src
+# Directory: src
 add_subdirectory(src)
 
-# test
+# Directory: test
 add_subdirectory(test)
 
-# tool
+# Directory: tool
 add_subdirectory(tool)
