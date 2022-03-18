@@ -1,6 +1,7 @@
 #include <assert.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "bmp.h"
 
@@ -8,7 +9,8 @@
 #pragma warning(disable : 4996)
 #endif
 
-static char *const  MODE            = "wb";
+static char *const  MODE_READ       = "r";
+static char *const  MODE_WRITE      = "wb";
 static const double BITS_PER_DWORD  = 32;
 static const size_t BYTES_PER_DWORD = 4;
 
@@ -89,7 +91,7 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 	file_header.reserved2 = 0;
 	file_header.offset    = (uint32_t)bmp_bitmap_v4_offset;
 
-	file_h = fopen(file, MODE);
+	file_h = fopen(file, MODE_WRITE);
 	if (file_h == NULL) {
 		return ret;
 	}
@@ -106,6 +108,73 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 
 	writes = fwrite(target_buff, image_size_bytes, 1, file_h);
 	if (writes != 1) {
+		goto cleanup;
+	}
+
+	ret = 0;
+
+cleanup:
+	fclose(file_h);
+	return ret;
+}
+
+int
+bmp_read_bitmap(char                     *file,
+                bmp_file_header_t        *file_header_out,
+                bmp_bitmap_info_header_t *bitmap_info_header_out,
+                char                    **image_out)
+{
+	int      ret    = 1;
+	FILE    *file_h = NULL;
+	uint32_t dib_header_size;
+	uint32_t image_size_bytes;
+	size_t   reads;
+	int      error;
+	fpos_t   pos;
+
+	file_h = fopen(file, MODE_READ);
+	if (file_h == NULL) {
+		return ret;
+	}
+
+	reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	error = fgetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
+	reads = fread(&dib_header_size, sizeof(uint32_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	error = fsetpos(file_h, &pos);
+	if (error != 0) {
+		goto cleanup;
+	}
+
+	if (dib_header_size != BITMAPINFOHEADER) {
+		goto cleanup;
+	}
+
+	reads = fread(bitmap_info_header_out, sizeof(bmp_bitmap_info_header_t), 1, file_h);
+	if (reads != 1) {
+		goto cleanup;
+	}
+
+	image_size_bytes = bitmap_info_header_out->image_size_bytes;
+
+	*image_out = calloc(image_size_bytes, sizeof(char));
+	if (*image_out == NULL) {
+		goto cleanup;
+	}
+
+	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
+	if (reads != 1) {
 		goto cleanup;
 	}
 
