@@ -5,10 +5,6 @@
 #include "bmp.h"
 #include "test.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4996)
-#endif
-
 static char *const BMP_FILE = "./assets/test.bmp";
 
 int
