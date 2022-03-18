@@ -1,5 +1,3 @@
-enable_testing()
-
 # load_bmp
 add_executable(test_load_bmp load_bmp.c)
 SET_COMPILER_OPTIONS(test_load_bmp)
