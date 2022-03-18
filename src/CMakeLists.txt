@@ -1,22 +1,24 @@
 # Library: bmp
-add_library(bmp bmp.h bmp.c)
+add_library(bmp bmp.c)
 SET_COMPILER_OPTIONS(bmp)
+target_include_directories(bmp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-check_symbol_exists(ceil math.h HAVE_CEIL)
-if(NOT HAVE_CEIL)
+if(UNIX)
   target_link_libraries(bmp PRIVATE m)
 endif()
 
 # Library: util
-add_library(util util.h util.c)
+add_library(util util.c)
 SET_COMPILER_OPTIONS(util)
+target_include_directories(util INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Executable: main
 add_executable(main main.c)
 SET_COMPILER_OPTIONS(main)
 
+# On MinGW builds, this call to target_link_libraries must be before the call for SDL2::SDL2main
 if(MINGW)
-  target_link_libraries(main PRIVATE util mingw32 SDL2::SDL2main SDL2::SDL2)
-else()
-  target_link_libraries(main PRIVATE util SDL2::SDL2main SDL2::SDL2)
+  target_link_libraries(main PRIVATE mingw32)
 endif()
+
+target_link_libraries(main PRIVATE util SDL2::SDL2main SDL2::SDL2)

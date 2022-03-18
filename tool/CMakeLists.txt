@@ -1,17 +1,16 @@
 # Executable: render_font_to_file
 add_executable(render_font_to_file render_font_to_file.c)
 SET_COMPILER_OPTIONS(render_font_to_file)
+target_link_libraries(render_font_to_file PRIVATE bmp)
 
-if(MSVC)
-  target_include_directories(render_font_to_file PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
-  target_link_libraries(render_font_to_file PRIVATE freetype bmp)
-else()
-  target_include_directories(render_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS} $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
-  target_link_libraries(render_font_to_file PRIVATE ${FREETYPE2_LIBRARIES} bmp)
+if(VCPKG_FOUND)
+  target_link_libraries(render_font_to_file PRIVATE freetype)
+elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
+  target_include_directories(render_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+  target_link_libraries(render_font_to_file PRIVATE ${FREETYPE2_LIBRARIES})
 endif()
 
 # Executable: render_test_bitmap
 add_executable(render_test_bitmap render_test_bitmap.c)
 SET_COMPILER_OPTIONS(render_test_bitmap)
-target_include_directories(render_test_bitmap PRIVATE $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 target_link_libraries(render_test_bitmap PRIVATE bmp)
