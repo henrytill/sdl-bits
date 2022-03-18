@@ -145,4 +145,10 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
                     size_t                    image_height,
                     char                     *file);
 
+int
+bmp_read_bitmap(char                     *file,
+                bmp_file_header_t        *file_header_out,
+                bmp_bitmap_info_header_t *bitmap_info_header_out,
+                char                    **image_out);
+
 #endif // SDL_BITS_BMP_H
