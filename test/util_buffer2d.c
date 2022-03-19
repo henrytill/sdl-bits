@@ -1,7 +1,11 @@
 #include "test.h"
 #include "util.h"
 
+// Some helper macros
+
 #define CHECKED_INIT(buff, x_cap, y_cap) TEST(util_buffer2d_init(buff, x_cap, y_cap) == 0)
+
+#define CHECKED_DEINIT(buff) TEST(util_buffer2d_deinit(buff) == 0)
 
 #define CHECKED_SET(buff, x_index, y_index, item)                                                  \
 	TEST(util_buffer2d_set(buff, x_index, y_index, item) == 0)
@@ -58,6 +62,20 @@ main(int argc, char *argv[])
 	CHECKED_READ(buffer, 3, 2, 0);
 	CHECKED_READ(buffer, 3, 3, 'z');
 	CHECKED_READ(buffer, 5, 5, 0);
+
+	CHECKED_DEINIT(&buffer);
+	CHECKED_INIT(&buffer, 3, 3);
+	CHECKED_SET(buffer, 6, 6, 'z');
+	CHECK_X_CAP(buffer, 12);
+	CHECK_Y_CAP(buffer, 12);
+
+	CHECKED_READ(buffer, 6, 0, 0);
+	CHECKED_READ(buffer, 6, 1, 0);
+	CHECKED_READ(buffer, 6, 2, 0);
+	CHECKED_READ(buffer, 6, 6, 'z');
+	CHECKED_READ(buffer, 11, 11, 0);
+
+	CHECKED_DEINIT(&buffer);
 
 	return 0;
 }
