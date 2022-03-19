@@ -128,5 +128,7 @@ main(int argc, char *argv[])
 	CHECK_CAP(buffer, UINT32_MAX);
 	CHECK_COUNT(buffer, UINT32_MAX);
 
+	CHECKED_DEINIT(&buffer);
+
 	return 0;
 }
