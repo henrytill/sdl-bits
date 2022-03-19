@@ -1,10 +1,5 @@
 #include <stdint.h>
-
-#ifdef _MSC_VER
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif
 
 #include "util.h"
 
