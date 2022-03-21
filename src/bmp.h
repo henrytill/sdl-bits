@@ -20,22 +20,22 @@ typedef struct bmp_file_header_s {
 	// Header field
 	uint16_t type;
 	// File size in bytes
-	uint32_t size;
+	uint32_t size_bytes;
 	// Reserved
 	uint16_t reserved1;
 	// Reserved
 	uint16_t reserved2;
 	// Offset to image data in bytes
-	uint32_t offset;
+	uint32_t offset_bytes;
 } bmp_file_header_t;
 
 typedef struct bmp_bitmap_info_header_s {
 	// Size of DIB header
-	uint32_t dib_header_size;
+	uint32_t dib_header_size_bytes;
 	// Bitmap width in pixels
-	int32_t width_px;
+	int32_t width_pixels;
 	// Bitmap height in pixels
-	int32_t height_px;
+	int32_t height_pixels;
 	// Number of color planes
 	uint16_t num_planes;
 	// Bits per pixel
@@ -77,11 +77,11 @@ typedef struct bmp_color_space_triple_s {
 
 typedef struct bmp_bitmap_v4_header_s {
 	// Size of DIB header
-	uint32_t dib_header_size;
+	uint32_t dib_header_size_bytes;
 	// Bitmap width in pixels
-	int32_t width_px;
+	int32_t width_pixels;
 	// Bitmap height in pixels
-	int32_t height_px;
+	int32_t height_pixels;
 	// Number of color planes
 	uint16_t num_planes;
 	// Bits per pixel
@@ -137,12 +137,12 @@ static const size_t bmp_bitmap_v4_offset =
     sizeof(bmp_file_header_t) + sizeof(bmp_bitmap_v4_header_t);
 
 size_t
-bmp_row_size(uint16_t bits_per_pixel, int32_t width_px);
+bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
 int
 bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
-                    size_t                    image_width,
-                    size_t                    image_height,
+                    size_t                    image_width_pixels,
+                    size_t                    image_height_pixels,
                     char                     *file);
 
 int

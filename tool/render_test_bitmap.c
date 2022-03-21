@@ -1,8 +1,8 @@
 #include "bmp.h"
 
 enum {
-	WIDTH  = 4,
-	HEIGHT = 2,
+	WIDTH_PIXELS  = 4,
+	HEIGHT_PIXELS = 2,
 };
 
 static const bmp_pixel_ARGB32_t target_buff[] = {
@@ -27,7 +27,7 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	error = bmp_write_bitmap_v4(target_buff, WIDTH, HEIGHT, BMP_FILE);
+	error = bmp_write_bitmap_v4(target_buff, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
 	if (error != 0) {
 		goto cleanup;
 	}
