@@ -20,9 +20,9 @@
 	} while (0)
 
 enum {
-	FONT_WIDTH      = 10,
-	FONT_HEIGHT     = 20,
-	CHAR_CODES_SIZE = 94, // ('~' - '!') + 1
+	FONT_WIDTH_PIXELS  = 10,
+	FONT_HEIGHT_PIXELS = 20,
+	CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
 };
 
 static char *const              FONT_FILE = "./ucs-fonts/10x20.bdf";
@@ -44,6 +44,9 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset);
 
 #ifdef DRAW_IMAGE
 static void
+draw_image(unsigned char **image, size_t image_width, size_t image_height);
+#else
+static inline void
 draw_image(unsigned char **image, size_t image_width, size_t image_height);
 #endif
 
@@ -131,6 +134,14 @@ draw_image(unsigned char **image, size_t image_width, size_t image_height)
 		printf("|\n");
 	}
 }
+#else
+static inline void
+draw_image(unsigned char **image, size_t image_width, size_t image_height)
+{
+	(void)image;
+	(void)image_width;
+	(void)image_height;
+}
 #endif
 
 int
@@ -158,8 +169,8 @@ main(int argc, char *argv[])
 		char_codes[i] = (char)(i + '!');
 	}
 
-	image_width  = FONT_WIDTH * CHAR_CODES_SIZE;
-	image_height = FONT_HEIGHT;
+	image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+	image_height = FONT_HEIGHT_PIXELS;
 	error        = alloc_image(&image, image_height, image_width);
 	if (error != 0) {
 		fprintf(stderr, "could not allocate image");
@@ -182,7 +193,7 @@ main(int argc, char *argv[])
 		goto cleanup;
 	}
 
-	error = FT_Set_Pixel_Sizes(face, FONT_WIDTH, FONT_HEIGHT);
+	error = FT_Set_Pixel_Sizes(face, FONT_WIDTH_PIXELS, FONT_HEIGHT_PIXELS);
 	if (error != 0) {
 		print_error(error);
 		goto cleanup;
@@ -216,9 +227,7 @@ main(int argc, char *argv[])
 		render_char(slot, image, i);
 	}
 
-#ifdef DRAW_IMAGE
 	draw_image(image, image_width, image_height);
-#endif
 
 	target_buff = calloc(image_width * image_height, sizeof(bmp_pixel_ARGB32_t));
 	if (target_buff == NULL) {
