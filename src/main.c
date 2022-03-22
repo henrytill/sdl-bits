@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         util_print_sdl_error();
-        goto cleanup;
+        goto out;
     }
 
     window = SDL_CreateWindow("Hello, world!",
@@ -37,20 +37,20 @@ int main(int argc, char *argv[]) {
                               SDL_WINDOW_SHOWN);
     if (window == NULL) {
         util_print_sdl_error();
-        goto cleanup;
+        goto out;
     }
 
     window_surface = SDL_GetWindowSurface(window);
     if (window_surface == NULL) {
         util_print_sdl_error();
-        goto cleanup;
+        goto out;
     }
 
     fill_color = SDL_MapRGB(window_surface->format, 0xFF, 0xFF, 0xFF);
 
     if (SDL_FillRect(window_surface, NULL, fill_color) != 0) {
         util_print_sdl_error();
-        goto cleanup;
+        goto out;
     }
 
     // Begin main event loop
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         // Update
         if (SDL_UpdateWindowSurface(window) != 0) {
             util_print_sdl_error();
-            goto cleanup;
+            goto out;
         }
 
         // Calculate frame delay
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 
     ret = 0;
 
-cleanup:
+out:
     SDL_DestroyWindow(window);
     SDL_Quit();
     return ret;

@@ -27,11 +27,11 @@ int main(int argc, char *argv[]) {
 
     error = bmp_write_bitmap_v4(target_buff, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     ret = 0;
 
-cleanup:
+out:
     return ret;
 }
