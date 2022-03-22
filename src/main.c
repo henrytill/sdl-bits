@@ -3,9 +3,9 @@
 
 #include "util.h"
 
-static const int      screen_width      = 640;
-static const int      screen_height     = 480;
-static const uint32_t target_frame_time = 16;
+static const int      SCREEN_WIDTH_PIXELS      = 640;
+static const int      SCREEN_HEIGHT_PIXELS     = 480;
+static const uint32_t TARGET_FRAME_TIME_MILLIS = 16;
 
 // Establishes loop conditionals
 typedef enum loop_status_e { STOP = 0, RUN = 1 } loop_status_t;
@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     window = SDL_CreateWindow("Hello, world!",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
-                              screen_width,
-                              screen_height,
+                              SCREEN_WIDTH_PIXELS,
+                              SCREEN_HEIGHT_PIXELS,
                               SDL_WINDOW_SHOWN);
     if (window == NULL) {
         util_print_sdl_error();
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
         // Calculate frame delay
         loop_end    = SDL_GetTicks() - loop_start;
-        frame_delay = util_uint32_sat_sub(target_frame_time, loop_end);
+        frame_delay = util_uint32_sat_sub(TARGET_FRAME_TIME_MILLIS, loop_end);
         if (frame_delay > 0) {
             SDL_Delay(frame_delay);
         }
