@@ -154,36 +154,36 @@ int main(int argc, char *argv[]) {
     error        = alloc_image(&image, image_height, image_width);
     if (error != 0) {
         fprintf(stderr, "could not allocate image");
-        goto cleanup;
+        goto out;
     }
 
     error = FT_Init_FreeType(&library);
     if (error != 0) {
         print_error(error);
-        goto cleanup;
+        goto out;
     }
 
     error = FT_New_Face(library, FONT_FILE, 0, &face);
     if (error == FT_Err_Unknown_File_Format) {
         print_error(error);
-        goto cleanup;
+        goto out;
     }
     if (error != 0) {
         print_error(error);
-        goto cleanup;
+        goto out;
     }
 
     error = FT_Set_Pixel_Sizes(face, FONT_WIDTH_PIXELS, FONT_HEIGHT_PIXELS);
     if (error != 0) {
         print_error(error);
-        goto cleanup;
+        goto out;
     }
 
     for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
         error = FT_Load_Char(face, char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
         if (error != 0) {
             print_error(error);
-            goto cleanup;
+            goto out;
         }
 
         slot = face->glyph;
@@ -191,17 +191,17 @@ int main(int argc, char *argv[]) {
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
         if (error != 0) {
             print_error(error);
-            goto cleanup;
+            goto out;
         }
 
         if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
             fprintf(stderr, "format was not FL_GLYPH_FORMAT_BITMAP");
-            goto cleanup;
+            goto out;
         }
 
         if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
             fprintf(stderr, "pixel_mode was not FL_PIXEL_MODE_MONO");
-            goto cleanup;
+            goto out;
         }
 
         render_char(slot, image, i);
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
 
     target_buff = calloc(image_width * image_height, sizeof(bmp_pixel_ARGB32_t));
     if (target_buff == NULL) {
-        goto cleanup;
+        goto out;
     }
 
     for (size_t y = image_height, i = 0; y-- > 0;) {
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
 
     bmp_write_bitmap_v4(target_buff, image_width, image_height, BMP_FILE);
 
-cleanup:
+out:
     free(target_buff);
     FT_Done_Face(face);
     FT_Done_FreeType(library);

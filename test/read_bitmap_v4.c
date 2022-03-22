@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     error = bmp_read_bitmap_v4(BMP_FILE, &file_header, &bitmap_v4_header, &image);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     bmp_pixel_ARGB32_t *pixel = (bmp_pixel_ARGB32_t *)image;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     ret = 0;
 
-cleanup:
+out:
     free(image);
     return ret;
 }

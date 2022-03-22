@@ -96,22 +96,22 @@ int bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 
     writes = fwrite(&file_header, sizeof(bmp_file_header_t), 1, file_h);
     if (writes != 1) {
-        goto cleanup;
+        goto out;
     }
 
     writes = fwrite(&bitmap_v4_header, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
     if (writes != 1) {
-        goto cleanup;
+        goto out;
     }
 
     writes = fwrite(target_buff, image_size_bytes, 1, file_h);
     if (writes != 1) {
-        goto cleanup;
+        goto out;
     }
 
     ret = 0;
 
-cleanup:
+out:
     fclose(file_h);
     return ret;
 }
@@ -135,48 +135,48 @@ int bmp_read_bitmap(char                     *file,
 
     reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     error = fgetpos(file_h, &pos);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     error = fsetpos(file_h, &pos);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     if (dib_header_size_bytes != BITMAPINFOHEADER) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(bitmap_info_header_out, sizeof(bmp_bitmap_info_header_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     image_size_bytes = bitmap_info_header_out->image_size_bytes;
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     ret = 0;
 
-cleanup:
+out:
     fclose(file_h);
     return ret;
 }
@@ -200,48 +200,48 @@ int bmp_read_bitmap_v4(char                   *file,
 
     reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     error = fgetpos(file_h, &pos);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     error = fsetpos(file_h, &pos);
     if (error != 0) {
-        goto cleanup;
+        goto out;
     }
 
     if (dib_header_size_bytes != BITMAPV4HEADER) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(bitmap_v4_header_out, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     image_size_bytes = bitmap_v4_header_out->image_size_bytes;
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
-        goto cleanup;
+        goto out;
     }
 
     reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
     if (reads != 1) {
-        goto cleanup;
+        goto out;
     }
 
     ret = 0;
 
-cleanup:
+out:
     fclose(file_h);
     return ret;
 }
