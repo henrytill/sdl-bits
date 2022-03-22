@@ -76,7 +76,7 @@ bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
 	bitmap_v4_header.x_resolution_ppm      = 0;
 	bitmap_v4_header.y_resolution_ppm      = 0;
 	bitmap_v4_header.num_colors            = 0;
-	bitmap_v4_header.important_colors      = 0;
+	bitmap_v4_header.num_important_colors  = 0;
 	bitmap_v4_header.red_mask              = 0x00FF0000;
 	bitmap_v4_header.green_mask            = 0x0000FF00;
 	bitmap_v4_header.blue_mask             = 0x000000FF;

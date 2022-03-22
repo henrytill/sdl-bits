@@ -30,7 +30,7 @@ typedef struct bmp_file_header_s {
 } bmp_file_header_t;
 
 typedef struct bmp_bitmap_info_header_s {
-	// Size of DIB header
+	// DIB header size in bytes
 	uint32_t dib_header_size_bytes;
 	// Bitmap width in pixels
 	int32_t width_pixels;
@@ -51,7 +51,7 @@ typedef struct bmp_bitmap_info_header_s {
 	// Number of colors in the color palette
 	uint32_t num_colors;
 	// Number of important colors used
-	uint32_t important_colors;
+	uint32_t num_important_colors;
 } bmp_bitmap_info_header_t;
 
 typedef struct bmp_color_space_triple_s {
@@ -76,7 +76,7 @@ typedef struct bmp_color_space_triple_s {
 } bmp_color_space_triple_t;
 
 typedef struct bmp_bitmap_v4_header_s {
-	// Size of DIB header
+	// DIB header size in bytes
 	uint32_t dib_header_size_bytes;
 	// Bitmap width in pixels
 	int32_t width_pixels;
@@ -97,7 +97,7 @@ typedef struct bmp_bitmap_v4_header_s {
 	// Number of colors in the color palette
 	uint32_t num_colors;
 	// Number of important colors used
-	uint32_t important_colors;
+	uint32_t num_important_colors;
 	// Red channel bit mask
 	uint32_t red_mask;
 	// Green channel bit mask
