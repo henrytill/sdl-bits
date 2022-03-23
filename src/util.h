@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define BUFFER_GROWTH_FACTOR 2
+enum { BUFFER_GROWTH_FACTOR = 2 };
 
 // Prints well-formatted SDL error
 #define util_print_sdl_error()                                                                     \

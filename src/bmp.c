@@ -9,10 +9,13 @@
 #pragma warning(disable : 4996)
 #endif
 
-static char *const  MODE_READ       = "r";
-static char *const  MODE_WRITE      = "wb";
-static const double BITS_PER_DWORD  = 32;
-static const size_t BYTES_PER_DWORD = 4;
+enum {
+    BITS_PER_DWORD  = 32,
+    BYTES_PER_DWORD = 4
+};
+
+static char *const MODE_READ  = "r";
+static char *const MODE_WRITE = "wb";
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels) {
     double bits;
