@@ -25,10 +25,10 @@ enum {
     CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
 };
 
-static char *const              FONT_FILE = "./ucs-fonts/10x20.bdf";
-static char *const              BMP_FILE  = "./10x20.bmp";
-static const bmp_pixel_ARGB32_t WHITE     = {0xFF, 0xFF, 0xFF, 0x00};
-static const bmp_pixel_ARGB32_t BLACK     = {0x00, 0x00, 0x00, 0xFF};
+static char *const           FONT_FILE = "./ucs-fonts/10x20.bdf";
+static char *const           BMP_FILE  = "./10x20.bmp";
+static const bmp_PixelARGB32 WHITE     = {0xFF, 0xFF, 0xFF, 0x00};
+static const bmp_PixelARGB32 BLACK     = {0x00, 0x00, 0x00, 0xFF};
 
 static unsigned char get_bit(unsigned char source, size_t pos);
 
@@ -127,15 +127,15 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 int main(int argc, char *argv[]) {
-    int                 error;
-    FT_Library          library     = NULL;
-    FT_Face             face        = NULL;
-    FT_GlyphSlot        slot        = NULL;
-    unsigned char     **image       = NULL;
-    bmp_pixel_ARGB32_t *target_buff = NULL;
-    char                char_codes[CHAR_CODES_SIZE];
-    size_t              image_width;
-    size_t              image_height;
+    int              error;
+    FT_Library       library     = NULL;
+    FT_Face          face        = NULL;
+    FT_GlyphSlot     slot        = NULL;
+    unsigned char  **image       = NULL;
+    bmp_PixelARGB32 *target_buff = NULL;
+    char             char_codes[CHAR_CODES_SIZE];
+    size_t           image_width;
+    size_t           image_height;
 
     (void)argc;
     (void)argv;
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 
     draw_image(image, image_width, image_height);
 
-    target_buff = calloc(image_width * image_height, sizeof(bmp_pixel_ARGB32_t));
+    target_buff = calloc(image_width * image_height, sizeof(bmp_PixelARGB32));
     if (target_buff == NULL) {
         goto out;
     }

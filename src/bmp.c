@@ -23,18 +23,18 @@ size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels) {
     return (size_t)(ceil((bits * width) / BITS_PER_DWORD)) * BYTES_PER_DWORD;
 }
 
-int bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
-                        size_t                    image_width_pixels,
-                        size_t                    image_height_pixels,
-                        char                     *file) {
-    int                      ret                = 1;
-    FILE                    *file_h             = NULL;
-    bmp_color_space_triple_t color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    bmp_bitmap_v4_header_t   bitmap_v4_header;
-    bmp_file_header_t        file_header;
-    size_t                   image_size_bytes;
-    size_t                   file_size_bytes;
-    size_t                   writes;
+int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
+                        size_t                 image_width_pixels,
+                        size_t                 image_height_pixels,
+                        char                  *file) {
+    int                  ret                = 1;
+    FILE                *file_h             = NULL;
+    bmp_ColorSpaceTriple color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    bmp_BitmapV4Header   bitmap_v4_header;
+    bmp_FileHeader       file_header;
+    size_t               image_size_bytes;
+    size_t               file_size_bytes;
+    size_t               writes;
 
     assert(bmp_bitmap_v4_offset < UINT32_MAX);
 
@@ -50,7 +50,7 @@ int bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
         return ret;
     }
 
-    image_size_bytes = (image_width_pixels * image_height_pixels) * sizeof(bmp_pixel_ARGB32_t);
+    image_size_bytes = (image_width_pixels * image_height_pixels) * sizeof(bmp_PixelARGB32);
 
     if (image_size_bytes > UINT32_MAX) {
         return ret;
@@ -94,12 +94,12 @@ int bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
         return ret;
     }
 
-    writes = fwrite(&file_header, sizeof(bmp_file_header_t), 1, file_h);
+    writes = fwrite(&file_header, sizeof(bmp_FileHeader), 1, file_h);
     if (writes != 1) {
         goto out;
     }
 
-    writes = fwrite(&bitmap_v4_header, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
+    writes = fwrite(&bitmap_v4_header, sizeof(bmp_BitmapV4Header), 1, file_h);
     if (writes != 1) {
         goto out;
     }
@@ -116,10 +116,10 @@ out:
     return ret;
 }
 
-int bmp_read_bitmap(char                     *file,
-                    bmp_file_header_t        *file_header_out,
-                    bmp_bitmap_info_header_t *bitmap_info_header_out,
-                    char                    **image_out) {
+int bmp_read_bitmap(char                 *file,
+                    bmp_FileHeader       *file_header_out,
+                    bmp_BitmapInfoHeader *bitmap_info_header_out,
+                    char                **image_out) {
     int      ret    = 1;
     FILE    *file_h = NULL;
     uint32_t dib_header_size_bytes;
@@ -133,7 +133,7 @@ int bmp_read_bitmap(char                     *file,
         return ret;
     }
 
-    reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
+    reads = fread(file_header_out, sizeof(bmp_FileHeader), 1, file_h);
     if (reads != 1) {
         goto out;
     }
@@ -157,7 +157,7 @@ int bmp_read_bitmap(char                     *file,
         goto out;
     }
 
-    reads = fread(bitmap_info_header_out, sizeof(bmp_bitmap_info_header_t), 1, file_h);
+    reads = fread(bitmap_info_header_out, sizeof(bmp_BitmapInfoHeader), 1, file_h);
     if (reads != 1) {
         goto out;
     }
@@ -181,10 +181,10 @@ out:
     return ret;
 }
 
-int bmp_read_bitmap_v4(char                   *file,
-                       bmp_file_header_t      *file_header_out,
-                       bmp_bitmap_v4_header_t *bitmap_v4_header_out,
-                       char                  **image_out) {
+int bmp_read_bitmap_v4(char               *file,
+                       bmp_FileHeader     *file_header_out,
+                       bmp_BitmapV4Header *bitmap_v4_header_out,
+                       char              **image_out) {
     int      ret    = 1;
     FILE    *file_h = NULL;
     uint32_t dib_header_size_bytes;
@@ -198,7 +198,7 @@ int bmp_read_bitmap_v4(char                   *file,
         return ret;
     }
 
-    reads = fread(file_header_out, sizeof(bmp_file_header_t), 1, file_h);
+    reads = fread(file_header_out, sizeof(bmp_FileHeader), 1, file_h);
     if (reads != 1) {
         goto out;
     }
@@ -222,7 +222,7 @@ int bmp_read_bitmap_v4(char                   *file,
         goto out;
     }
 
-    reads = fread(bitmap_v4_header_out, sizeof(bmp_bitmap_v4_header_t), 1, file_h);
+    reads = fread(bitmap_v4_header_out, sizeof(bmp_BitmapV4Header), 1, file_h);
     if (reads != 1) {
         goto out;
     }

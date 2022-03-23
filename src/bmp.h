@@ -6,7 +6,7 @@
 
 #pragma pack(push, 1)
 
-typedef enum bmp_dib_header_size_e {
+typedef enum bmp_DIBHeaderSize {
     BITMAPCOREHEADER   = 12,
     OS22XBITMAPHEADER  = 64,
     BITMAPINFOHEADER   = 40,
@@ -14,9 +14,9 @@ typedef enum bmp_dib_header_size_e {
     BITMAPV3INFOHEADER = 56,
     BITMAPV4HEADER     = 108,
     BITMAPV5HEADER     = 124
-} bmp_dib_header_size_t;
+} bmp_DIBHeaderSize;
 
-typedef struct bmp_file_header_s {
+typedef struct bmp_FileHeader {
     // Header field
     uint16_t type;
     // File size in bytes
@@ -27,9 +27,9 @@ typedef struct bmp_file_header_s {
     uint16_t reserved2;
     // Offset to image data in bytes
     uint32_t offset_bytes;
-} bmp_file_header_t;
+} bmp_FileHeader;
 
-typedef struct bmp_bitmap_info_header_s {
+typedef struct bmp_BitmapInfoHeader {
     // DIB header size in bytes
     uint32_t dib_header_size_bytes;
     // Bitmap width in pixels
@@ -52,9 +52,9 @@ typedef struct bmp_bitmap_info_header_s {
     uint32_t num_colors;
     // Number of important colors used
     uint32_t num_important_colors;
-} bmp_bitmap_info_header_t;
+} bmp_BitmapInfoHeader;
 
-typedef struct bmp_color_space_triple_s {
+typedef struct bmp_ColorSpaceTriple {
     // X coordinate of red endpoint
     int32_t red_x;
     // Y coordinate of red endpoint
@@ -73,9 +73,9 @@ typedef struct bmp_color_space_triple_s {
     int32_t blue_y;
     // Z coordinate of blue endpoint
     int32_t blue_z;
-} bmp_color_space_triple_t;
+} bmp_ColorSpaceTriple;
 
-typedef struct bmp_bitmap_v4_header_s {
+typedef struct bmp_BitmapV4Header {
     // DIB header size in bytes
     uint32_t dib_header_size_bytes;
     // Bitmap width in pixels
@@ -109,48 +109,47 @@ typedef struct bmp_bitmap_v4_header_s {
     // Color space type
     uint32_t color_space_type;
     // Color space triple
-    bmp_color_space_triple_t color_space_triple;
+    bmp_ColorSpaceTriple color_space_triple;
     // Red gamma
     uint32_t red_gamma;
     // Green gamma
     uint32_t green_gamma;
     // Blue gamma
     uint32_t blue_gamma;
-} bmp_bitmap_v4_header_t;
+} bmp_BitmapV4Header;
 
-typedef struct bmp_pixel_RGB24_s {
+typedef struct bmp_PixelRGB24 {
     uint8_t blue;
     uint8_t green;
     uint8_t red;
-} bmp_pixel_RGB24_t;
+} bmp_PixelRGB24;
 
-typedef struct bmp_pixel_ARGB32_s {
+typedef struct bmp_PixelARGB32 {
     uint8_t blue;
     uint8_t green;
     uint8_t red;
     uint8_t alpha;
-} bmp_pixel_ARGB32_t;
+} bmp_PixelARGB32;
 
 #pragma pack(pop)
 
-static const size_t bmp_bitmap_v4_offset =
-    sizeof(bmp_file_header_t) + sizeof(bmp_bitmap_v4_header_t);
+static const size_t bmp_bitmap_v4_offset = sizeof(bmp_FileHeader) + sizeof(bmp_BitmapV4Header);
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
-int bmp_write_bitmap_v4(const bmp_pixel_ARGB32_t *target_buff,
-                        size_t                    image_width_pixels,
-                        size_t                    image_height_pixels,
-                        char                     *file);
+int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
+                        size_t                 image_width_pixels,
+                        size_t                 image_height_pixels,
+                        char                  *file);
 
-int bmp_read_bitmap(char                     *file,
-                    bmp_file_header_t        *file_header_out,
-                    bmp_bitmap_info_header_t *bitmap_info_header_out,
-                    char                    **image_out);
+int bmp_read_bitmap(char                 *file,
+                    bmp_FileHeader       *file_header_out,
+                    bmp_BitmapInfoHeader *bitmap_info_header_out,
+                    char                **image_out);
 
-int bmp_read_bitmap_v4(char                   *file,
-                       bmp_file_header_t      *file_header_out,
-                       bmp_bitmap_v4_header_t *bitmap_v4_header_out,
-                       char                  **image_out);
+int bmp_read_bitmap_v4(char               *file,
+                       bmp_FileHeader     *file_header_out,
+                       bmp_BitmapV4Header *bitmap_v4_header_out,
+                       char              **image_out);
 
 #endif // SDL_BITS_BMP_H

@@ -29,7 +29,7 @@
 #define CHECK_COUNT(buff, expected) TEST(util_buffer_count(buff) == (expected))
 
 int main(int argc, char *argv[]) {
-    util_buffer_t *buffer = NULL;
+    util_Buffer *buffer = NULL;
 
     (void)argc;
     (void)argv;

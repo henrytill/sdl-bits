@@ -7,11 +7,11 @@
 static char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
 int main(int argc, char *argv[]) {
-    int                      ret   = 1;
-    char                    *image = NULL;
-    bmp_file_header_t        file_header;
-    bmp_bitmap_info_header_t bitmap_info_header;
-    int                      error;
+    int                  ret   = 1;
+    char                *image = NULL;
+    bmp_FileHeader       file_header;
+    bmp_BitmapInfoHeader bitmap_info_header;
+    int                  error;
 
     (void)argc;
     (void)argv;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    bmp_pixel_RGB24_t *pixel = (bmp_pixel_RGB24_t *)image;
+    bmp_PixelRGB24 *pixel = (bmp_PixelRGB24 *)image;
 
     TEST(pixel->blue == 0);
     TEST(pixel->green == 0);
