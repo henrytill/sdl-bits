@@ -3,12 +3,10 @@
 
 #include "util.h"
 
-static int util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t growth);
+static int util_buffer_grow(util_Buffer *buff, uint32_t cap_hint, uint32_t growth);
 
-static int util_buffer2d_grow(util_buffer2d_t *buff,
-                              uint32_t         x_cap_hint,
-                              uint32_t         y_cap_hint,
-                              uint32_t         growth);
+static int
+util_buffer2d_grow(util_Buffer2d *buff, uint32_t x_cap_hint, uint32_t y_cap_hint, uint32_t growth);
 
 uint32_t util_uint32_sat_sub(uint32_t x, uint32_t y) {
     uint32_t ret;
@@ -18,18 +16,18 @@ uint32_t util_uint32_sat_sub(uint32_t x, uint32_t y) {
     return ret;
 }
 
-struct util_buffer_s {
+struct util_Buffer {
     uint32_t cap;
     uint32_t count;
     char    *data;
 };
 
-int util_buffer_init(util_buffer_t **buff, uint32_t cap) {
-    util_buffer_t *buff_h = NULL;
-    char          *data_h = NULL;
+int util_buffer_init(util_Buffer **buff, uint32_t cap) {
+    util_Buffer *buff_h = NULL;
+    char        *data_h = NULL;
 
     // Allocate buffer and assign to buff if successful
-    buff_h = malloc(sizeof(util_buffer_t));
+    buff_h = malloc(sizeof(util_Buffer));
     if (buff_h == NULL) {
         return 1;
     }
@@ -49,7 +47,7 @@ int util_buffer_init(util_buffer_t **buff, uint32_t cap) {
     return 0;
 }
 
-int util_buffer_deinit(util_buffer_t **buff) {
+int util_buffer_deinit(util_Buffer **buff) {
     if (*buff == NULL) {
         return 0;
     }
@@ -66,21 +64,21 @@ int util_buffer_deinit(util_buffer_t **buff) {
     return 0;
 }
 
-uint32_t util_buffer_cap(util_buffer_t *buff) {
+uint32_t util_buffer_cap(util_Buffer *buff) {
     if (buff == NULL) {
         return 0;
     }
     return buff->cap;
 }
 
-uint32_t util_buffer_count(util_buffer_t *buff) {
+uint32_t util_buffer_count(util_Buffer *buff) {
     if (buff == NULL) {
         return 0;
     }
     return buff->count;
 }
 
-static int util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t growth) {
+static int util_buffer_grow(util_Buffer *buff, uint32_t cap_hint, uint32_t growth) {
     char          *data_h  = NULL;
     const uint32_t cap     = buff->cap;
     uint64_t       new_cap = (uint64_t)cap;
@@ -113,7 +111,7 @@ static int util_buffer_grow(util_buffer_t *buff, uint32_t cap_hint, uint32_t gro
     return 0;
 }
 
-int util_buffer_push(util_buffer_t *buff, char item) {
+int util_buffer_push(util_Buffer *buff, char item) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
@@ -129,7 +127,7 @@ int util_buffer_push(util_buffer_t *buff, char item) {
     return 0;
 }
 
-int util_buffer_set(util_buffer_t *buff, uint32_t index, char item) {
+int util_buffer_set(util_Buffer *buff, uint32_t index, char item) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
@@ -144,7 +142,7 @@ int util_buffer_set(util_buffer_t *buff, uint32_t index, char item) {
     return 0;
 }
 
-int util_buffer_read(util_buffer_t *buff, uint32_t index, char *out) {
+int util_buffer_read(util_Buffer *buff, uint32_t index, char *out) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
@@ -155,20 +153,20 @@ int util_buffer_read(util_buffer_t *buff, uint32_t index, char *out) {
     return 0;
 }
 
-struct util_buffer2d_s {
+struct util_Buffer2d {
     uint32_t x_cap;
     uint32_t y_cap;
     char   **data;
 };
 
-int util_buffer2d_init(util_buffer2d_t **buff, uint32_t x_cap, uint32_t y_cap) {
-    util_buffer2d_t *buff_h;
-    char           **data_h;
-    char            *row_h;
-    uint32_t         i;
+int util_buffer2d_init(util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
+    util_Buffer2d *buff_h;
+    char         **data_h;
+    char          *row_h;
+    uint32_t       i;
 
     // Allocate buffer and assign to buff if successful
-    buff_h = malloc(sizeof(util_buffer2d_t));
+    buff_h = malloc(sizeof(util_Buffer2d));
     if (buff_h == NULL) {
         return 1;
     }
@@ -197,7 +195,7 @@ int util_buffer2d_init(util_buffer2d_t **buff, uint32_t x_cap, uint32_t y_cap) {
     return 0;
 }
 
-int util_buffer2d_deinit(util_buffer2d_t **buff) {
+int util_buffer2d_deinit(util_Buffer2d **buff) {
     uint32_t i;
 
     if (*buff == NULL) {
@@ -217,24 +215,22 @@ int util_buffer2d_deinit(util_buffer2d_t **buff) {
     return 0;
 }
 
-uint32_t util_buffer2d_x_cap(util_buffer2d_t *buff) {
+uint32_t util_buffer2d_x_cap(util_Buffer2d *buff) {
     if (buff == NULL) {
         return 0;
     }
     return buff->x_cap;
 }
 
-uint32_t util_buffer2d_y_cap(util_buffer2d_t *buff) {
+uint32_t util_buffer2d_y_cap(util_Buffer2d *buff) {
     if (buff == NULL) {
         return 0;
     }
     return buff->y_cap;
 }
 
-static int util_buffer2d_grow(util_buffer2d_t *buff,
-                              uint32_t         x_cap_hint,
-                              uint32_t         y_cap_hint,
-                              uint32_t         growth) {
+static int
+util_buffer2d_grow(util_Buffer2d *buff, uint32_t x_cap_hint, uint32_t y_cap_hint, uint32_t growth) {
     char         **data_h    = NULL;
     char          *sub_h     = NULL;
     const uint32_t x_cap     = buff->x_cap;
@@ -294,7 +290,7 @@ static int util_buffer2d_grow(util_buffer2d_t *buff,
     return 0;
 }
 
-int util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char item) {
+int util_buffer2d_set(util_Buffer2d *buff, uint32_t x_index, uint32_t y_index, char item) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
@@ -307,7 +303,7 @@ int util_buffer2d_set(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index,
     return 0;
 }
 
-int util_buffer2d_read(util_buffer2d_t *buff, uint32_t x_index, uint32_t y_index, char *out) {
+int util_buffer2d_read(util_Buffer2d *buff, uint32_t x_index, uint32_t y_index, char *out) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }

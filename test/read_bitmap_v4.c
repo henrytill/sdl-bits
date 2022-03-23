@@ -7,11 +7,11 @@
 static char *const BMP_FILE = "./assets/test.bmp";
 
 int main(int argc, char *argv[]) {
-    int                    ret   = 1;
-    char                  *image = NULL;
-    bmp_file_header_t      file_header;
-    bmp_bitmap_v4_header_t bitmap_v4_header;
-    int                    error;
+    int                ret   = 1;
+    char              *image = NULL;
+    bmp_FileHeader     file_header;
+    bmp_BitmapV4Header bitmap_v4_header;
+    int                error;
 
     (void)argc;
     (void)argv;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    bmp_pixel_ARGB32_t *pixel = (bmp_pixel_ARGB32_t *)image;
+    bmp_PixelARGB32 *pixel = (bmp_PixelARGB32 *)image;
 
     TEST(pixel->blue == 255);
     TEST(pixel->green == 0);
