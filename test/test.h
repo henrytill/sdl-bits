@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define TEST(expr)                                                                                 \
+#define test(expr)                                                                                 \
     do {                                                                                           \
         if (!(expr)) {                                                                             \
             fprintf(stderr, "FAIL: %s:%d", __FILE__, __LINE__);                                    \

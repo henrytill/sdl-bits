@@ -23,10 +23,10 @@ int main(int argc, char *argv[]) {
 
     bmp_PixelARGB32 *pixel = (bmp_PixelARGB32 *)image;
 
-    TEST(pixel->blue == 255);
-    TEST(pixel->green == 0);
-    TEST(pixel->red == 0);
-    TEST(pixel->alpha == 127);
+    test(pixel->blue == 255);
+    test(pixel->green == 0);
+    test(pixel->red == 0);
+    test(pixel->alpha == 127);
 
     ret = 0;
 

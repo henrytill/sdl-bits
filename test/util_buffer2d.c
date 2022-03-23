@@ -3,23 +3,23 @@
 
 // Some helper macros
 
-#define CHECKED_INIT(buff, x_cap, y_cap) TEST(util_buffer2d_init(buff, x_cap, y_cap) == 0)
+#define checked_init(buff, x_cap, y_cap) test(util_buffer2d_init(buff, x_cap, y_cap) == 0)
 
-#define CHECKED_DEINIT(buff) TEST(util_buffer2d_deinit(buff) == 0)
+#define checked_deinit(buff) test(util_buffer2d_deinit(buff) == 0)
 
-#define CHECKED_SET(buff, x_index, y_index, item)                                                  \
-    TEST(util_buffer2d_set(buff, x_index, y_index, item) == 0)
+#define checked_set(buff, x_index, y_index, item)                                                  \
+    test(util_buffer2d_set(buff, x_index, y_index, item) == 0)
 
-#define CHECKED_READ(buff, x_index, y_index, expected)                                             \
+#define checked_read(buff, x_index, y_index, expected)                                             \
     do {                                                                                           \
         char out;                                                                                  \
-        TEST(util_buffer2d_read(buff, x_index, y_index, &out) == 0);                               \
-        TEST(out == (expected));                                                                   \
+        test(util_buffer2d_read(buff, x_index, y_index, &out) == 0);                               \
+        test(out == (expected));                                                                   \
     } while (0)
 
-#define CHECK_X_CAP(buff, expected) TEST(util_buffer2d_x_cap(buff) == (expected))
+#define check_x_cap(buff, expected) test(util_buffer2d_x_cap(buff) == (expected))
 
-#define CHECK_Y_CAP(buff, expected) TEST(util_buffer2d_y_cap(buff) == (expected))
+#define check_y_cap(buff, expected) test(util_buffer2d_y_cap(buff) == (expected))
 
 int main(int argc, char *argv[]) {
     util_Buffer2d *buffer = NULL;
@@ -27,53 +27,53 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
-    CHECKED_INIT(&buffer, 3, 3);
-    CHECK_X_CAP(buffer, 3);
-    CHECK_Y_CAP(buffer, 3);
+    checked_init(&buffer, 3, 3);
+    check_x_cap(buffer, 3);
+    check_y_cap(buffer, 3);
 
-    CHECKED_SET(buffer, 0, 0, 'a');
-    CHECKED_SET(buffer, 1, 0, 'b');
-    CHECKED_SET(buffer, 2, 0, 'c');
-    CHECKED_SET(buffer, 0, 1, 'd');
-    CHECKED_SET(buffer, 1, 1, 'e');
-    CHECKED_SET(buffer, 2, 1, 'f');
-    CHECKED_SET(buffer, 0, 2, 'g');
-    CHECKED_SET(buffer, 1, 2, 'h');
-    CHECKED_SET(buffer, 2, 2, 'i');
+    checked_set(buffer, 0, 0, 'a');
+    checked_set(buffer, 1, 0, 'b');
+    checked_set(buffer, 2, 0, 'c');
+    checked_set(buffer, 0, 1, 'd');
+    checked_set(buffer, 1, 1, 'e');
+    checked_set(buffer, 2, 1, 'f');
+    checked_set(buffer, 0, 2, 'g');
+    checked_set(buffer, 1, 2, 'h');
+    checked_set(buffer, 2, 2, 'i');
 
-    CHECKED_READ(buffer, 0, 0, 'a');
-    CHECKED_READ(buffer, 1, 0, 'b');
-    CHECKED_READ(buffer, 2, 0, 'c');
-    CHECKED_READ(buffer, 0, 1, 'd');
-    CHECKED_READ(buffer, 1, 1, 'e');
-    CHECKED_READ(buffer, 2, 1, 'f');
-    CHECKED_READ(buffer, 0, 2, 'g');
-    CHECKED_READ(buffer, 1, 2, 'h');
-    CHECKED_READ(buffer, 2, 2, 'i');
+    checked_read(buffer, 0, 0, 'a');
+    checked_read(buffer, 1, 0, 'b');
+    checked_read(buffer, 2, 0, 'c');
+    checked_read(buffer, 0, 1, 'd');
+    checked_read(buffer, 1, 1, 'e');
+    checked_read(buffer, 2, 1, 'f');
+    checked_read(buffer, 0, 2, 'g');
+    checked_read(buffer, 1, 2, 'h');
+    checked_read(buffer, 2, 2, 'i');
 
-    CHECKED_SET(buffer, 3, 3, 'z');
-    CHECK_X_CAP(buffer, 6);
-    CHECK_Y_CAP(buffer, 6);
+    checked_set(buffer, 3, 3, 'z');
+    check_x_cap(buffer, 6);
+    check_y_cap(buffer, 6);
 
-    CHECKED_READ(buffer, 3, 0, 0);
-    CHECKED_READ(buffer, 3, 1, 0);
-    CHECKED_READ(buffer, 3, 2, 0);
-    CHECKED_READ(buffer, 3, 3, 'z');
-    CHECKED_READ(buffer, 5, 5, 0);
+    checked_read(buffer, 3, 0, 0);
+    checked_read(buffer, 3, 1, 0);
+    checked_read(buffer, 3, 2, 0);
+    checked_read(buffer, 3, 3, 'z');
+    checked_read(buffer, 5, 5, 0);
 
-    CHECKED_DEINIT(&buffer);
-    CHECKED_INIT(&buffer, 3, 3);
-    CHECKED_SET(buffer, 6, 6, 'z');
-    CHECK_X_CAP(buffer, 12);
-    CHECK_Y_CAP(buffer, 12);
+    checked_deinit(&buffer);
+    checked_init(&buffer, 3, 3);
+    checked_set(buffer, 6, 6, 'z');
+    check_x_cap(buffer, 12);
+    check_y_cap(buffer, 12);
 
-    CHECKED_READ(buffer, 6, 0, 0);
-    CHECKED_READ(buffer, 6, 1, 0);
-    CHECKED_READ(buffer, 6, 2, 0);
-    CHECKED_READ(buffer, 6, 6, 'z');
-    CHECKED_READ(buffer, 11, 11, 0);
+    checked_read(buffer, 6, 0, 0);
+    checked_read(buffer, 6, 1, 0);
+    checked_read(buffer, 6, 2, 0);
+    checked_read(buffer, 6, 6, 'z');
+    checked_read(buffer, 11, 11, 0);
 
-    CHECKED_DEINIT(&buffer);
+    checked_deinit(&buffer);
 
     return 0;
 }
