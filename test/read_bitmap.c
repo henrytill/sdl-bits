@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
 
     bmp_PixelRGB24 *pixel = (bmp_PixelRGB24 *)image;
 
-    TEST(pixel->blue == 0);
-    TEST(pixel->green == 0);
-    TEST(pixel->red == 255);
+    test(pixel->blue == 0);
+    test(pixel->green == 0);
+    test(pixel->red == 255);
 
     ret = 0;
 
