@@ -3,12 +3,17 @@
 
 #include "util.h"
 
-static const int      SCREEN_WIDTH_PIXELS      = 640;
-static const int      SCREEN_HEIGHT_PIXELS     = 480;
-static const uint32_t TARGET_FRAME_TIME_MILLIS = 16;
+enum {
+    SCREEN_WIDTH_PIXELS      = 640,
+    SCREEN_HEIGHT_PIXELS     = 480,
+    TARGET_FRAME_TIME_MILLIS = 16
+};
 
 // Establishes loop conditionals
-typedef enum LoopStatus { STOP = 0, RUN = 1 } LoopStatus;
+typedef enum LoopStatus {
+    STOP = 0,
+    RUN  = 1
+} LoopStatus;
 
 int main(int argc, char *argv[]) {
     int          ret               = 1;

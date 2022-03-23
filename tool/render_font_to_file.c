@@ -12,14 +12,13 @@
 #pragma warning(disable : 4996)
 #endif
 
-#define EXPECTED_CHAR_BIT 8
-
 #define print_error(error)                                                                         \
     do {                                                                                           \
         fprintf(stderr, "ERROR: %s:%d: %d", __FILE__, __LINE__, error);                            \
     } while (0)
 
 enum {
+    EXPECTED_CHAR_BIT  = 8,
     FONT_WIDTH_PIXELS  = 10,
     FONT_HEIGHT_PIXELS = 20,
     CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
