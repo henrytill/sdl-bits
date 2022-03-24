@@ -5,10 +5,6 @@
 
 #include "bmp.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4996)
-#endif
-
 enum {
     BITS_PER_DWORD  = 32,
     BYTES_PER_DWORD = 4,
@@ -24,38 +20,30 @@ static const uint32_t ARGB24_BLUE_MASK        = 0x000000FF;
 static const uint32_t ARGB24_ALPHA_MASK       = 0xFF000000;
 static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
+static const bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 static char *const MODE_READ  = "r";
 static char *const MODE_WRITE = "wb";
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels) {
-    double bits;
-    double width;
-
-    bits  = (double)bits_per_pixel;
-    width = (double)width_pixels;
-    return (size_t)(ceil((bits * width) / BITS_PER_DWORD)) * BYTES_PER_DWORD;
+    return (size_t)(ceil((double)bits_per_pixel * width_pixels / BITS_PER_DWORD)) * BYTES_PER_DWORD;
 }
 
 int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
                         size_t                 image_width_pixels,
                         size_t                 image_height_pixels,
                         char                  *file) {
-    int                  ret                = 1;
-    FILE                *file_h             = NULL;
-    bmp_ColorSpaceTriple color_space_triple = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    bmp_BitmapV4Header   bitmap_v4_header;
-    bmp_FileHeader       file_header;
-    size_t               image_size_bytes;
-    size_t               file_size_bytes;
-    size_t               writes;
+    int                ret    = 1;
+    FILE              *file_h = NULL;
+    bmp_BitmapV4Header bitmap_v4_header;
+    bmp_FileHeader     file_header;
+    size_t             image_size_bytes;
+    size_t             file_size_bytes;
+    size_t             writes;
 
     assert(bmp_bitmap_v4_offset < UINT32_MAX);
 
-    if (target_buff == NULL) {
-        return ret;
-    }
-
-    if (file == NULL) {
+    if (target_buff == NULL || file == NULL) {
         return ret;
     }
 
@@ -73,6 +61,12 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
         return ret;
     }
 
+    file_header.type         = BITMAP_FILE_TYPE;
+    file_header.size_bytes   = (uint32_t)file_size_bytes;
+    file_header.reserved1    = 0;
+    file_header.reserved2    = 0;
+    file_header.offset_bytes = (uint32_t)bmp_bitmap_v4_offset;
+
     bitmap_v4_header.dib_header_size_bytes = BITMAPV4HEADER;
     bitmap_v4_header.width_pixels          = (int32_t)image_width_pixels;
     bitmap_v4_header.height_pixels         = (int32_t)image_height_pixels;
@@ -89,16 +83,10 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
     bitmap_v4_header.blue_mask             = ARGB24_BLUE_MASK;
     bitmap_v4_header.alpha_mask            = ARGB24_ALPHA_MASK;
     bitmap_v4_header.color_space_type      = LCS_WINDOWS_COLOR_SPACE;
-    bitmap_v4_header.color_space_triple    = color_space_triple;
+    bitmap_v4_header.color_space_triple    = COLOR_SPACE_TRIPLE;
     bitmap_v4_header.red_gamma             = 0;
     bitmap_v4_header.green_gamma           = 0;
     bitmap_v4_header.blue_gamma            = 0;
-
-    file_header.type         = BITMAP_FILE_TYPE;
-    file_header.size_bytes   = (uint32_t)file_size_bytes;
-    file_header.reserved1    = 0;
-    file_header.reserved2    = 0;
-    file_header.offset_bytes = (uint32_t)bmp_bitmap_v4_offset;
 
     file_h = fopen(file, MODE_WRITE);
     if (file_h == NULL) {
@@ -201,8 +189,8 @@ int bmp_read_bitmap_v4(char               *file,
     uint32_t dib_header_size_bytes;
     uint32_t image_size_bytes;
     size_t   reads;
-    int      error;
     fpos_t   pos;
+    int      error;
 
     file_h = fopen(file, MODE_READ);
     if (file_h == NULL) {

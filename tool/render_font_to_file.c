@@ -8,10 +8,6 @@
 
 #include "bmp.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4996)
-#endif
-
 #define print_error(error)                                                                         \
     do {                                                                                           \
         fprintf(stderr, "ERROR: %s:%d: %d", __FILE__, __LINE__, error);                            \
@@ -24,11 +20,13 @@ enum {
     CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
 };
 
-static char *const           FONT_FILE = "./ucs-fonts/10x20.bdf";
-static char *const           BMP_FILE  = "./10x20.bmp";
-static const bmp_PixelARGB32 WHITE     = {0xFF, 0xFF, 0xFF, 0x00};
-static const bmp_PixelARGB32 BLACK     = {0x00, 0x00, 0x00, 0xFF};
+static char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
+static char *const BMP_FILE  = "./10x20.bmp";
 
+static const bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
+static const bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
+
+// pos = 0 is MSB
 static unsigned char get_bit(unsigned char source, size_t pos);
 
 static int alloc_image(unsigned char ***image, size_t height, size_t width);
@@ -43,8 +41,8 @@ static void draw_image(unsigned char **image, size_t image_width, size_t image_h
 static inline void draw_image(unsigned char **image, size_t image_width, size_t image_height);
 #endif
 
-// pos = 0 is MSB
 static unsigned char get_bit(unsigned char source, size_t pos) {
+    // https://stackoverflow.com/a/881968
     assert(CHAR_BIT == EXPECTED_CHAR_BIT);
     if (pos >= CHAR_BIT) {
         return 0;
@@ -58,14 +56,12 @@ static int alloc_image(unsigned char ***image, size_t height, size_t width) {
     if (*image == NULL) {
         return 1;
     }
-
     for (size_t i = 0; i < height; i++) {
         *(*image + i) = calloc(width, sizeof(unsigned char));
         if (*(*image + i) == NULL) {
             return 1;
         }
     }
-
     return 0;
 }
 
@@ -73,7 +69,6 @@ void free_image(unsigned char ***image, size_t height) {
     if (image == NULL) {
         return;
     }
-
     for (size_t i = 0; i < height; i++) {
         free(*(*image + i));
     }
@@ -82,16 +77,11 @@ void free_image(unsigned char ***image, size_t height) {
 }
 
 static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset) {
-    unsigned char *buffer = NULL;
-    unsigned int   rows;
-    unsigned int   width;
+    unsigned char *buffer = slot->bitmap.buffer;
+    unsigned int   rows   = slot->bitmap.rows;
+    unsigned int   width  = slot->bitmap.width;
+    unsigned int   pitch  = abs(slot->bitmap.pitch);
     unsigned char  datum;
-    unsigned int   pitch;
-
-    buffer = slot->bitmap.buffer;
-    rows   = slot->bitmap.rows;
-    width  = slot->bitmap.width;
-    pitch  = abs(slot->bitmap.pitch);
 
     for (size_t y = 0, p = 0; y < rows; y++, p += pitch) {
         for (size_t i = 0; i < pitch; i++) {
@@ -126,33 +116,27 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 int main(int argc, char *argv[]) {
-    int              error;
-    FT_Library       library     = NULL;
-    FT_Face          face        = NULL;
-    FT_GlyphSlot     slot        = NULL;
-    unsigned char  **image       = NULL;
-    bmp_PixelARGB32 *target_buff = NULL;
+    int              ret          = 1;
+    FT_Library       library      = NULL;
+    FT_Face          face         = NULL;
+    FT_GlyphSlot     slot         = NULL;
+    unsigned char  **image        = NULL;
+    bmp_PixelARGB32 *target_buff  = NULL;
+    size_t           image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+    size_t           image_height = FONT_HEIGHT_PIXELS;
     char             char_codes[CHAR_CODES_SIZE];
-    size_t           image_width;
-    size_t           image_height;
+    int              error;
 
     (void)argc;
     (void)argv;
-
-    setbuf(stdout, NULL);
-
-    // https://stackoverflow.com/a/881968
-    assert(CHAR_BIT == EXPECTED_CHAR_BIT);
 
     for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
         char_codes[i] = (char)(i + '!');
     }
 
-    image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-    image_height = FONT_HEIGHT_PIXELS;
-    error        = alloc_image(&image, image_height, image_width);
+    error = alloc_image(&image, image_height, image_width);
     if (error != 0) {
-        fprintf(stderr, "could not allocate image");
+        print_error(error);
         goto out;
     }
 
@@ -163,10 +147,6 @@ int main(int argc, char *argv[]) {
     }
 
     error = FT_New_Face(library, FONT_FILE, 0, &face);
-    if (error == FT_Err_Unknown_File_Format) {
-        print_error(error);
-        goto out;
-    }
     if (error != 0) {
         print_error(error);
         goto out;
@@ -185,21 +165,18 @@ int main(int argc, char *argv[]) {
             goto out;
         }
 
-        slot = face->glyph;
-
+        slot  = face->glyph;
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
         if (error != 0) {
             print_error(error);
             goto out;
         }
-
         if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
-            fprintf(stderr, "format was not FL_GLYPH_FORMAT_BITMAP");
+            fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
             goto out;
         }
-
         if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
-            fprintf(stderr, "pixel_mode was not FL_PIXEL_MODE_MONO");
+            fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
             goto out;
         }
 
@@ -221,10 +198,12 @@ int main(int argc, char *argv[]) {
 
     bmp_write_bitmap_v4(target_buff, image_width, image_height, BMP_FILE);
 
+    ret = 0;
+
 out:
     free(target_buff);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     free_image(&image, image_height);
-    return error;
+    return ret;
 }
