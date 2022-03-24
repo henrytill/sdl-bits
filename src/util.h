@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
+#include <string.h> // IWYU pragma: keep
 
 enum { BUFFER_GROWTH_FACTOR = 2 };
 
