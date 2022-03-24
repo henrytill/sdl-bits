@@ -64,13 +64,11 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
     }
 
     image_size_bytes = (image_width_pixels * image_height_pixels) * sizeof(bmp_PixelARGB32);
-
     if (image_size_bytes > UINT32_MAX) {
         return ret;
     }
 
     file_size_bytes = bmp_bitmap_v4_offset + image_size_bytes;
-
     if (file_size_bytes > UINT32_MAX) {
         return ret;
     }

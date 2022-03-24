@@ -161,9 +161,9 @@ struct util_Buffer2d {
 };
 
 int util_buffer2d_init(util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
-    util_Buffer2d *buff_h;
-    char         **data_h;
-    char          *row_h;
+    util_Buffer2d *buff_h = NULL;
+    char         **data_h = NULL;
+    char          *row_h  = NULL;
     uint32_t       i;
 
     // Allocate buffer and assign to buff if successful
