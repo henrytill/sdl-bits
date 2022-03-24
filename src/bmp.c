@@ -11,8 +11,18 @@
 
 enum {
     BITS_PER_DWORD  = 32,
-    BYTES_PER_DWORD = 4
+    BYTES_PER_DWORD = 4,
+    NUM_PLANES      = 1,
+    BITS_PER_PIXEL  = 32
 };
+
+static const uint16_t BITMAP_FILE_TYPE        = 0x4D42;
+static const uint32_t BI_BITFIELDS            = 0x0003;
+static const uint32_t ARGB24_RED_MASK         = 0x00FF0000;
+static const uint32_t ARGB24_GREEN_MASK       = 0x0000FF00;
+static const uint32_t ARGB24_BLUE_MASK        = 0x000000FF;
+static const uint32_t ARGB24_ALPHA_MASK       = 0xFF000000;
+static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 static char *const MODE_READ  = "r";
 static char *const MODE_WRITE = "wb";
@@ -68,25 +78,25 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
     bitmap_v4_header.dib_header_size_bytes = BITMAPV4HEADER;
     bitmap_v4_header.width_pixels          = (int32_t)image_width_pixels;
     bitmap_v4_header.height_pixels         = (int32_t)image_height_pixels;
-    bitmap_v4_header.num_planes            = 1;
-    bitmap_v4_header.bits_per_pixel        = 32;
-    bitmap_v4_header.compression           = 0x0003;
+    bitmap_v4_header.num_planes            = NUM_PLANES;
+    bitmap_v4_header.bits_per_pixel        = BITS_PER_PIXEL;
+    bitmap_v4_header.compression           = BI_BITFIELDS;
     bitmap_v4_header.image_size_bytes      = (uint32_t)image_size_bytes;
     bitmap_v4_header.x_resolution_ppm      = 0;
     bitmap_v4_header.y_resolution_ppm      = 0;
     bitmap_v4_header.num_colors            = 0;
     bitmap_v4_header.num_important_colors  = 0;
-    bitmap_v4_header.red_mask              = 0x00FF0000;
-    bitmap_v4_header.green_mask            = 0x0000FF00;
-    bitmap_v4_header.blue_mask             = 0x000000FF;
-    bitmap_v4_header.alpha_mask            = 0xFF000000;
-    bitmap_v4_header.color_space_type      = 0x57696E20;
+    bitmap_v4_header.red_mask              = ARGB24_RED_MASK;
+    bitmap_v4_header.green_mask            = ARGB24_GREEN_MASK;
+    bitmap_v4_header.blue_mask             = ARGB24_BLUE_MASK;
+    bitmap_v4_header.alpha_mask            = ARGB24_ALPHA_MASK;
+    bitmap_v4_header.color_space_type      = LCS_WINDOWS_COLOR_SPACE;
     bitmap_v4_header.color_space_triple    = color_space_triple;
     bitmap_v4_header.red_gamma             = 0;
     bitmap_v4_header.green_gamma           = 0;
     bitmap_v4_header.blue_gamma            = 0;
 
-    file_header.type         = 0x4D42;
+    file_header.type         = BITMAP_FILE_TYPE;
     file_header.size_bytes   = (uint32_t)file_size_bytes;
     file_header.reserved1    = 0;
     file_header.reserved2    = 0;
