@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "test.h"
 #include "util.h"
@@ -131,5 +132,5 @@ int main(int argc, char *argv[]) {
 
     checked_deinit(&buffer);
 
-    return 0;
+    return EXIT_SUCCESS;
 }

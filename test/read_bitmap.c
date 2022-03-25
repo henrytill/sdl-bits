@@ -7,7 +7,6 @@
 static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
 int main(int argc, char *argv[]) {
-    int                  ret   = 1;
     char                *image = NULL;
     bmp_FileHeader       file_header;
     bmp_BitmapInfoHeader bitmap_info_header;
@@ -27,9 +26,7 @@ int main(int argc, char *argv[]) {
     test(pixel->green == 0);
     test(pixel->red == 255);
 
-    ret = 0;
-
 out:
     free(image);
-    return ret;
+    return error;
 }

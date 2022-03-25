@@ -116,7 +116,6 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 int main(int argc, char *argv[]) {
-    int              ret          = 1;
     FT_Library       library      = NULL;
     FT_Face          face         = NULL;
     FT_GlyphSlot     slot         = NULL;
@@ -187,6 +186,7 @@ int main(int argc, char *argv[]) {
 
     target_buff = calloc(image_width * image_height, sizeof(bmp_PixelARGB32));
     if (target_buff == NULL) {
+        error = 1;
         goto out;
     }
 
@@ -196,14 +196,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    bmp_write_bitmap_v4(target_buff, image_width, image_height, BMP_FILE);
-
-    ret = 0;
+    error = bmp_write_bitmap_v4(target_buff, image_width, image_height, BMP_FILE);
 
 out:
     free(target_buff);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     free_image(&image, image_height);
-    return ret;
+    return error;
 }
