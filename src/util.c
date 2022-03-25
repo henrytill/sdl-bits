@@ -4,6 +4,8 @@
 
 #include "util.h"
 
+enum { BUFFER_GROWTH_FACTOR = 2 };
+
 static int util_buffer_grow(util_Buffer *buff, uint32_t cap_hint, uint32_t growth);
 
 static int
