@@ -16,7 +16,7 @@ static const bmp_PixelARGB32 TARGET_BUFF[] = {
     {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static char *const BMP_FILE = "./test.bmp";
+static const char *const BMP_FILE = "./test.bmp";
 
 int main(int argc, char *argv[]) {
     int ret = 1;

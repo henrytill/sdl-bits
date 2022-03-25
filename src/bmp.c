@@ -22,8 +22,8 @@ static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 static const bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static char *const MODE_READ  = "r";
-static char *const MODE_WRITE = "wb";
+static const char *const MODE_READ  = "r";
+static const char *const MODE_WRITE = "wb";
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels) {
     return (size_t)(ceil((double)bits_per_pixel * width_pixels / BITS_PER_DWORD)) * BYTES_PER_DWORD;
@@ -32,7 +32,7 @@ size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels) {
 int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
                         size_t                 image_width_pixels,
                         size_t                 image_height_pixels,
-                        char                  *file) {
+                        const char            *file) {
     int                ret    = 1;
     FILE              *file_h = NULL;
     bmp_BitmapV4Header bitmap_v4_header;
@@ -115,7 +115,7 @@ out:
     return ret;
 }
 
-int bmp_read_bitmap(char                 *file,
+int bmp_read_bitmap(const char           *file,
                     bmp_FileHeader       *file_header_out,
                     bmp_BitmapInfoHeader *bitmap_info_header_out,
                     char                **image_out) {
@@ -180,7 +180,7 @@ out:
     return ret;
 }
 
-int bmp_read_bitmap_v4(char               *file,
+int bmp_read_bitmap_v4(const char         *file,
                        bmp_FileHeader     *file_header_out,
                        bmp_BitmapV4Header *bitmap_v4_header_out,
                        char              **image_out) {

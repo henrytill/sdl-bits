@@ -20,8 +20,8 @@ enum {
     CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
 };
 
-static char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
-static char *const BMP_FILE  = "./10x20.bmp";
+static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
+static const char *const BMP_FILE  = "./10x20.bmp";
 
 static const bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
