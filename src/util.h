@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <string.h> // IWYU pragma: keep
 
-enum { BUFFER_GROWTH_FACTOR = 2 };
-
 // Prints well-formatted SDL error
 #define util_print_sdl_error()                                                                     \
     do {                                                                                           \
