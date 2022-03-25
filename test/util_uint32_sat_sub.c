@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <limits.h>
 
 #include "test.h"
@@ -21,5 +22,5 @@ int main(int argc, char *argv[]) {
     test(util_uint32_sat_sub(UINT_MAX, UINT_MAX - 1) == 1);
     test(util_uint32_sat_sub(UINT_MAX, 1) == UINT_MAX - 1);
 
-    return 0;
+    return EXIT_SUCCESS;
 }

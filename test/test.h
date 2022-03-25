@@ -2,12 +2,13 @@
 #define SDL_BITS_TEST_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define test(expr)                                                                                 \
     do {                                                                                           \
         if (!(expr)) {                                                                             \
             fprintf(stderr, "FAIL: %s:%d", __FILE__, __LINE__);                                    \
-            return 1;                                                                              \
+            exit(EXIT_FAILURE);                                                                    \
         }                                                                                          \
     } while (0)
 

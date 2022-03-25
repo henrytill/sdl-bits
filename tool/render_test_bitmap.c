@@ -19,7 +19,6 @@ static const bmp_PixelARGB32 TARGET_BUFF[] = {
 static const char *const BMP_FILE = "./test.bmp";
 
 int main(int argc, char *argv[]) {
-    int ret = 1;
     int error;
 
     (void)argc;
@@ -30,8 +29,6 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    ret = 0;
-
 out:
-    return ret;
+    return error;
 }
