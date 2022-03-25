@@ -4,7 +4,7 @@
 #include "bmp.h"
 #include "test.h"
 
-static char *const BMP_FILE = "./assets/test.bmp";
+static const char *const BMP_FILE = "./assets/test.bmp";
 
 int main(int argc, char *argv[]) {
     int                ret   = 1;
