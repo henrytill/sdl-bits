@@ -14,10 +14,10 @@ enum {
 
 static const uint16_t BITMAP_FILE_TYPE        = 0x4D42;
 static const uint32_t BI_BITFIELDS            = 0x0003;
-static const uint32_t ARGB24_RED_MASK         = 0x00FF0000;
-static const uint32_t ARGB24_GREEN_MASK       = 0x0000FF00;
-static const uint32_t ARGB24_BLUE_MASK        = 0x000000FF;
-static const uint32_t ARGB24_ALPHA_MASK       = 0xFF000000;
+static const uint32_t ARGB32_RED_MASK         = 0x00FF0000;
+static const uint32_t ARGB32_GREEN_MASK       = 0x0000FF00;
+static const uint32_t ARGB32_BLUE_MASK        = 0x000000FF;
+static const uint32_t ARGB32_ALPHA_MASK       = 0xFF000000;
 static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 static const bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -78,10 +78,10 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
     bitmap_v4_header.y_resolution_ppm      = 0;
     bitmap_v4_header.num_colors            = 0;
     bitmap_v4_header.num_important_colors  = 0;
-    bitmap_v4_header.red_mask              = ARGB24_RED_MASK;
-    bitmap_v4_header.green_mask            = ARGB24_GREEN_MASK;
-    bitmap_v4_header.blue_mask             = ARGB24_BLUE_MASK;
-    bitmap_v4_header.alpha_mask            = ARGB24_ALPHA_MASK;
+    bitmap_v4_header.red_mask              = ARGB32_RED_MASK;
+    bitmap_v4_header.green_mask            = ARGB32_GREEN_MASK;
+    bitmap_v4_header.blue_mask             = ARGB32_BLUE_MASK;
+    bitmap_v4_header.alpha_mask            = ARGB32_ALPHA_MASK;
     bitmap_v4_header.color_space_type      = LCS_WINDOWS_COLOR_SPACE;
     bitmap_v4_header.color_space_triple    = COLOR_SPACE_TRIPLE;
     bitmap_v4_header.red_gamma             = 0;
