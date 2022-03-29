@@ -33,13 +33,11 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
                         size_t                 image_width_pixels,
                         size_t                 image_height_pixels,
                         const char            *file) {
-    int                ret    = 1;
-    FILE              *file_h = NULL;
-    bmp_BitmapV4Header bitmap_v4_header;
-    bmp_FileHeader     file_header;
-    size_t             image_size_bytes;
-    size_t             file_size_bytes;
-    size_t             writes;
+    int    ret    = 1;
+    FILE  *file_h = NULL;
+    size_t image_size_bytes;
+    size_t file_size_bytes;
+    size_t writes;
 
     assert(bmp_bitmap_v4_offset < UINT32_MAX);
 
@@ -61,32 +59,36 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
         return ret;
     }
 
-    file_header.type         = BITMAP_FILE_TYPE;
-    file_header.size_bytes   = (uint32_t)file_size_bytes;
-    file_header.reserved1    = 0;
-    file_header.reserved2    = 0;
-    file_header.offset_bytes = (uint32_t)bmp_bitmap_v4_offset;
+    bmp_FileHeader file_header = {
+        .type         = BITMAP_FILE_TYPE,
+        .size_bytes   = (uint32_t)file_size_bytes,
+        .reserved1    = 0,
+        .reserved2    = 0,
+        .offset_bytes = (uint32_t)bmp_bitmap_v4_offset,
+    };
 
-    bitmap_v4_header.dib_header_size_bytes = BITMAPV4HEADER;
-    bitmap_v4_header.width_pixels          = (int32_t)image_width_pixels;
-    bitmap_v4_header.height_pixels         = (int32_t)image_height_pixels;
-    bitmap_v4_header.num_planes            = NUM_PLANES;
-    bitmap_v4_header.bits_per_pixel        = BITS_PER_PIXEL;
-    bitmap_v4_header.compression           = BI_BITFIELDS;
-    bitmap_v4_header.image_size_bytes      = (uint32_t)image_size_bytes;
-    bitmap_v4_header.x_resolution_ppm      = 0;
-    bitmap_v4_header.y_resolution_ppm      = 0;
-    bitmap_v4_header.num_colors            = 0;
-    bitmap_v4_header.num_important_colors  = 0;
-    bitmap_v4_header.red_mask              = ARGB32_RED_MASK;
-    bitmap_v4_header.green_mask            = ARGB32_GREEN_MASK;
-    bitmap_v4_header.blue_mask             = ARGB32_BLUE_MASK;
-    bitmap_v4_header.alpha_mask            = ARGB32_ALPHA_MASK;
-    bitmap_v4_header.color_space_type      = LCS_WINDOWS_COLOR_SPACE;
-    bitmap_v4_header.color_space_triple    = COLOR_SPACE_TRIPLE;
-    bitmap_v4_header.red_gamma             = 0;
-    bitmap_v4_header.green_gamma           = 0;
-    bitmap_v4_header.blue_gamma            = 0;
+    bmp_BitmapV4Header bitmap_v4_header = {
+        .dib_header_size_bytes = BITMAPV4HEADER,
+        .width_pixels          = (int32_t)image_width_pixels,
+        .height_pixels         = (int32_t)image_height_pixels,
+        .num_planes            = NUM_PLANES,
+        .bits_per_pixel        = BITS_PER_PIXEL,
+        .compression           = BI_BITFIELDS,
+        .image_size_bytes      = (uint32_t)image_size_bytes,
+        .x_resolution_ppm      = 0,
+        .y_resolution_ppm      = 0,
+        .num_colors            = 0,
+        .num_important_colors  = 0,
+        .red_mask              = ARGB32_RED_MASK,
+        .green_mask            = ARGB32_GREEN_MASK,
+        .blue_mask             = ARGB32_BLUE_MASK,
+        .alpha_mask            = ARGB32_ALPHA_MASK,
+        .color_space_type      = LCS_WINDOWS_COLOR_SPACE,
+        .color_space_triple    = COLOR_SPACE_TRIPLE,
+        .red_gamma             = 0,
+        .green_gamma           = 0,
+        .blue_gamma            = 0,
+    };
 
     file_h = fopen(file, MODE_WRITE);
     if (file_h == NULL) {
