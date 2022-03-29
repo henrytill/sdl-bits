@@ -4,23 +4,26 @@
 
 #include "bmp.h"
 
+// Integer constants used for calculating row size
 enum {
     BITS_PER_DWORD  = 32,
     BYTES_PER_DWORD = 4,
-    NUM_PLANES      = 1,
-    BITS_PER_PIXEL  = 32
 };
 
-static const uint16_t BITMAP_FILE_TYPE        = 0x4D42;
-static const size_t   BITMAP_V4_OFFSET_BYTES  = sizeof(bmp_FileHeader) + sizeof(bmp_BitmapV4Header);
-static const uint32_t BI_BITFIELDS            = 0x0003;
-static const uint32_t ARGB32_RED_MASK         = 0x00FF0000;
-static const uint32_t ARGB32_GREEN_MASK       = 0x0000FF00;
-static const uint32_t ARGB32_BLUE_MASK        = 0x000000FF;
-static const uint32_t ARGB32_ALPHA_MASK       = 0xFF000000;
-static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
+// File header constants
+static const uint16_t BITMAP_FILE_TYPE       = 0x4D42;
+static const size_t   BITMAP_V4_OFFSET_BYTES = sizeof(bmp_FileHeader) + sizeof(bmp_BitmapV4Header);
 
-static const bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+// Bitmap v4 header constants
+static const uint16_t             NUM_PLANES              = 1;
+static const uint16_t             BITS_PER_PIXEL          = 32;
+static const uint32_t             BI_BITFIELDS            = 0x0003;
+static const uint32_t             ARGB32_RED_MASK         = 0x00FF0000;
+static const uint32_t             ARGB32_GREEN_MASK       = 0x0000FF00;
+static const uint32_t             ARGB32_BLUE_MASK        = 0x000000FF;
+static const uint32_t             ARGB32_ALPHA_MASK       = 0xFF000000;
+static const uint32_t             LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
+static const bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE      = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 static const char *const MODE_READ  = "r";
 static const char *const MODE_WRITE = "wb";
