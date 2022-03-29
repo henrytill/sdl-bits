@@ -133,8 +133,6 @@ typedef struct bmp_PixelARGB32 {
 
 #pragma pack(pop)
 
-static const size_t bmp_bitmap_v4_offset = sizeof(bmp_FileHeader) + sizeof(bmp_BitmapV4Header);
-
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
 int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,

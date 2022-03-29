@@ -12,6 +12,7 @@ enum {
 };
 
 static const uint16_t BITMAP_FILE_TYPE        = 0x4D42;
+static const size_t   BITMAP_V4_OFFSET_BYTES  = sizeof(bmp_FileHeader) + sizeof(bmp_BitmapV4Header);
 static const uint32_t BI_BITFIELDS            = 0x0003;
 static const uint32_t ARGB32_RED_MASK         = 0x00FF0000;
 static const uint32_t ARGB32_GREEN_MASK       = 0x0000FF00;
@@ -51,7 +52,7 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
         return ret;
     }
 
-    file_size_bytes = bmp_bitmap_v4_offset + image_size_bytes;
+    file_size_bytes = BITMAP_V4_OFFSET_BYTES + image_size_bytes;
     if (file_size_bytes > UINT32_MAX) {
         return ret;
     }
@@ -61,7 +62,7 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
         .size_bytes   = (uint32_t)file_size_bytes,
         .reserved1    = 0,
         .reserved2    = 0,
-        .offset_bytes = (uint32_t)bmp_bitmap_v4_offset,
+        .offset_bytes = (uint32_t)BITMAP_V4_OFFSET_BYTES,
     };
 
     bmp_BitmapV4Header bitmap_v4_header = {
