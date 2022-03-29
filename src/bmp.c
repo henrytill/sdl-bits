@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,8 +37,6 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
     size_t image_size_bytes;
     size_t file_size_bytes;
     size_t writes;
-
-    assert(bmp_bitmap_v4_offset < UINT32_MAX);
 
     if (target_buff == NULL || file == NULL) {
         return ret;
