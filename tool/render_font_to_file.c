@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
     FT_GlyphSlot     slot         = NULL;
     unsigned char  **image        = NULL;
     bmp_PixelARGB32 *target_buff  = NULL;
-    size_t           image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-    size_t           image_height = FONT_HEIGHT_PIXELS;
+    const size_t     image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+    const size_t     image_height = FONT_HEIGHT_PIXELS;
     char             char_codes[CHAR_CODES_SIZE];
     int              error;
 
