@@ -35,8 +35,6 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
                         const char            *file) {
     int    ret    = 1;
     FILE  *file_h = NULL;
-    size_t image_size_bytes;
-    size_t file_size_bytes;
     size_t writes;
 
     if (target_buff == NULL || file == NULL) {
@@ -47,12 +45,13 @@ int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
         return ret;
     }
 
-    image_size_bytes = (image_width_pixels * image_height_pixels) * sizeof(bmp_PixelARGB32);
+    const size_t image_size_bytes =
+        (image_width_pixels * image_height_pixels) * sizeof(bmp_PixelARGB32);
     if (image_size_bytes > UINT32_MAX) {
         return ret;
     }
 
-    file_size_bytes = BITMAP_V4_OFFSET_BYTES + image_size_bytes;
+    const size_t file_size_bytes = BITMAP_V4_OFFSET_BYTES + image_size_bytes;
     if (file_size_bytes > UINT32_MAX) {
         return ret;
     }
@@ -122,7 +121,6 @@ int bmp_read_bitmap(const char           *file,
     int      ret    = 1;
     FILE    *file_h = NULL;
     uint32_t dib_header_size_bytes;
-    uint32_t image_size_bytes;
     size_t   reads;
     int      error;
     fpos_t   pos;
@@ -161,7 +159,7 @@ int bmp_read_bitmap(const char           *file,
         goto out;
     }
 
-    image_size_bytes = bitmap_info_header_out->image_size_bytes;
+    const uint32_t image_size_bytes = bitmap_info_header_out->image_size_bytes;
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
@@ -187,7 +185,6 @@ int bmp_read_bitmap_v4(const char         *file,
     int      ret    = 1;
     FILE    *file_h = NULL;
     uint32_t dib_header_size_bytes;
-    uint32_t image_size_bytes;
     size_t   reads;
     fpos_t   pos;
     int      error;
@@ -226,7 +223,7 @@ int bmp_read_bitmap_v4(const char         *file,
         goto out;
     }
 
-    image_size_bytes = bitmap_v4_header_out->image_size_bytes;
+    const uint32_t image_size_bytes = bitmap_v4_header_out->image_size_bytes;
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
