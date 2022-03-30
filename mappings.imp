@@ -1,11 +1,14 @@
 [
     { include: ["<SDL_events.h>",                 "private", "<SDL.h>",      "public"] },
+    { include: ["<SDL_log.h>",                    "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_pixels.h>",                 "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_surface.h>",                "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_timer.h>",                  "private", "<SDL.h>",      "public"] },
+    { include: ["<SDL_version.h>",                "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_video.h>",                  "private", "<SDL.h>",      "public"] },
     { include: ["<freetype/freetype.h>",          "private", "<ft2build.h>", "public"] },
     { include: ["<freetype/fterrors.h>",          "private", "<ft2build.h>", "public"] },
     { include: ["\"freetype/config/ftheader.h\"", "private", "<ft2build.h>", "public"] },
-    { include: ["\"freetype/ftimage.h\"",         "private", "<ft2build.h>", "public"] }
+    { include: ["\"freetype/ftimage.h\"",         "private", "<ft2build.h>", "public"] },
+    { include: ["\"freetype/fttypes.h\"",         "private", "<ft2build.h>", "public"] }
 ]
