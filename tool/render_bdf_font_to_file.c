@@ -78,9 +78,9 @@ void free_image(unsigned char ***image, size_t height) {
 
 static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset) {
     unsigned char *buffer = slot->bitmap.buffer;
-    unsigned int   rows   = slot->bitmap.rows;
-    unsigned int   width  = slot->bitmap.width;
-    unsigned int   pitch  = abs(slot->bitmap.pitch);
+    unsigned int   rows   = (unsigned int)slot->bitmap.rows;
+    unsigned int   width  = (unsigned int)slot->bitmap.width;
+    unsigned int   pitch  = (unsigned int)abs(slot->bitmap.pitch);
     unsigned char  datum;
 
     for (size_t y = 0, p = 0; y < rows; y++, p += pitch) {
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
-        error = FT_Load_Char(face, char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+        error = FT_Load_Char(face, (FT_ULong)char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
         if (error != 0) {
             print_error(error);
             goto out;
