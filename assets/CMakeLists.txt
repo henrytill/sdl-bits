@@ -29,13 +29,13 @@ add_custom_target(font_bmp ALL DEPENDS ${FONT_BMP_OUTPUT_PATH})
 
 set_target_properties(font_bmp PROPERTIES ADDITIONAL_CLEAN_FILES ${FONT_BMP_OUTPUT_PATH})
 
-# render_test_bitmap
+# generate_test_bitmap
 set(TEST_BMP_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/test.bmp)
 
 add_custom_command(OUTPUT ${TEST_BMP_OUTPUT_PATH}
-                   COMMAND render_test_bitmap
+                   COMMAND generate_test_bitmap
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                   DEPENDS render_test_bitmap)
+                   DEPENDS generate_test_bitmap)
 
 add_custom_target(test_bmp ALL DEPENDS ${TEST_BMP_OUTPUT_PATH})
 
