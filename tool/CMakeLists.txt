@@ -1,3 +1,9 @@
+# Executable: generate_test_bitmap
+add_executable(generate_test_bitmap generate_test_bitmap.c)
+SET_COMPILER_OPTIONS(generate_test_bitmap)
+target_link_libraries(generate_test_bitmap PRIVATE bmp)
+
+
 # Executable: library_versions
 add_executable(library_versions library_versions.c)
 SET_COMPILER_OPTIONS(library_versions)
@@ -29,9 +35,3 @@ elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
   target_include_directories(render_bdf_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS})
   target_link_libraries(render_bdf_font_to_file PRIVATE ${FREETYPE2_LIBRARIES})
 endif()
-
-
-# Executable: render_test_bitmap
-add_executable(render_test_bitmap render_test_bitmap.c)
-SET_COMPILER_OPTIONS(render_test_bitmap)
-target_link_libraries(render_test_bitmap PRIVATE bmp)
