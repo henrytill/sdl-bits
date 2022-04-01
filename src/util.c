@@ -11,11 +11,20 @@ static int util_buffer_grow(util_Buffer *buff, uint32_t cap_hint, uint32_t growt
 static int
 util_buffer2d_grow(util_Buffer2d *buff, uint32_t x_cap_hint, uint32_t y_cap_hint, uint32_t growth);
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 uint32_t util_uint32_sat_sub(uint32_t x, uint32_t y) {
     uint32_t ret = x - y;
     ret &= -(ret <= x);
     return ret;
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 struct util_Buffer {
     uint32_t cap;
