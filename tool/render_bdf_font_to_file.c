@@ -172,10 +172,12 @@ int main(int argc, char *argv[]) {
         }
         if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
             fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
+            error = 1;
             goto out;
         }
         if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
             fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
+            error = 1;
             goto out;
         }
 
