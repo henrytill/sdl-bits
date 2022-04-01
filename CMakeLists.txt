@@ -51,6 +51,13 @@ check_symbol_exists(ceil math.h HAVE_CEIL)
 # Dependency: SDL
 find_package(SDL2 CONFIG REQUIRED)
 
+# Dependency: SDL_ttf
+if(VCPKG_FOUND)
+  find_package(sdl2-ttf CONFIG REQUIRED)
+elseif(PKG_CONFIG_FOUND)
+  pkg_check_modules(SDL2_ttf REQUIRED SDL2_ttf)
+endif()
+
 # Dependency: Freetype
 if(VCPKG_FOUND)
   find_package(freetype CONFIG REQUIRED)
