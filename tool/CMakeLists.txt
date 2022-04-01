@@ -17,17 +17,17 @@ elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
 endif()
 
 
-# Executable: render_font_to_file
-add_executable(render_font_to_file render_font_to_file.c)
-SET_COMPILER_OPTIONS(render_font_to_file)
-target_compile_definitions(render_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
-target_link_libraries(render_font_to_file PRIVATE bmp)
+# Executable: render_bdf_font_to_file
+add_executable(render_bdf_font_to_file render_bdf_font_to_file.c)
+SET_COMPILER_OPTIONS(render_bdf_font_to_file)
+target_compile_definitions(render_bdf_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_link_libraries(render_bdf_font_to_file PRIVATE bmp)
 
 if(VCPKG_FOUND)
-  target_link_libraries(render_font_to_file PRIVATE freetype)
+  target_link_libraries(render_bdf_font_to_file PRIVATE freetype)
 elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
-  target_include_directories(render_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS})
-  target_link_libraries(render_font_to_file PRIVATE ${FREETYPE2_LIBRARIES})
+  target_include_directories(render_bdf_font_to_file PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+  target_link_libraries(render_bdf_font_to_file PRIVATE ${FREETYPE2_LIBRARIES})
 endif()
 
 
