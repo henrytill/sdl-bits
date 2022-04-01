@@ -173,7 +173,6 @@ int util_buffer2d_init(util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
     util_Buffer2d *buff_h = NULL;
     char         **data_h = NULL;
     char          *row_h  = NULL;
-    uint32_t       i;
 
     // Allocate buffer and assign to buff if successful
     buff_h = malloc(sizeof(util_Buffer2d));
@@ -189,7 +188,7 @@ int util_buffer2d_init(util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
     }
 
     // Allocate sub-arrays
-    for (i = 0; i < x_cap; i++) {
+    for (uint32_t i = 0; i < x_cap; i++) {
         row_h = calloc(y_cap, sizeof(char));
         if (row_h == NULL) {
             return 1;
@@ -206,13 +205,11 @@ int util_buffer2d_init(util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
 }
 
 int util_buffer2d_deinit(util_Buffer2d **buff) {
-    uint32_t i;
-
     if (*buff == NULL) {
         return 0;
     }
 
-    for (i = 0; i < (*buff)->x_cap; i++) {
+    for (uint32_t i = 0; i < (*buff)->x_cap; i++) {
         free(*((*buff)->data + i));
     }
     free((*buff)->data);
@@ -247,7 +244,6 @@ util_buffer2d_grow(util_Buffer2d *buff, uint32_t x_cap_hint, uint32_t y_cap_hint
     const uint32_t y_cap     = buff->y_cap;
     uint64_t       new_x_cap = (uint64_t)x_cap;
     uint64_t       new_y_cap = (uint64_t)y_cap;
-    uint32_t       i;
 
     if (x_cap_hint <= x_cap || y_cap_hint <= y_cap) {
         return 0;
@@ -276,7 +272,7 @@ util_buffer2d_grow(util_Buffer2d *buff, uint32_t x_cap_hint, uint32_t y_cap_hint
     memset(data_h + x_cap, 0, (size_t)(new_x_cap - x_cap) * sizeof(char *));
 
     // Reallocate sub-arrays
-    for (i = 0; i < new_x_cap; i++) {
+    for (uint32_t i = 0; i < new_x_cap; i++) {
         sub_h = realloc(*(data_h + i), (size_t)new_y_cap * sizeof(char));
         if (sub_h == NULL) {
             return 1;
