@@ -3,10 +3,13 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 static void log_freetype_version(void);
 
 static void log_sdl_version(void);
+
+static void log_sdl_ttf_version(void);
 
 static void log_freetype_version(void) {
     FT_Library library = NULL;
@@ -47,12 +50,30 @@ static void log_sdl_version(void) {
                 sdl_version_linked.patch);
 }
 
+static void log_sdl_ttf_version(void) {
+    SDL_version sdl_ttf_version_compiled;
+
+    SDL_TTF_VERSION(&sdl_ttf_version_compiled);
+    const SDL_version *sdl_ttf_version_linked = TTF_Linked_Version();
+    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+                "We compiled against SDL_ttf version %u.%u.%u ...\n",
+                sdl_ttf_version_compiled.major,
+                sdl_ttf_version_compiled.minor,
+                sdl_ttf_version_compiled.patch);
+    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+                "... and we are linking against SDL_ttf version %u.%u.%u.\n",
+                sdl_ttf_version_linked->major,
+                sdl_ttf_version_linked->minor,
+                sdl_ttf_version_linked->patch);
+}
+
 int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
     log_freetype_version();
     log_sdl_version();
+    log_sdl_ttf_version();
 
     return EXIT_SUCCESS;
 }

@@ -28,6 +28,15 @@ jobs:
         make
         sudo make install
         popd
+    - name: Install SDL2_ttf
+      run: |
+        pushd $(mktemp -d)
+        curl -LO https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.0.18/SDL2_ttf-2.0.18.tar.gz
+        tar xvzf SDL2_ttf-2.0.18.tar.gz
+        cd SDL2_ttf-2.0.18
+        ./configure
+        sudo make install
+        popd
 
     - uses: actions/checkout@v2
       with:

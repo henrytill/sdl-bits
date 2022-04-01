@@ -16,6 +16,13 @@ endif()
 target_link_libraries(library_versions PRIVATE SDL2::SDL2main SDL2::SDL2)
 
 if(VCPKG_FOUND)
+  target_link_libraries(library_versions PRIVATE SDL2::SDL2_ttf)
+elseif(PKG_CONFIG_FOUND AND SDL2_ttf_FOUND)
+  target_include_directories(library_versions PRIVATE ${SDL2_ttf_INCLUDE_DIRS})
+  target_link_libraries(library_versions PRIVATE ${SDL2_ttf_LIBRARIES})
+endif()
+
+if(VCPKG_FOUND)
   target_link_libraries(library_versions PRIVATE freetype)
 elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
   target_include_directories(library_versions PRIVATE ${FREETYPE2_INCLUDE_DIRS})
