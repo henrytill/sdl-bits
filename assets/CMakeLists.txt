@@ -17,13 +17,13 @@ foreach(TARGET ${TARGETS})
   set_target_properties(${TARGET_NAME} PROPERTIES ADDITIONAL_CLEAN_FILES ${OUTPUT_PATH})
 endforeach()
 
-# render_font_to_file
+# render_bdf_font_to_file
 set(FONT_BMP_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/10x20.bmp)
 
 add_custom_command(OUTPUT ${FONT_BMP_OUTPUT_PATH}
-                   COMMAND render_font_to_file
+                   COMMAND render_bdf_font_to_file
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                   DEPENDS render_font_to_file ucs_fonts)
+                   DEPENDS render_bdf_font_to_file ucs_fonts)
 
 add_custom_target(font_bmp ALL DEPENDS ${FONT_BMP_OUTPUT_PATH})
 
