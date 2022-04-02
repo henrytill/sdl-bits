@@ -6,7 +6,7 @@
 
 #pragma pack(push, 1)
 
-typedef enum bmp_DIBHeaderSize {
+enum bmp_DIBHeaderSize {
     BITMAPCOREHEADER   = 12,
     OS22XBITMAPHEADER  = 64,
     BITMAPINFOHEADER   = 40,
@@ -14,9 +14,9 @@ typedef enum bmp_DIBHeaderSize {
     BITMAPV3INFOHEADER = 56,
     BITMAPV4HEADER     = 108,
     BITMAPV5HEADER     = 124
-} bmp_DIBHeaderSize;
+};
 
-typedef struct bmp_FileHeader {
+struct bmp_FileHeader {
     // Header field
     uint16_t type;
     // File size in bytes
@@ -27,9 +27,9 @@ typedef struct bmp_FileHeader {
     uint16_t reserved2;
     // Offset to image data in bytes
     uint32_t offset_bytes;
-} bmp_FileHeader;
+};
 
-typedef struct bmp_BitmapInfoHeader {
+struct bmp_BitmapInfoHeader {
     // DIB header size in bytes
     uint32_t dib_header_size_bytes;
     // Bitmap width in pixels
@@ -52,9 +52,9 @@ typedef struct bmp_BitmapInfoHeader {
     uint32_t num_colors;
     // Number of important colors used
     uint32_t num_important_colors;
-} bmp_BitmapInfoHeader;
+};
 
-typedef struct bmp_ColorSpaceTriple {
+struct bmp_ColorSpaceTriple {
     // X coordinate of red endpoint
     int32_t red_x;
     // Y coordinate of red endpoint
@@ -73,9 +73,9 @@ typedef struct bmp_ColorSpaceTriple {
     int32_t blue_y;
     // Z coordinate of blue endpoint
     int32_t blue_z;
-} bmp_ColorSpaceTriple;
+};
 
-typedef struct bmp_BitmapV4Header {
+struct bmp_BitmapV4Header {
     // DIB header size in bytes
     uint32_t dib_header_size_bytes;
     // Bitmap width in pixels
@@ -109,45 +109,45 @@ typedef struct bmp_BitmapV4Header {
     // Color space type
     uint32_t color_space_type;
     // Color space triple
-    bmp_ColorSpaceTriple color_space_triple;
+    struct bmp_ColorSpaceTriple color_space_triple;
     // Red gamma
     uint32_t red_gamma;
     // Green gamma
     uint32_t green_gamma;
     // Blue gamma
     uint32_t blue_gamma;
-} bmp_BitmapV4Header;
+};
 
-typedef struct bmp_PixelRGB24 {
+struct bmp_PixelRGB24 {
     uint8_t blue;
     uint8_t green;
     uint8_t red;
-} bmp_PixelRGB24;
+};
 
-typedef struct bmp_PixelARGB32 {
+struct bmp_PixelARGB32 {
     uint8_t blue;
     uint8_t green;
     uint8_t red;
     uint8_t alpha;
-} bmp_PixelARGB32;
+};
 
 #pragma pack(pop)
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
-int bmp_write_bitmap_v4(const bmp_PixelARGB32 *target_buff,
-                        size_t                 image_width_pixels,
-                        size_t                 image_height_pixels,
-                        const char            *file);
+int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *target_buff,
+                        size_t                        image_width_pixels,
+                        size_t                        image_height_pixels,
+                        const char                   *file);
 
-int bmp_read_bitmap(const char           *file,
-                    bmp_FileHeader       *file_header_out,
-                    bmp_BitmapInfoHeader *bitmap_info_header_out,
-                    char                **image_out);
+int bmp_read_bitmap(const char                  *file,
+                    struct bmp_FileHeader       *file_header_out,
+                    struct bmp_BitmapInfoHeader *bitmap_info_header_out,
+                    char                       **image_out);
 
-int bmp_read_bitmap_v4(const char         *file,
-                       bmp_FileHeader     *file_header_out,
-                       bmp_BitmapV4Header *bitmap_v4_header_out,
-                       char              **image_out);
+int bmp_read_bitmap_v4(const char                *file,
+                       struct bmp_FileHeader     *file_header_out,
+                       struct bmp_BitmapV4Header *bitmap_v4_header_out,
+                       char                     **image_out);
 
 #endif // SDL_BITS_BMP_H
