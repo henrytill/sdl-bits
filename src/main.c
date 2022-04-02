@@ -74,6 +74,9 @@ int main(int argc, char *argv[]) {
     enum LoopStatus event_loop_status = RUN;
     struct MainWindow main_window = {.window = NULL, .surface = NULL};
     SDL_Event event;
+    uint32_t loop_start;
+    uint32_t loop_duration;
+    uint32_t frame_delay;
 
     (void)argc;
     (void)argv;
@@ -97,7 +100,7 @@ int main(int argc, char *argv[]) {
     }
 
     while (event_loop_status == RUN) {
-        uint32_t loop_start = SDL_GetTicks();
+        loop_start = SDL_GetTicks();
 
         while (SDL_PollEvent(&event) != 0) {
             switch (event.type) {
@@ -115,8 +118,8 @@ int main(int argc, char *argv[]) {
             goto out;
         }
 
-        uint32_t loop_duration = SDL_GetTicks() - loop_start;
-        uint32_t frame_delay = util_uint32_sat_sub((uint32_t)frame_time_millis, loop_duration);
+        loop_duration = SDL_GetTicks() - loop_start;
+        frame_delay = util_uint32_sat_sub((uint32_t)frame_time_millis, loop_duration);
         if (frame_delay > 0) {
             SDL_Delay(frame_delay);
         }
