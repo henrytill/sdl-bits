@@ -78,18 +78,15 @@ static struct Config config = {
 };
 
 int main(int argc, char *argv[]) {
+    int error;
     enum LoopStatus event_loop_status = RUN;
     struct MainWindow main_window = {.window = NULL, .surface = NULL};
     SDL_Event event;
-    uint32_t loop_start;
-    uint32_t loop_end;
-    uint32_t frame_delay;
-    int error;
 
     (void)argc;
     (void)argv;
 
-    const float target_frame_time_millis = calculate_frame_time_millis(config.target_frame_rate);
+    const float frame_time_millis = calculate_frame_time_millis(config.target_frame_rate);
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != 0) {
@@ -108,7 +105,7 @@ int main(int argc, char *argv[]) {
     }
 
     while (event_loop_status == RUN) {
-        loop_start = SDL_GetTicks();
+        uint32_t loop_start = SDL_GetTicks();
 
         while (SDL_PollEvent(&event) != 0) {
             switch (event.type) {
@@ -126,8 +123,8 @@ int main(int argc, char *argv[]) {
             goto out;
         }
 
-        loop_end = SDL_GetTicks() - loop_start;
-        frame_delay = util_uint32_sat_sub((uint32_t)target_frame_time_millis, loop_end);
+        uint32_t loop_duration = SDL_GetTicks() - loop_start;
+        uint32_t frame_delay = util_uint32_sat_sub((uint32_t)frame_time_millis, loop_duration);
         if (frame_delay > 0) {
             SDL_Delay(frame_delay);
         }
