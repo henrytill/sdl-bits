@@ -14,14 +14,14 @@
     } while (0)
 
 enum {
-    EXPECTED_CHAR_BIT  = 8,
-    FONT_WIDTH_PIXELS  = 10,
+    EXPECTED_CHAR_BIT = 8,
+    FONT_WIDTH_PIXELS = 10,
     FONT_HEIGHT_PIXELS = 20,
-    CHAR_CODES_SIZE    = 94, /* ('~' - '!') + 1 */
+    CHAR_CODES_SIZE = 94, /* ('~' - '!') + 1 */
 };
 
 static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
-static const char *const BMP_FILE  = "./10x20.bmp";
+static const char *const BMP_FILE = "./10x20.bmp";
 
 static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
@@ -77,10 +77,10 @@ void free_image(unsigned char ***image, size_t height) {
 
 static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset) {
     unsigned char *buffer = slot->bitmap.buffer;
-    unsigned int   rows   = (unsigned int)slot->bitmap.rows;
-    unsigned int   width  = (unsigned int)slot->bitmap.width;
-    unsigned int   pitch  = (unsigned int)abs(slot->bitmap.pitch);
-    unsigned char  datum;
+    unsigned int rows = (unsigned int)slot->bitmap.rows;
+    unsigned int width = (unsigned int)slot->bitmap.width;
+    unsigned int pitch = (unsigned int)abs(slot->bitmap.pitch);
+    unsigned char datum;
 
     for (size_t y = 0, p = 0; y < rows; y++, p += pitch) {
         for (size_t i = 0; i < pitch; i++) {
@@ -115,15 +115,15 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 int main(int argc, char *argv[]) {
-    FT_Library              library      = NULL;
-    FT_Face                 face         = NULL;
-    FT_GlyphSlot            slot         = NULL;
-    unsigned char         **image        = NULL;
-    struct bmp_PixelARGB32 *target_buff  = NULL;
-    const size_t            image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-    const size_t            image_height = FONT_HEIGHT_PIXELS;
-    char                    char_codes[CHAR_CODES_SIZE];
-    int                     error;
+    FT_Library library = NULL;
+    FT_Face face = NULL;
+    FT_GlyphSlot slot = NULL;
+    unsigned char **image = NULL;
+    struct bmp_PixelARGB32 *target_buff = NULL;
+    const size_t image_width = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+    const size_t image_height = FONT_HEIGHT_PIXELS;
+    char char_codes[CHAR_CODES_SIZE];
+    int error;
 
     (void)argc;
     (void)argv;
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
             goto out;
         }
 
-        slot  = face->glyph;
+        slot = face->glyph;
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
         if (error != 0) {
             print_error(error);

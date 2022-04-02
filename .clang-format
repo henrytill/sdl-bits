@@ -1,6 +1,4 @@
 BasedOnStyle: LLVM
-AlignConsecutiveAssignments: Consecutive
-AlignConsecutiveDeclarations: Consecutive
 AlignConsecutiveMacros: Consecutive
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty

@@ -9,9 +9,9 @@ enum { BUFFER_GROWTH_FACTOR = 2 };
 static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_t growth);
 
 static int util_buffer2d_grow(struct util_Buffer2d *buff,
-                              uint32_t              x_cap_hint,
-                              uint32_t              y_cap_hint,
-                              uint32_t              growth);
+                              uint32_t x_cap_hint,
+                              uint32_t y_cap_hint,
+                              uint32_t growth);
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -31,12 +31,12 @@ uint32_t util_uint32_sat_sub(uint32_t x, uint32_t y) {
 struct util_Buffer {
     uint32_t cap;
     uint32_t count;
-    char    *data;
+    char *data;
 };
 
 int util_buffer_init(struct util_Buffer **buff, uint32_t cap) {
     struct util_Buffer *buff_h = NULL;
-    char               *data_h = NULL;
+    char *data_h = NULL;
 
     buff_h = malloc(sizeof(struct util_Buffer));
     if (buff_h == NULL) {
@@ -49,8 +49,8 @@ int util_buffer_init(struct util_Buffer **buff, uint32_t cap) {
         return 1;
     }
 
-    (*buff)->data  = data_h;
-    (*buff)->cap   = cap;
+    (*buff)->data = data_h;
+    (*buff)->cap = cap;
     (*buff)->count = 0;
 
     return 0;
@@ -65,9 +65,9 @@ int util_buffer_deinit(struct util_Buffer **buff) {
         free((*buff)->data);
     }
 
-    (*buff)->cap   = 0;
+    (*buff)->cap = 0;
     (*buff)->count = 0;
-    (*buff)->data  = NULL;
+    (*buff)->data = NULL;
     free(*buff);
     *buff = NULL;
     return 0;
@@ -88,9 +88,9 @@ uint32_t util_buffer_count(struct util_Buffer *buff) {
 }
 
 static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_t growth) {
-    char          *data_h  = NULL;
-    const uint32_t cap     = buff->cap;
-    uint64_t       new_cap = (uint64_t)cap;
+    char *data_h = NULL;
+    const uint32_t cap = buff->cap;
+    uint64_t new_cap = (uint64_t)cap;
 
     if (cap_hint <= cap) {
         return 0;
@@ -111,7 +111,7 @@ static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_
     memset(data_h + cap, 0, (size_t)(new_cap - cap) * sizeof(char));
 
     buff->data = data_h;
-    buff->cap  = (uint32_t)new_cap;
+    buff->cap = (uint32_t)new_cap;
 
     return 0;
 }
@@ -128,7 +128,7 @@ int util_buffer_push(struct util_Buffer *buff, char item) {
         return 1;
     }
     *(buff->data + buff->count) = item;
-    buff->count                 = new_count;
+    buff->count = new_count;
     return 0;
 }
 
@@ -161,13 +161,13 @@ int util_buffer_read(struct util_Buffer *buff, uint32_t index, char *out) {
 struct util_Buffer2d {
     uint32_t x_cap;
     uint32_t y_cap;
-    char   **data;
+    char **data;
 };
 
 int util_buffer2d_init(struct util_Buffer2d **buff, uint32_t x_cap, uint32_t y_cap) {
     struct util_Buffer2d *buff_h = NULL;
-    char                **data_h = NULL;
-    char                 *row_h  = NULL;
+    char **data_h = NULL;
+    char *row_h = NULL;
 
     buff_h = malloc(sizeof(struct util_Buffer2d));
     if (buff_h == NULL) {
@@ -188,7 +188,7 @@ int util_buffer2d_init(struct util_Buffer2d **buff, uint32_t x_cap, uint32_t y_c
         *(data_h + i) = row_h;
     }
 
-    (*buff)->data  = data_h;
+    (*buff)->data = data_h;
     (*buff)->x_cap = x_cap;
     (*buff)->y_cap = y_cap;
 
@@ -207,7 +207,7 @@ int util_buffer2d_deinit(struct util_Buffer2d **buff) {
 
     (*buff)->x_cap = 0;
     (*buff)->y_cap = 0;
-    (*buff)->data  = NULL;
+    (*buff)->data = NULL;
     free(*buff);
     *buff = NULL;
     return 0;
@@ -228,15 +228,15 @@ uint32_t util_buffer2d_y_cap(struct util_Buffer2d *buff) {
 }
 
 static int util_buffer2d_grow(struct util_Buffer2d *buff,
-                              uint32_t              x_cap_hint,
-                              uint32_t              y_cap_hint,
-                              uint32_t              growth) {
-    char         **data_h    = NULL;
-    char          *sub_h     = NULL;
-    const uint32_t x_cap     = buff->x_cap;
-    const uint32_t y_cap     = buff->y_cap;
-    uint64_t       new_x_cap = (uint64_t)x_cap;
-    uint64_t       new_y_cap = (uint64_t)y_cap;
+                              uint32_t x_cap_hint,
+                              uint32_t y_cap_hint,
+                              uint32_t growth) {
+    char **data_h = NULL;
+    char *sub_h = NULL;
+    const uint32_t x_cap = buff->x_cap;
+    const uint32_t y_cap = buff->y_cap;
+    uint64_t new_x_cap = (uint64_t)x_cap;
+    uint64_t new_y_cap = (uint64_t)y_cap;
 
     if (x_cap_hint <= x_cap || y_cap_hint <= y_cap) {
         return 0;
@@ -276,7 +276,7 @@ static int util_buffer2d_grow(struct util_Buffer2d *buff,
         }
     }
 
-    buff->data  = data_h;
+    buff->data = data_h;
     buff->x_cap = (uint32_t)new_x_cap;
     buff->y_cap = (uint32_t)new_y_cap;
 

@@ -7,10 +7,10 @@
 static const char *const BMP_FILE = "./assets/test.bmp";
 
 int main(int argc, char *argv[]) {
-    char                     *image = NULL;
-    struct bmp_FileHeader     file_header;
+    char *image = NULL;
+    struct bmp_FileHeader file_header;
     struct bmp_BitmapV4Header bitmap_v4_header;
-    int                       error;
+    int error;
 
     (void)argc;
     (void)argv;

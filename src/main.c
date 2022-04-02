@@ -7,7 +7,7 @@
 
 enum LoopStatus {
     STOP = 0,
-    RUN  = 1
+    RUN = 1
 };
 
 struct Config {
@@ -17,7 +17,7 @@ struct Config {
 };
 
 struct MainWindow {
-    SDL_Window  *window;
+    SDL_Window *window;
     SDL_Surface *surface;
 };
 
@@ -72,19 +72,19 @@ static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_
 static const char *const window_title = "Hello, world!";
 
 static struct Config config = {
-    .window_width_pixels  = 640,
+    .window_width_pixels = 640,
     .window_height_pixels = 480,
-    .target_frame_rate    = 60,
+    .target_frame_rate = 60,
 };
 
 int main(int argc, char *argv[]) {
-    enum LoopStatus   event_loop_status = RUN;
-    struct MainWindow main_window       = {.window = NULL, .surface = NULL};
-    SDL_Event         event;
-    uint32_t          loop_start;
-    uint32_t          loop_end;
-    uint32_t          frame_delay;
-    int               error;
+    enum LoopStatus event_loop_status = RUN;
+    struct MainWindow main_window = {.window = NULL, .surface = NULL};
+    SDL_Event event;
+    uint32_t loop_start;
+    uint32_t loop_end;
+    uint32_t frame_delay;
+    int error;
 
     (void)argc;
     (void)argv;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
             goto out;
         }
 
-        loop_end    = SDL_GetTicks() - loop_start;
+        loop_end = SDL_GetTicks() - loop_start;
         frame_delay = util_uint32_sat_sub((uint32_t)target_frame_time_millis, loop_end);
         if (frame_delay > 0) {
             SDL_Delay(frame_delay);
