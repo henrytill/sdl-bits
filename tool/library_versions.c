@@ -13,10 +13,10 @@ static void log_sdl_ttf_version(void);
 
 static void log_freetype_version(void) {
     FT_Library library = NULL;
-    FT_Int     version_major;
-    FT_Int     version_minor;
-    FT_Int     version_patch;
-    int        error;
+    FT_Int version_major;
+    FT_Int version_minor;
+    FT_Int version_patch;
+    int error;
 
     error = FT_Init_FreeType(&library);
     if (error != 0) {

@@ -1,7 +1,7 @@
 #include "bmp.h"
 
 enum {
-    WIDTH_PIXELS  = 4,
+    WIDTH_PIXELS = 4,
     HEIGHT_PIXELS = 2,
 };
 
