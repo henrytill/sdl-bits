@@ -90,9 +90,9 @@ struct bmp_PixelARGB32 {
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
-int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *target_buff,
-                        size_t image_width_pixels,
-                        size_t image_height_pixels,
+int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
+                        size_t width_pixels,
+                        size_t height_pixels,
                         const char *file);
 
 int bmp_read_bitmap(const char *file,
