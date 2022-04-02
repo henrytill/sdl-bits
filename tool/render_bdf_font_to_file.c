@@ -23,8 +23,8 @@ enum {
 static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
 static const char *const BMP_FILE  = "./10x20.bmp";
 
-static const bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
-static const bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
+static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
+static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 // pos = 0 is MSB
 static unsigned char get_bit(unsigned char source, size_t pos);
@@ -116,15 +116,15 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 int main(int argc, char *argv[]) {
-    FT_Library       library      = NULL;
-    FT_Face          face         = NULL;
-    FT_GlyphSlot     slot         = NULL;
-    unsigned char  **image        = NULL;
-    bmp_PixelARGB32 *target_buff  = NULL;
-    const size_t     image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-    const size_t     image_height = FONT_HEIGHT_PIXELS;
-    char             char_codes[CHAR_CODES_SIZE];
-    int              error;
+    FT_Library              library      = NULL;
+    FT_Face                 face         = NULL;
+    FT_GlyphSlot            slot         = NULL;
+    unsigned char         **image        = NULL;
+    struct bmp_PixelARGB32 *target_buff  = NULL;
+    const size_t            image_width  = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+    const size_t            image_height = FONT_HEIGHT_PIXELS;
+    char                    char_codes[CHAR_CODES_SIZE];
+    int                     error;
 
     (void)argc;
     (void)argv;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
 
     draw_image(image, image_width, image_height);
 
-    target_buff = calloc(image_width * image_height, sizeof(bmp_PixelARGB32));
+    target_buff = calloc(image_width * image_height, sizeof(struct bmp_PixelARGB32));
     if (target_buff == NULL) {
         error = 1;
         goto out;

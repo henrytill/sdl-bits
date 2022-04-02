@@ -12,21 +12,21 @@ enum {
 };
 
 // Establishes loop conditionals
-typedef enum LoopStatus {
+enum LoopStatus {
     STOP = 0,
     RUN  = 1
-} LoopStatus;
+};
 
 int main(int argc, char *argv[]) {
-    int          ret               = 1;
-    LoopStatus   event_loop_status = RUN;
-    SDL_Window  *window            = NULL;
-    SDL_Surface *window_surface    = NULL;
-    SDL_Event    event;
-    uint32_t     fill_color;
-    uint32_t     loop_start;
-    uint32_t     loop_end;
-    uint32_t     frame_delay;
+    int             ret               = 1;
+    enum LoopStatus event_loop_status = RUN;
+    SDL_Window     *window            = NULL;
+    SDL_Surface    *window_surface    = NULL;
+    SDL_Event       event;
+    uint32_t        fill_color;
+    uint32_t        loop_start;
+    uint32_t        loop_end;
+    uint32_t        frame_delay;
 
     (void)argc;
     (void)argv;

@@ -7,10 +7,10 @@
 static const char *const BMP_FILE = "./assets/test.bmp";
 
 int main(int argc, char *argv[]) {
-    char              *image = NULL;
-    bmp_FileHeader     file_header;
-    bmp_BitmapV4Header bitmap_v4_header;
-    int                error;
+    char                     *image = NULL;
+    struct bmp_FileHeader     file_header;
+    struct bmp_BitmapV4Header bitmap_v4_header;
+    int                       error;
 
     (void)argc;
     (void)argv;
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    bmp_PixelARGB32 *pixel = (bmp_PixelARGB32 *)image;
+    struct bmp_PixelARGB32 *pixel = (struct bmp_PixelARGB32 *)image;
 
     test(pixel->blue == 255);
     test(pixel->green == 0);

@@ -25,7 +25,7 @@
 #define check_y_cap(buff, expected) test(util_buffer2d_y_cap(buff) == (expected))
 
 int main(int argc, char *argv[]) {
-    util_Buffer2d *buffer = NULL;
+    struct util_Buffer2d *buffer = NULL;
 
     (void)argc;
     (void)argv;

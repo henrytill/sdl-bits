@@ -5,7 +5,7 @@ enum {
     HEIGHT_PIXELS = 2,
 };
 
-static const bmp_PixelARGB32 TARGET_BUFF[] = {
+static const struct bmp_PixelARGB32 TARGET_BUFF[] = {
     {0xFF, 0x00, 0x00, 0x7F},
     {0x00, 0xFF, 0x00, 0x7F},
     {0x00, 0x00, 0xFF, 0x7F},
