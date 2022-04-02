@@ -17,105 +17,60 @@ enum bmp_DIBHeaderSize {
 };
 
 struct bmp_FileHeader {
-    // Header field
     uint16_t type;
-    // File size in bytes
     uint32_t size_bytes;
-    // Reserved
     uint16_t reserved1;
-    // Reserved
     uint16_t reserved2;
-    // Offset to image data in bytes
     uint32_t offset_bytes;
 };
 
 struct bmp_BitmapInfoHeader {
-    // DIB header size in bytes
     uint32_t dib_header_size_bytes;
-    // Bitmap width in pixels
-    int32_t width_pixels;
-    // Bitmap height in pixels
-    int32_t height_pixels;
-    // Number of color planes
+    int32_t  width_pixels;
+    int32_t  height_pixels;
     uint16_t num_planes;
-    // Bits per pixel
     uint16_t bits_per_pixel;
-    // Compression method
     uint32_t compression;
-    // Image size in bytes
     uint32_t image_size_bytes;
-    // Horizontal resolution of the image in pixels per meter
-    int32_t x_resolution_ppm;
-    // Vertical resolution of the image in pixels per meter
-    int32_t y_resolution_ppm;
-    // Number of colors in the color palette
+    int32_t  x_resolution_ppm;
+    int32_t  y_resolution_ppm;
     uint32_t num_colors;
-    // Number of important colors used
     uint32_t num_important_colors;
 };
 
 struct bmp_ColorSpaceTriple {
-    // X coordinate of red endpoint
     int32_t red_x;
-    // Y coordinate of red endpoint
     int32_t red_y;
-    // Z coordinate of red endpoint
     int32_t red_z;
-    // X coordinate of green endpoint
     int32_t green_x;
-    // Y coordinate of green endpoint
     int32_t green_y;
-    // Z coordinate of green endpoint
     int32_t green_z;
-    // X coordinate of blue endpoint
     int32_t blue_x;
-    // Y coordinate of blue endpoint
     int32_t blue_y;
-    // Z coordinate of blue endpoint
     int32_t blue_z;
 };
 
 struct bmp_BitmapV4Header {
-    // DIB header size in bytes
-    uint32_t dib_header_size_bytes;
-    // Bitmap width in pixels
-    int32_t width_pixels;
-    // Bitmap height in pixels
-    int32_t height_pixels;
-    // Number of color planes
-    uint16_t num_planes;
-    // Bits per pixel
-    uint16_t bits_per_pixel;
-    // Compression method
-    uint32_t compression;
-    // Image size in bytes
-    uint32_t image_size_bytes;
-    // Horizontal resolution of the image in pixels per meter
-    int32_t x_resolution_ppm;
-    // Vertical resolution of the image in pixels per meter
-    int32_t y_resolution_ppm;
-    // Number of colors in the color palette
-    uint32_t num_colors;
-    // Number of important colors used
-    uint32_t num_important_colors;
-    // Red channel bit mask
-    uint32_t red_mask;
-    // Green channel bit mask
-    uint32_t green_mask;
-    // Blue channel bit mask
-    uint32_t blue_mask;
-    // Alpha channel bit mask
-    uint32_t alpha_mask;
-    // Color space type
-    uint32_t color_space_type;
-    // Color space triple
+    uint32_t                    dib_header_size_bytes;
+    int32_t                     width_pixels;
+    int32_t                     height_pixels;
+    uint16_t                    num_planes;
+    uint16_t                    bits_per_pixel;
+    uint32_t                    compression;
+    uint32_t                    image_size_bytes;
+    int32_t                     x_resolution_ppm;
+    int32_t                     y_resolution_ppm;
+    uint32_t                    num_colors;
+    uint32_t                    num_important_colors;
+    uint32_t                    red_mask;
+    uint32_t                    green_mask;
+    uint32_t                    blue_mask;
+    uint32_t                    alpha_mask;
+    uint32_t                    color_space_type;
     struct bmp_ColorSpaceTriple color_space_triple;
-    // Red gamma
-    uint32_t red_gamma;
-    // Green gamma
-    uint32_t green_gamma;
-    // Blue gamma
-    uint32_t blue_gamma;
+    uint32_t                    red_gamma;
+    uint32_t                    green_gamma;
+    uint32_t                    blue_gamma;
 };
 
 struct bmp_PixelRGB24 {
@@ -150,4 +105,4 @@ int bmp_read_bitmap_v4(const char                *file,
                        struct bmp_BitmapV4Header *bitmap_v4_header_out,
                        char                     **image_out);
 
-#endif // SDL_BITS_BMP_H
+#endif /* SDL_BITS_BMP_H */

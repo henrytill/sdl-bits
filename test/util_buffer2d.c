@@ -4,8 +4,6 @@
 #include "test.h"
 #include "util.h"
 
-// Some helper macros
-
 #define checked_init(buff, x_cap, y_cap) test(util_buffer2d_init(buff, x_cap, y_cap) == 0)
 
 #define checked_deinit(buff) test(util_buffer2d_deinit(buff) == 0)

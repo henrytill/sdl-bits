@@ -5,8 +5,6 @@
 
 #include "util.h"
 
-/* Some types */
-
 enum LoopStatus {
     STOP = 0,
     RUN  = 1
@@ -23,22 +21,13 @@ struct MainWindow {
     SDL_Surface *surface;
 };
 
-/* Static Function Prototypes */
-
-// Calculates frame time (in milliseconds) from the provided frames per second.
 static float calculate_frame_time_millis(unsigned int frames_per_second);
 
-// Calls SDL_CreateWindow and SDL_GetWindowSurface on the created window.  Stores pointers to the
-// window and surface in the output struct.
 static int create_main_window(struct Config *config, const char *title, struct MainWindow *out);
 
-// Calls SDL_DestroyWindow on the provided main window's SDL_Window.
 static void destroy_main_window(struct MainWindow *main_window);
 
-// Fills a given surface with the provided color.
 static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_t blue);
-
-/* Static Function Definitions */
 
 static float calculate_frame_time_millis(unsigned int frames_per_second) {
     const float second_millis = 1000;
@@ -80,8 +69,6 @@ static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_
     return error;
 }
 
-/* Static Data */
-
 static const char *const window_title = "Hello, world!";
 
 static struct Config config = {
@@ -89,8 +76,6 @@ static struct Config config = {
     .window_height_pixels = 480,
     .target_frame_rate    = 60,
 };
-
-/* main */
 
 int main(int argc, char *argv[]) {
     enum LoopStatus   event_loop_status = RUN;
@@ -122,11 +107,9 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    // Begin main event loop
     while (event_loop_status == RUN) {
         loop_start = SDL_GetTicks();
 
-        // Handle events on the SDL event queue
         while (SDL_PollEvent(&event) != 0) {
             switch (event.type) {
             case SDL_QUIT:
@@ -137,21 +120,18 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // Update
         error = SDL_UpdateWindowSurface(main_window.window);
         if (error != 0) {
             util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
             goto out;
         }
 
-        // Calculate frame delay
         loop_end    = SDL_GetTicks() - loop_start;
         frame_delay = util_uint32_sat_sub((uint32_t)target_frame_time_millis, loop_end);
         if (frame_delay > 0) {
             SDL_Delay(frame_delay);
         }
     }
-    // End main event loop
 
 out:
     destroy_main_window(&main_window);

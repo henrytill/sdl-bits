@@ -38,20 +38,17 @@ int util_buffer_init(struct util_Buffer **buff, uint32_t cap) {
     struct util_Buffer *buff_h = NULL;
     char               *data_h = NULL;
 
-    // Allocate buffer and assign to buff if successful
     buff_h = malloc(sizeof(struct util_Buffer));
     if (buff_h == NULL) {
         return 1;
     }
     *buff = buff_h;
 
-    // Allocate array
     data_h = calloc(cap, sizeof(char));
     if (data_h == NULL) {
         return 1;
     }
 
-    // Assign
     (*buff)->data  = data_h;
     (*buff)->cap   = cap;
     (*buff)->count = 0;
@@ -99,7 +96,6 @@ static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_
         return 0;
     }
 
-    // Update capacity
     while (cap_hint > new_cap) {
         new_cap *= growth;
     }
@@ -107,16 +103,13 @@ static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_
         new_cap = UINT32_MAX;
     }
 
-    // Reallocate array
     data_h = realloc(buff->data, (size_t)new_cap * sizeof(char));
     if (data_h == NULL) {
         return 1;
     }
 
-    // Zero out new trailing cells
     memset(data_h + cap, 0, (size_t)(new_cap - cap) * sizeof(char));
 
-    // Assign
     buff->data = data_h;
     buff->cap  = (uint32_t)new_cap;
 
@@ -176,20 +169,17 @@ int util_buffer2d_init(struct util_Buffer2d **buff, uint32_t x_cap, uint32_t y_c
     char                **data_h = NULL;
     char                 *row_h  = NULL;
 
-    // Allocate buffer and assign to buff if successful
     buff_h = malloc(sizeof(struct util_Buffer2d));
     if (buff_h == NULL) {
         return 1;
     }
     *buff = buff_h;
 
-    // Allocate base array
     data_h = calloc(x_cap, sizeof(char *));
     if (data_h == NULL) {
         return 1;
     }
 
-    // Allocate sub-arrays
     for (uint32_t i = 0; i < x_cap; i++) {
         row_h = calloc(y_cap, sizeof(char));
         if (row_h == NULL) {
@@ -198,7 +188,6 @@ int util_buffer2d_init(struct util_Buffer2d **buff, uint32_t x_cap, uint32_t y_c
         *(data_h + i) = row_h;
     }
 
-    // Assign
     (*buff)->data  = data_h;
     (*buff)->x_cap = x_cap;
     (*buff)->y_cap = y_cap;
@@ -266,16 +255,13 @@ static int util_buffer2d_grow(struct util_Buffer2d *buff,
         new_y_cap = UINT32_MAX;
     }
 
-    // Reallocate base array
     data_h = realloc(buff->data, (size_t)new_x_cap * sizeof(char *));
     if (data_h == NULL) {
         return 1;
     }
 
-    // Nullify new trailing cells in base array
     memset(data_h + x_cap, 0, (size_t)(new_x_cap - x_cap) * sizeof(char *));
 
-    // Reallocate sub-arrays
     for (uint32_t i = 0; i < new_x_cap; i++) {
         sub_h = realloc(*(data_h + i), (size_t)new_y_cap * sizeof(char));
         if (sub_h == NULL) {
@@ -283,16 +269,13 @@ static int util_buffer2d_grow(struct util_Buffer2d *buff,
         }
         *(data_h + i) = sub_h;
 
-        // Zero out new trailing cells in existing sub-arrays
         memset(*(data_h + i) + y_cap, 0, (size_t)(new_y_cap - y_cap) * sizeof(char));
 
-        // Zero out new sub-arrays
         if (i >= x_cap) {
             memset(*(data_h + i), 0, (size_t)new_y_cap * sizeof(char));
         }
     }
 
-    // Assign
     buff->data  = data_h;
     buff->x_cap = (uint32_t)new_x_cap;
     buff->y_cap = (uint32_t)new_y_cap;

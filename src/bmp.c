@@ -4,18 +4,15 @@
 
 #include "bmp.h"
 
-// Integer constants used for calculating row size
 enum {
     BITS_PER_DWORD  = 32,
     BYTES_PER_DWORD = 4,
 };
 
-// File header constants
 static const uint16_t BITMAP_FILE_TYPE = 0x4D42;
 static const size_t   BITMAP_V4_OFFSET_BYTES =
     sizeof(struct bmp_FileHeader) + sizeof(struct bmp_BitmapV4Header);
 
-// Bitmap v4 header constants
 static const uint16_t NUM_PLANES              = 1;
 static const uint16_t BITS_PER_PIXEL          = 32;
 static const uint32_t BI_BITFIELDS            = 0x0003;
