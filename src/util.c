@@ -6,13 +6,6 @@
 
 enum { BUFFER_GROWTH_FACTOR = 2 };
 
-static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_t growth);
-
-static int util_buffer2d_grow(struct util_Buffer2d *buff,
-                              uint32_t x_cap_hint,
-                              uint32_t y_cap_hint,
-                              uint32_t growth);
-
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
