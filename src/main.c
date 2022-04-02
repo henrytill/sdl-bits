@@ -21,13 +21,13 @@ struct MainWindow {
     SDL_Surface *surface;
 };
 
-static float calculate_frame_time_millis(unsigned int frames_per_second);
+static const char *const window_title = "Hello, world!";
 
-static int create_main_window(struct Config *config, const char *title, struct MainWindow *out);
-
-static void destroy_main_window(struct MainWindow *main_window);
-
-static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_t blue);
+static struct Config default_config = {
+    .window_width_pixels = 640,
+    .window_height_pixels = 480,
+    .target_frame_rate = 60,
+};
 
 static float calculate_frame_time_millis(unsigned int frames_per_second) {
     const float second_millis = 1000;
@@ -69,14 +69,6 @@ static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_
     return error;
 }
 
-static const char *const window_title = "Hello, world!";
-
-static struct Config config = {
-    .window_width_pixels = 640,
-    .window_height_pixels = 480,
-    .target_frame_rate = 60,
-};
-
 int main(int argc, char *argv[]) {
     int error;
     enum LoopStatus event_loop_status = RUN;
@@ -86,7 +78,7 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
-    const float frame_time_millis = calculate_frame_time_millis(config.target_frame_rate);
+    const float frame_time_millis = calculate_frame_time_millis(default_config.target_frame_rate);
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != 0) {
@@ -94,7 +86,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    error = create_main_window(&config, window_title, &main_window);
+    error = create_main_window(&default_config, window_title, &main_window);
     if (error != 0) {
         goto out;
     }

@@ -27,20 +27,6 @@ static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 /* pos = 0 is MSB */
-static unsigned char get_bit(unsigned char source, size_t pos);
-
-static int alloc_image(unsigned char ***image, size_t height, size_t width);
-
-static void free_image(unsigned char ***image, size_t height);
-
-static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset);
-
-#ifdef DRAW_IMAGE
-static void draw_image(unsigned char **image, size_t image_width, size_t image_height);
-#else
-static inline void draw_image(unsigned char **image, size_t image_width, size_t image_height);
-#endif
-
 static unsigned char get_bit(unsigned char source, size_t pos) {
     assert(CHAR_BIT == EXPECTED_CHAR_BIT);
     if (pos >= CHAR_BIT) {

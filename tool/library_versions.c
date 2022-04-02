@@ -5,12 +5,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-static void log_freetype_version(void);
-
-static void log_sdl_version(void);
-
-static void log_sdl_ttf_version(void);
-
 static void log_freetype_version(void) {
     FT_Library library = NULL;
     FT_Int version_major;
