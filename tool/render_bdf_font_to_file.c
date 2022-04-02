@@ -17,7 +17,7 @@ enum {
     EXPECTED_CHAR_BIT  = 8,
     FONT_WIDTH_PIXELS  = 10,
     FONT_HEIGHT_PIXELS = 20,
-    CHAR_CODES_SIZE    = 94, // ('~' - '!') + 1
+    CHAR_CODES_SIZE    = 94, /* ('~' - '!') + 1 */
 };
 
 static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
@@ -26,7 +26,7 @@ static const char *const BMP_FILE  = "./10x20.bmp";
 static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
-// pos = 0 is MSB
+/* pos = 0 is MSB */
 static unsigned char get_bit(unsigned char source, size_t pos);
 
 static int alloc_image(unsigned char ***image, size_t height, size_t width);
@@ -42,12 +42,11 @@ static inline void draw_image(unsigned char **image, size_t image_width, size_t 
 #endif
 
 static unsigned char get_bit(unsigned char source, size_t pos) {
-    // https://stackoverflow.com/a/881968
     assert(CHAR_BIT == EXPECTED_CHAR_BIT);
     if (pos >= CHAR_BIT) {
         return 0;
     }
-    // Also: source & (1 << (CHAR_BIT + ~pos));
+    /* Also: source & (1 << (CHAR_BIT + ~pos)); */
     return (source >> (CHAR_BIT + ~pos)) & 1;
 }
 

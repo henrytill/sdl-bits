@@ -5,8 +5,6 @@
 #include "test.h"
 #include "util.h"
 
-// Some helper macros
-
 #define checked_init(buff, size) test(util_buffer_init(buff, size) == 0)
 
 #define checked_deinit(buff) test(util_buffer_deinit(buff) == 0)
