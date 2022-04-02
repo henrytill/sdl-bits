@@ -2,18 +2,16 @@
 #define SDL_BITS_UTIL_H
 
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h> // IWYU pragma: keep
 
 // Prints well-formatted SDL error
-#define util_print_sdl_error()                                                                     \
+#define util_log_sdl_error(category)                                                               \
     do {                                                                                           \
         const char *sdl_err = SDL_GetError();                                                      \
-        fprintf(stderr, "ERROR: %s:%d", __FILE__, __LINE__);                                       \
         if (strlen(sdl_err) != 0) {                                                                \
-            fprintf(stderr, ": %s", sdl_err);                                                      \
+            SDL_LogError((category), "ERROR: %s:%d: %s", __FILE__, __LINE__, sdl_err);             \
+        } else {                                                                                   \
+            SDL_LogError((category), "ERROR: %s:%d", __FILE__, __LINE__);                          \
         }                                                                                          \
-        fprintf(stderr, "\n");                                                                     \
     } while (0)
 
 //
