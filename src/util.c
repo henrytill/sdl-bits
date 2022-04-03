@@ -116,7 +116,7 @@ int util_buffer_push(struct util_Buffer *buff, char item) {
     if (buff->count == UINT32_MAX) {
         return 1;
     }
-    uint32_t new_count = buff->count + 1;
+    const uint32_t new_count = buff->count + 1;
     if (util_buffer_grow(buff, new_count, BUFFER_GROWTH_FACTOR) == 1) {
         return 1;
     }
@@ -129,7 +129,7 @@ int util_buffer_set(struct util_Buffer *buff, uint32_t index, char item) {
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
-    uint32_t new_count = index + 1;
+    const uint32_t new_count = index + 1;
     if (util_buffer_grow(buff, new_count, BUFFER_GROWTH_FACTOR) == 1) {
         return 1;
     }
@@ -280,8 +280,8 @@ int util_buffer2d_set(struct util_Buffer2d *buff, uint32_t x_index, uint32_t y_i
     if (buff == NULL || buff->data == NULL) {
         return 1;
     }
-    uint32_t x_cap_hint = x_index + 1;
-    uint32_t y_cap_hint = y_index + 1;
+    const uint32_t x_cap_hint = x_index + 1;
+    const uint32_t y_cap_hint = y_index + 1;
     if (util_buffer2d_grow(buff, x_cap_hint, y_cap_hint, BUFFER_GROWTH_FACTOR) == 1) {
         return 1;
     }
