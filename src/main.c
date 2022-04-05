@@ -61,7 +61,6 @@ static void destroy_main_window(struct MainWindow *main_window) {
 
 static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_t blue) {
     uint32_t fill_color = SDL_MapRGB(surface->format, red, green, blue);
-
     int error = SDL_FillRect(surface, NULL, fill_color);
     if (error != 0) {
         util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
@@ -124,7 +123,6 @@ int main(int argc, char *argv[]) {
             SDL_Delay(frame_delay);
         }
     }
-
 out:
     destroy_main_window(&main_window);
     SDL_Quit();

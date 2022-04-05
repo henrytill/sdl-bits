@@ -7,9 +7,9 @@
     do {                                                                                           \
         const char *sdl_err = SDL_GetError();                                                      \
         if (strlen(sdl_err) != 0) {                                                                \
-            SDL_LogError((category), "ERROR: %s:%d: %s", __FILE__, __LINE__, sdl_err);             \
+            SDL_LogError((category), "%s:%d: %s", __FILE__, __LINE__, sdl_err);                    \
         } else {                                                                                   \
-            SDL_LogError((category), "ERROR: %s:%d", __FILE__, __LINE__);                          \
+            SDL_LogError((category), "%s:%d", __FILE__, __LINE__);                                 \
         }                                                                                          \
     } while (0)
 

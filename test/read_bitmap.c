@@ -25,7 +25,6 @@ int main(int argc, char *argv[]) {
     test(pixel->blue == 0);
     test(pixel->green == 0);
     test(pixel->red == 255);
-
 out:
     free(image);
     return error;

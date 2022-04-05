@@ -45,7 +45,6 @@ int util_buffer_init(struct util_Buffer **buff, uint32_t cap) {
     (*buff)->data = data_h;
     (*buff)->cap = cap;
     (*buff)->count = 0;
-
     return 0;
 }
 
@@ -105,7 +104,6 @@ static int util_buffer_grow(struct util_Buffer *buff, uint32_t cap_hint, uint32_
 
     buff->data = data_h;
     buff->cap = (uint32_t)new_cap;
-
     return 0;
 }
 
@@ -184,7 +182,6 @@ int util_buffer2d_init(struct util_Buffer2d **buff, uint32_t x_cap, uint32_t y_c
     (*buff)->data = data_h;
     (*buff)->x_cap = x_cap;
     (*buff)->y_cap = y_cap;
-
     return 0;
 }
 
@@ -272,7 +269,6 @@ static int util_buffer2d_grow(struct util_Buffer2d *buff,
     buff->data = data_h;
     buff->x_cap = (uint32_t)new_x_cap;
     buff->y_cap = (uint32_t)new_y_cap;
-
     return 0;
 }
 

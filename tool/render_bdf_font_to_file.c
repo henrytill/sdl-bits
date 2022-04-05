@@ -184,7 +184,6 @@ int main(int argc, char *argv[]) {
     }
 
     error = bmp_write_bitmap_v4(target_buff, width_pixels, height_pixels, BMP_FILE);
-
 out:
     free(target_buff);
     FT_Done_Face(face);
