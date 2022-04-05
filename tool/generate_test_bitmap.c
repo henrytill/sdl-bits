@@ -19,16 +19,8 @@ static const struct bmp_PixelARGB32 TARGET_BUFF[] = {
 static const char *const BMP_FILE = "./test.bmp";
 
 int main(int argc, char *argv[]) {
-    int error;
-
     (void)argc;
     (void)argv;
 
-    error = bmp_write_bitmap_v4(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
-    if (error != 0) {
-        goto out;
-    }
-
-out:
-    return error;
+    return bmp_write_bitmap_v4(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
 }
