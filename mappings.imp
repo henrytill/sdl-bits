@@ -1,4 +1,5 @@
 [
+    { include: ["<SDL_error.h>",                  "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_events.h>",                 "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_log.h>",                    "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_pixels.h>",                 "private", "<SDL.h>",      "public"] },

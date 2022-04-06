@@ -1,9 +1,20 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <SDL.h>
 
 #include "util.h"
+
+#define log_sdl_error(category)                                                                    \
+    do {                                                                                           \
+        const char *sdl_err = SDL_GetError();                                                      \
+        if (strlen(sdl_err) != 0) {                                                                \
+            SDL_LogError((category), "%s:%d: %s", __FILE__, __LINE__, sdl_err);                    \
+        } else {                                                                                   \
+            SDL_LogError((category), "%s:%d", __FILE__, __LINE__);                                 \
+        }                                                                                          \
+    } while (0)
 
 enum LoopStatus {
     STOP = 0,
@@ -42,12 +53,12 @@ static int create_main_window(struct Config *config, const char *title, struct M
                                    (int)config->window_height_pixels,
                                    SDL_WINDOW_SHOWN);
     if (out->window == NULL) {
-        util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
         return 1;
     }
     out->surface = SDL_GetWindowSurface(out->window);
     if (out->surface == NULL) {
-        util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
         return 1;
     }
     return 0;
@@ -63,7 +74,7 @@ static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_
     uint32_t fill_color = SDL_MapRGB(surface->format, red, green, blue);
     int error = SDL_FillRect(surface, NULL, fill_color);
     if (error != 0) {
-        util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
     }
     return error;
 }
@@ -84,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != 0) {
-        util_log_sdl_error(SDL_LOG_CATEGORY_SYSTEM);
+        log_sdl_error(SDL_LOG_CATEGORY_SYSTEM);
         goto out;
     }
 
@@ -113,7 +124,7 @@ int main(int argc, char *argv[]) {
 
         error = SDL_UpdateWindowSurface(main_window.window);
         if (error != 0) {
-            util_log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+            log_sdl_error(SDL_LOG_CATEGORY_ERROR);
             goto out;
         }
 
