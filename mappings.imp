@@ -3,6 +3,8 @@
     { include: ["<SDL_events.h>",                 "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_log.h>",                    "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_pixels.h>",                 "private", "<SDL.h>",      "public"] },
+    { include: ["<SDL_rect.h>",                   "private", "<SDL.h>",      "public"] },
+    { include: ["<SDL_render.h>",                 "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_surface.h>",                "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_timer.h>",                  "private", "<SDL.h>",      "public"] },
     { include: ["<SDL_version.h>",                "private", "<SDL.h>",      "public"] },
