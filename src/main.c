@@ -31,7 +31,7 @@ struct Config {
 
 struct MainWindow {
     SDL_Window *window;
-    SDL_Surface *surface;
+    SDL_Renderer *renderer;
 };
 
 static const char *const window_title = "Hello, world!";
@@ -41,6 +41,8 @@ static struct Config default_config = {
     .window_height_pixels = 480,
     .target_frame_rate = 60,
 };
+
+static const char *const TEST_BMP = "../../assets/test.bmp";
 
 static float calculate_frame_time_millis(unsigned int frames_per_second) {
     const float second_millis = 1000;
@@ -58,33 +60,58 @@ static int create_main_window(struct Config *config, const char *title, struct M
         log_sdl_error(UNHANDLED);
         return 1;
     }
-    out->surface = SDL_GetWindowSurface(out->window);
-    if (out->surface == NULL) {
+    out->renderer = SDL_CreateRenderer(out->window, -1, SDL_RENDERER_ACCELERATED);
+    if (out->renderer == NULL) {
+        log_sdl_error(UNHANDLED);
+        return 1;
+    }
+    SDL_SetRenderDrawColor(out->renderer, 0x00, 0x00, 0x00, 0xFF);
+    return 0;
+}
+
+static void destroy_main_window(struct MainWindow *main_window) {
+    if (main_window == NULL) {
+        return;
+    }
+    if (main_window->renderer != NULL) {
+        SDL_DestroyRenderer(main_window->renderer);
+    }
+    if (main_window->window != NULL) {
+        SDL_DestroyWindow(main_window->window);
+    }
+}
+
+static int load_bmp(const char *file, SDL_Surface **out) {
+    *out = SDL_LoadBMP(file);
+    if (*out == NULL) {
         log_sdl_error(UNHANDLED);
         return 1;
     }
     return 0;
 }
 
-static void destroy_main_window(struct MainWindow *main_window) {
-    if (main_window != NULL && main_window->window != NULL) {
-        SDL_DestroyWindow(main_window->window);
+static inline void destroy_texture(SDL_Texture *texture) {
+    if (texture != NULL) {
+        SDL_DestroyTexture(texture);
     }
 }
 
-static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_t blue) {
-    uint32_t fill_color = SDL_MapRGB(surface->format, red, green, blue);
-    int error = SDL_FillRect(surface, NULL, fill_color);
-    if (error != 0) {
-        log_sdl_error(UNHANDLED);
+static inline void free_surface(SDL_Surface *surface) {
+    if (surface != NULL) {
+        SDL_FreeSurface(surface);
     }
-    return error;
 }
 
 int main(int argc, char *argv[]) {
     int error;
     enum LoopStatus event_loop_status = RUN;
-    struct MainWindow main_window = {.window = NULL, .surface = NULL};
+    struct MainWindow main_window = {.window = NULL, .renderer = NULL};
+    SDL_Surface *test_bmp_surface = NULL;
+    SDL_Texture *test_bmp_texture = NULL;
+    SDL_Rect window_rect = {.x = 0,
+                            .y = 0,
+                            .w = (int)default_config.window_width_pixels,
+                            .h = (int)default_config.window_height_pixels};
     SDL_Event event;
     uint32_t loop_start;
     uint32_t loop_duration;
@@ -92,6 +119,8 @@ int main(int argc, char *argv[]) {
 
     (void)argc;
     (void)argv;
+
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 
     const float frame_time_millis = calculate_frame_time_millis(default_config.target_frame_rate);
 
@@ -106,10 +135,19 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    error = fill_surface(main_window.surface, 0x00, 0x00, 0x00);
+    error = load_bmp(TEST_BMP, &test_bmp_surface);
     if (error != 0) {
         goto out;
     }
+
+    test_bmp_texture = SDL_CreateTextureFromSurface(main_window.renderer, test_bmp_surface);
+    if (test_bmp_texture == NULL) {
+        log_sdl_error(UNHANDLED);
+        error = 1;
+        goto out;
+    }
+    SDL_FreeSurface(test_bmp_surface);
+    test_bmp_surface = NULL;
 
     while (event_loop_status == RUN) {
         loop_start = SDL_GetTicks();
@@ -124,11 +162,19 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        error = SDL_UpdateWindowSurface(main_window.window);
+        error = SDL_RenderClear(main_window.renderer);
         if (error != 0) {
             log_sdl_error(UNHANDLED);
             goto out;
         }
+
+        error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
+        if (error != 0) {
+            log_sdl_error(UNHANDLED);
+            goto out;
+        }
+
+        SDL_RenderPresent(main_window.renderer);
 
         loop_duration = SDL_GetTicks() - loop_start;
         frame_delay = util_uint32_sat_sub((uint32_t)frame_time_millis, loop_duration);
@@ -137,6 +183,8 @@ int main(int argc, char *argv[]) {
         }
     }
 out:
+    destroy_texture(test_bmp_texture);
+    free_surface(test_bmp_surface);
     destroy_main_window(&main_window);
     SDL_Quit();
     return error;
