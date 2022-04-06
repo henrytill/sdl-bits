@@ -3,16 +3,6 @@
 
 #include <stdint.h>
 
-#define util_log_sdl_error(category)                                                               \
-    do {                                                                                           \
-        const char *sdl_err = SDL_GetError();                                                      \
-        if (strlen(sdl_err) != 0) {                                                                \
-            SDL_LogError((category), "%s:%d: %s", __FILE__, __LINE__, sdl_err);                    \
-        } else {                                                                                   \
-            SDL_LogError((category), "%s:%d", __FILE__, __LINE__);                                 \
-        }                                                                                          \
-    } while (0)
-
 /* Ref: http://locklessinc.com/articles/sat_arithmetic/ */
 uint32_t util_uint32_sat_sub(uint32_t x, uint32_t y);
 
