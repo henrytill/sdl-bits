@@ -8,6 +8,11 @@ if(UNIX)
   target_link_libraries(bmp PRIVATE m)
 endif()
 
+# Library: buffer
+add_library(buffer buffer.c)
+SET_COMPILER_OPTIONS(buffer)
+target_include_directories(buffer INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Library: util
 add_library(util util.c)
 SET_COMPILER_OPTIONS(util)

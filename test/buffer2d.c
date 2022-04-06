@@ -2,28 +2,28 @@
 #include <stdlib.h>
 
 #include "test.h"
-#include "util.h"
+#include "buffer.h"
 
-#define checked_init(buff, x_cap, y_cap) test(util_buffer2d_init(buff, x_cap, y_cap) == 0)
+#define checked_init(buff, x_cap, y_cap) test(buffer2d_init(buff, x_cap, y_cap) == 0)
 
-#define checked_deinit(buff) test(util_buffer2d_deinit(buff) == 0)
+#define checked_deinit(buff) test(buffer2d_deinit(buff) == 0)
 
 #define checked_set(buff, x_index, y_index, item)                                                  \
-    test(util_buffer2d_set(buff, x_index, y_index, item) == 0)
+    test(buffer2d_set(buff, x_index, y_index, item) == 0)
 
 #define checked_read(buff, x_index, y_index, expected)                                             \
     do {                                                                                           \
         char out;                                                                                  \
-        test(util_buffer2d_read(buff, x_index, y_index, &out) == 0);                               \
+        test(buffer2d_read(buff, x_index, y_index, &out) == 0);                                    \
         test(out == (expected));                                                                   \
     } while (0)
 
-#define check_x_cap(buff, expected) test(util_buffer2d_x_cap(buff) == (expected))
+#define check_x_cap(buff, expected) test(buffer2d_x_cap(buff) == (expected))
 
-#define check_y_cap(buff, expected) test(util_buffer2d_y_cap(buff) == (expected))
+#define check_y_cap(buff, expected) test(buffer2d_y_cap(buff) == (expected))
 
 int main(int argc, char *argv[]) {
-    struct util_Buffer2d *buffer = NULL;
+    struct Buffer2d *buffer = NULL;
 
     (void)argc;
     (void)argv;
