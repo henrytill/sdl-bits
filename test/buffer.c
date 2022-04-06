@@ -3,35 +3,35 @@
 #include <stdlib.h>
 
 #include "test.h"
-#include "util.h"
+#include "buffer.h"
 
-#define checked_init(buff, size) test(util_buffer_init(buff, size) == 0)
+#define checked_init(buff, size) test(buffer_init(buff, size) == 0)
 
-#define checked_deinit(buff) test(util_buffer_deinit(buff) == 0)
+#define checked_deinit(buff) test(buffer_deinit(buff) == 0)
 
-#define checked_push(buff, item) test(util_buffer_push(buff, item) == 0)
+#define checked_push(buff, item) test(buffer_push(buff, item) == 0)
 
 #define checked_read(buff, index, expected)                                                        \
     do {                                                                                           \
         char out;                                                                                  \
-        test(util_buffer_read(buff, index, &out) == 0);                                            \
+        test(buffer_read(buff, index, &out) == 0);                                                 \
         test(out == (expected));                                                                   \
     } while (0)
 
 #define failed_read(buff, index)                                                                   \
     do {                                                                                           \
         char out;                                                                                  \
-        test(util_buffer_read(buff, index, &out) == 1);                                            \
+        test(buffer_read(buff, index, &out) == 1);                                                 \
     } while (0)
 
-#define checked_set(buff, index, item) test(util_buffer_set(buff, index, item) == 0)
+#define checked_set(buff, index, item) test(buffer_set(buff, index, item) == 0)
 
-#define check_cap(buff, expected) test(util_buffer_cap(buff) == (expected))
+#define check_cap(buff, expected) test(buffer_cap(buff) == (expected))
 
-#define check_count(buff, expected) test(util_buffer_count(buff) == (expected))
+#define check_count(buff, expected) test(buffer_count(buff) == (expected))
 
 int main(int argc, char *argv[]) {
-    struct util_Buffer *buffer = NULL;
+    struct Buffer *buffer = NULL;
 
     (void)argc;
     (void)argv;
