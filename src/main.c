@@ -16,6 +16,8 @@
         }                                                                                          \
     } while (0)
 
+enum { UNHANDLED = SDL_LOG_CATEGORY_CUSTOM };
+
 enum LoopStatus {
     STOP = 0,
     RUN = 1
@@ -53,12 +55,12 @@ static int create_main_window(struct Config *config, const char *title, struct M
                                    (int)config->window_height_pixels,
                                    SDL_WINDOW_SHOWN);
     if (out->window == NULL) {
-        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(UNHANDLED);
         return 1;
     }
     out->surface = SDL_GetWindowSurface(out->window);
     if (out->surface == NULL) {
-        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(UNHANDLED);
         return 1;
     }
     return 0;
@@ -74,7 +76,7 @@ static int fill_surface(SDL_Surface *surface, uint8_t red, uint8_t green, uint8_
     uint32_t fill_color = SDL_MapRGB(surface->format, red, green, blue);
     int error = SDL_FillRect(surface, NULL, fill_color);
     if (error != 0) {
-        log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+        log_sdl_error(UNHANDLED);
     }
     return error;
 }
@@ -95,7 +97,7 @@ int main(int argc, char *argv[]) {
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != 0) {
-        log_sdl_error(SDL_LOG_CATEGORY_SYSTEM);
+        log_sdl_error(UNHANDLED);
         goto out;
     }
 
@@ -124,7 +126,7 @@ int main(int argc, char *argv[]) {
 
         error = SDL_UpdateWindowSurface(main_window.window);
         if (error != 0) {
-            log_sdl_error(SDL_LOG_CATEGORY_ERROR);
+            log_sdl_error(UNHANDLED);
             goto out;
         }
 
