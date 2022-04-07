@@ -6,16 +6,6 @@
 
 #include "util.h"
 
-#define log_sdl_error(category)                                                                    \
-    do {                                                                                           \
-        const char *sdl_err = SDL_GetError();                                                      \
-        if (strlen(sdl_err) != 0) {                                                                \
-            SDL_LogError((category), "%s:%d: %s", __FILE__, __LINE__, sdl_err);                    \
-        } else {                                                                                   \
-            SDL_LogError((category), "%s:%d", __FILE__, __LINE__);                                 \
-        }                                                                                          \
-    } while (0)
-
 enum { UNHANDLED = SDL_LOG_CATEGORY_CUSTOM };
 
 enum LoopStatus {
@@ -44,6 +34,15 @@ static struct Config default_config = {
 
 static const char *const TEST_BMP = "../../assets/test.bmp";
 
+static inline void log_sdl_error(int category, char *file, int line) {
+    const char *sdl_err = SDL_GetError();
+    if (strlen(sdl_err) != 0) {
+        SDL_LogError((category), "%s:%d: %s", file, line, sdl_err);
+    } else {
+        SDL_LogError((category), "%s:%d", file, line);
+    }
+}
+
 static float calculate_frame_time_millis(unsigned int frames_per_second) {
     const float second_millis = 1000;
     return second_millis / (float)frames_per_second;
@@ -57,12 +56,12 @@ static int create_main_window(struct Config *config, const char *title, struct M
                                    (int)config->window_height_pixels,
                                    SDL_WINDOW_SHOWN);
     if (out->window == NULL) {
-        log_sdl_error(UNHANDLED);
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         return 1;
     }
     out->renderer = SDL_CreateRenderer(out->window, -1, SDL_RENDERER_ACCELERATED);
     if (out->renderer == NULL) {
-        log_sdl_error(UNHANDLED);
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         return 1;
     }
     SDL_SetRenderDrawColor(out->renderer, 0x00, 0x00, 0x00, 0xFF);
@@ -84,7 +83,7 @@ static void destroy_main_window(struct MainWindow *main_window) {
 static int load_bmp(const char *file, SDL_Surface **out) {
     *out = SDL_LoadBMP(file);
     if (*out == NULL) {
-        log_sdl_error(UNHANDLED);
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         return 1;
     }
     return 0;
@@ -126,7 +125,7 @@ int main(int argc, char *argv[]) {
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != 0) {
-        log_sdl_error(UNHANDLED);
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         goto out;
     }
 
@@ -142,7 +141,7 @@ int main(int argc, char *argv[]) {
 
     test_bmp_texture = SDL_CreateTextureFromSurface(main_window.renderer, test_bmp_surface);
     if (test_bmp_texture == NULL) {
-        log_sdl_error(UNHANDLED);
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         error = 1;
         goto out;
     }
@@ -164,13 +163,13 @@ int main(int argc, char *argv[]) {
 
         error = SDL_RenderClear(main_window.renderer);
         if (error != 0) {
-            log_sdl_error(UNHANDLED);
+            log_sdl_error(UNHANDLED, __FILE__, __LINE__);
             goto out;
         }
 
         error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
         if (error != 0) {
-            log_sdl_error(UNHANDLED);
+            log_sdl_error(UNHANDLED, __FILE__, __LINE__);
             goto out;
         }
 
