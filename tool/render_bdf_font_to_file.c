@@ -8,11 +8,6 @@
 
 #include "bmp.h"
 
-#define print_error(error)                                                                         \
-    do {                                                                                           \
-        fprintf(stderr, "ERROR: %s:%d: %d", __FILE__, __LINE__, error);                            \
-    } while (0)
-
 enum {
     EXPECTED_CHAR_BIT = 8,
     FONT_WIDTH_PIXELS = 10,
@@ -25,6 +20,10 @@ static const char *const BMP_FILE = "./10x20.bmp";
 
 static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
+
+static void print_error(int error, char *file, int line) {
+    fprintf(stderr, "ERROR: %s:%d: %d", file, line, error);
+}
 
 /* pos = 0 is MSB */
 static unsigned char get_bit(unsigned char source, size_t pos) {
@@ -120,39 +119,39 @@ int main(int argc, char *argv[]) {
 
     error = alloc_image(&image, height_pixels, width_pixels);
     if (error != 0) {
-        print_error(error);
+        print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_Init_FreeType(&library);
     if (error != 0) {
-        print_error(error);
+        print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_New_Face(library, FONT_FILE, 0, &face);
     if (error != 0) {
-        print_error(error);
+        print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_Set_Pixel_Sizes(face, FONT_WIDTH_PIXELS, FONT_HEIGHT_PIXELS);
     if (error != 0) {
-        print_error(error);
+        print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
         error = FT_Load_Char(face, (FT_ULong)char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
         if (error != 0) {
-            print_error(error);
+            print_error(error, __FILE__, __LINE__);
             goto out;
         }
 
         slot = face->glyph;
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
         if (error != 0) {
-            print_error(error);
+            print_error(error, __FILE__, __LINE__);
             goto out;
         }
         if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
