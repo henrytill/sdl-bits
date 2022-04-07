@@ -9,6 +9,11 @@
 #include "bmp.h"
 
 enum {
+    SUCCESS = 0,
+    FAILURE = 1,
+};
+
+enum {
     EXPECTED_CHAR_BIT = 8,
     FONT_WIDTH_PIXELS = 10,
     FONT_HEIGHT_PIXELS = 20,
@@ -38,15 +43,15 @@ static unsigned char get_bit(unsigned char source, size_t pos) {
 static int alloc_image(unsigned char ***image, size_t height, size_t width) {
     *image = calloc(height, sizeof(unsigned char *));
     if (*image == NULL) {
-        return 1;
+        return FAILURE;
     }
     for (size_t i = 0; i < height; i++) {
         *(*image + i) = calloc(width, sizeof(unsigned char));
         if (*(*image + i) == NULL) {
-            return 1;
+            return FAILURE;
         }
     }
-    return 0;
+    return SUCCESS;
 }
 
 void free_image(unsigned char ***image, size_t height) {
@@ -118,50 +123,50 @@ int main(int argc, char *argv[]) {
     }
 
     error = alloc_image(&image, height_pixels, width_pixels);
-    if (error != 0) {
+    if (error != SUCCESS) {
         print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_Init_FreeType(&library);
-    if (error != 0) {
+    if (error != SUCCESS) {
         print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_New_Face(library, FONT_FILE, 0, &face);
-    if (error != 0) {
+    if (error != SUCCESS) {
         print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     error = FT_Set_Pixel_Sizes(face, FONT_WIDTH_PIXELS, FONT_HEIGHT_PIXELS);
-    if (error != 0) {
+    if (error != SUCCESS) {
         print_error(error, __FILE__, __LINE__);
         goto out;
     }
 
     for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
         error = FT_Load_Char(face, (FT_ULong)char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
-        if (error != 0) {
+        if (error != SUCCESS) {
             print_error(error, __FILE__, __LINE__);
             goto out;
         }
 
         slot = face->glyph;
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
-        if (error != 0) {
+        if (error != SUCCESS) {
             print_error(error, __FILE__, __LINE__);
             goto out;
         }
         if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
             fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-            error = 1;
+            error = FAILURE;
             goto out;
         }
         if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
             fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-            error = 1;
+            error = FAILURE;
             goto out;
         }
 
@@ -172,7 +177,7 @@ int main(int argc, char *argv[]) {
 
     target_buff = calloc(width_pixels * height_pixels, sizeof(struct bmp_PixelARGB32));
     if (target_buff == NULL) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
