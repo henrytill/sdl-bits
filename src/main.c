@@ -6,6 +6,11 @@
 
 #include "util.h"
 
+enum {
+    SUCCESS = 0,
+    FAILURE = 1,
+};
+
 enum { UNHANDLED = SDL_LOG_CATEGORY_CUSTOM };
 
 enum LoopStatus {
@@ -57,15 +62,15 @@ static int create_main_window(struct Config *config, const char *title, struct M
                                    SDL_WINDOW_SHOWN);
     if (out->window == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-        return 1;
+        return FAILURE;
     }
     out->renderer = SDL_CreateRenderer(out->window, -1, SDL_RENDERER_ACCELERATED);
     if (out->renderer == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-        return 1;
+        return FAILURE;
     }
     SDL_SetRenderDrawColor(out->renderer, 0x00, 0x00, 0x00, 0xFF);
-    return 0;
+    return SUCCESS;
 }
 
 static void destroy_main_window(struct MainWindow *main_window) {
@@ -84,9 +89,9 @@ static int load_bmp(const char *file, SDL_Surface **out) {
     *out = SDL_LoadBMP(file);
     if (*out == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-        return 1;
+        return FAILURE;
     }
-    return 0;
+    return SUCCESS;
 }
 
 static inline void destroy_texture(SDL_Texture *texture) {
@@ -124,25 +129,25 @@ int main(int argc, char *argv[]) {
     const float frame_time_millis = calculate_frame_time_millis(default_config.target_frame_rate);
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    if (error != 0) {
+    if (error != SUCCESS) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         goto out;
     }
 
     error = create_main_window(&default_config, window_title, &main_window);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     error = load_bmp(TEST_BMP, &test_bmp_surface);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     test_bmp_texture = SDL_CreateTextureFromSurface(main_window.renderer, test_bmp_surface);
     if (test_bmp_texture == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-        error = 1;
+        error = FAILURE;
         goto out;
     }
     SDL_FreeSurface(test_bmp_surface);
@@ -162,13 +167,13 @@ int main(int argc, char *argv[]) {
         }
 
         error = SDL_RenderClear(main_window.renderer);
-        if (error != 0) {
+        if (error != SUCCESS) {
             log_sdl_error(UNHANDLED, __FILE__, __LINE__);
             goto out;
         }
 
         error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
-        if (error != 0) {
+        if (error != SUCCESS) {
             log_sdl_error(UNHANDLED, __FILE__, __LINE__);
             goto out;
         }

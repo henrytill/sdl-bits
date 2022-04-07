@@ -4,6 +4,8 @@
 #include "test.h"
 #include "bmp.h"
 
+enum { SUCCESS = 0 };
+
 static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
 int main(int argc, char *argv[]) {
@@ -16,7 +18,7 @@ int main(int argc, char *argv[]) {
     (void)argv;
 
     error = bmp_read_bitmap(BMP_FILE, &file_header, &bitmap_info_header, &image);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 

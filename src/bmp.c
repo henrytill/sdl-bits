@@ -6,6 +6,11 @@
 #include "bmp.h"
 
 enum {
+    SUCCESS = 0,
+    FAILURE = 1,
+};
+
+enum {
     BITS_PER_DWORD = 32,
     BYTES_PER_DWORD = 4,
 };
@@ -36,7 +41,7 @@ int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
                         size_t width_pixels,
                         size_t height_pixels,
                         const char *file) {
-    int error = 1;
+    int error = FAILURE;
     size_t writes;
 
     if (source_buff == NULL || file == NULL) {
@@ -108,7 +113,7 @@ int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
         goto out;
     }
 
-    error = 0;
+    error = SUCCESS;
 out:
     fclose(file_h);
     return error;
@@ -118,7 +123,7 @@ int bmp_read_bitmap(const char *file,
                     struct bmp_FileHeader *file_header_out,
                     struct bmp_BitmapInfoHeader *bitmap_info_header_out,
                     char **image_out) {
-    int error = 1;
+    int error = FAILURE;
     uint32_t dib_header_size_bytes;
     size_t reads;
     fpos_t pos;
@@ -134,29 +139,29 @@ int bmp_read_bitmap(const char *file,
     }
 
     error = fgetpos(file_h, &pos);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     error = fsetpos(file_h, &pos);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     if (dib_header_size_bytes != BITMAPINFOHEADER) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     reads = fread(bitmap_info_header_out, sizeof(struct bmp_BitmapInfoHeader), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
@@ -164,17 +169,17 @@ int bmp_read_bitmap(const char *file,
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
-    assert(error == 0);
+    assert(error == SUCCESS);
 out:
     fclose(file_h);
     return error;
@@ -184,7 +189,7 @@ int bmp_read_bitmap_v4(const char *file,
                        struct bmp_FileHeader *file_header_out,
                        struct bmp_BitmapV4Header *bitmap_v4_header_out,
                        char **image_out) {
-    int error = 1;
+    int error = FAILURE;
     uint32_t dib_header_size_bytes;
     size_t reads;
     fpos_t pos;
@@ -196,34 +201,33 @@ int bmp_read_bitmap_v4(const char *file,
 
     reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1, file_h);
     if (reads != 1) {
-        error = 1;
         goto out;
     }
 
     error = fgetpos(file_h, &pos);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     error = fsetpos(file_h, &pos);
-    if (error != 0) {
+    if (error != SUCCESS) {
         goto out;
     }
 
     if (dib_header_size_bytes != BITMAPV4HEADER) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     reads = fread(bitmap_v4_header_out, sizeof(struct bmp_BitmapV4Header), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
@@ -231,17 +235,17 @@ int bmp_read_bitmap_v4(const char *file,
 
     *image_out = calloc(image_size_bytes, sizeof(char));
     if (*image_out == NULL) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
     reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
     if (reads != 1) {
-        error = 1;
+        error = FAILURE;
         goto out;
     }
 
-    assert(error == 0);
+    assert(error == SUCCESS);
 out:
     fclose(file_h);
     return error;
