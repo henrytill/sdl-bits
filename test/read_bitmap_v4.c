@@ -1,8 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "bmp.h"
 #include "test.h"
+#include "bmp.h"
 
 static const char *const BMP_FILE = "./assets/test.bmp";
 
@@ -22,10 +22,26 @@ int main(int argc, char *argv[]) {
 
     struct bmp_PixelARGB32 *pixel = (struct bmp_PixelARGB32 *)image;
 
-    test(pixel->blue == 255);
-    test(pixel->green == 0);
-    test(pixel->red == 0);
-    test(pixel->alpha == 127);
+    if (pixel->blue != 255) {
+        print_failure(__FILE__, __LINE__);
+        error = EXIT_FAILURE;
+        goto out;
+    }
+    if (pixel->green != 0) {
+        print_failure(__FILE__, __LINE__);
+        error = EXIT_FAILURE;
+        goto out;
+    }
+    if (pixel->red != 0) {
+        print_failure(__FILE__, __LINE__);
+        error = EXIT_FAILURE;
+        goto out;
+    }
+    if (pixel->alpha != 127) {
+        print_failure(__FILE__, __LINE__);
+        error = EXIT_FAILURE;
+        goto out;
+    }
 out:
     free(image);
     return error;
