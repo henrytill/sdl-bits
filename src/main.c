@@ -1,10 +1,14 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <SDL.h>
 
 #include "util.h"
+
+#define ARG_ASSET_PATH "--asset-path"
 
 enum {
     SUCCESS = 0,
@@ -22,6 +26,7 @@ struct Config {
     unsigned int window_width_pixels;
     unsigned int window_height_pixels;
     unsigned int target_frame_rate;
+    char *asset_path;
 };
 
 struct MainWindow {
@@ -35,9 +40,10 @@ static struct Config default_config = {
     .window_width_pixels = 640,
     .window_height_pixels = 480,
     .target_frame_rate = 60,
+    .asset_path = "./assets",
 };
 
-static const char *const TEST_BMP = "../../assets/test.bmp";
+static const char *const TEST_BMP_FILE = "test.bmp";
 
 static inline void log_sdl_error(int category, char *file, int line) {
     const char *sdl_err = SDL_GetError();
@@ -46,6 +52,25 @@ static inline void log_sdl_error(int category, char *file, int line) {
     } else {
         SDL_LogError((category), "%s:%d", file, line);
     }
+}
+
+static void parse_args(int argc, char *argv[], struct Config *config) {
+    for (size_t i = 0; i < (size_t)argc;) {
+        char *arg = argv[i++];
+        if (strcmp(arg, ARG_ASSET_PATH) == 0) {
+            config->asset_path = argv[i];
+        }
+    }
+}
+
+static char *create_test_bmp_path(const struct Config *config, const char *test_bmp_file) {
+    size_t len = (size_t)snprintf(NULL, 0, "%s/%s", config->asset_path, test_bmp_file);
+    len += 1; /* for null-termination */
+    char *ret = calloc(len, sizeof(char));
+    if (ret != NULL) {
+        snprintf(ret, len, "%s/%s", config->asset_path, test_bmp_file);
+    }
+    return ret;
 }
 
 static inline float calculate_frame_time_millis(unsigned int frames_per_second) {
@@ -107,7 +132,7 @@ static inline void free_surface(SDL_Surface *surface) {
 }
 
 int main(int argc, char *argv[]) {
-    int error;
+    int error = FAILURE;
     enum LoopStatus event_loop_status = RUN;
     struct MainWindow main_window = {.window = NULL, .renderer = NULL};
     SDL_Surface *test_bmp_surface = NULL;
@@ -126,6 +151,13 @@ int main(int argc, char *argv[]) {
 
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 
+    parse_args(argc, argv, &default_config);
+
+    const char *test_bmp_path = create_test_bmp_path(&default_config, TEST_BMP_FILE);
+    if (test_bmp_path == NULL) {
+        goto out;
+    }
+
     const float frame_time_millis = calculate_frame_time_millis(default_config.target_frame_rate);
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -139,7 +171,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    error = load_bmp(TEST_BMP, &test_bmp_surface);
+    error = load_bmp(test_bmp_path, &test_bmp_surface);
     if (error != SUCCESS) {
         goto out;
     }
