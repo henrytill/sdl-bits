@@ -48,9 +48,18 @@ static inline void log_sdl_error(int category, char *file, int line) {
     }
 }
 
-static float calculate_frame_time_millis(unsigned int frames_per_second) {
+static inline float calculate_frame_time_millis(unsigned int frames_per_second) {
     const float second_millis = 1000;
     return second_millis / (float)frames_per_second;
+}
+
+static int load_bmp(const char *file, SDL_Surface **out) {
+    *out = SDL_LoadBMP(file);
+    if (*out == NULL) {
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+        return FAILURE;
+    }
+    return SUCCESS;
 }
 
 static int create_main_window(struct Config *config, const char *title, struct MainWindow *out) {
@@ -73,7 +82,7 @@ static int create_main_window(struct Config *config, const char *title, struct M
     return SUCCESS;
 }
 
-static void destroy_main_window(struct MainWindow *main_window) {
+static inline void destroy_main_window(struct MainWindow *main_window) {
     if (main_window == NULL) {
         return;
     }
@@ -83,15 +92,6 @@ static void destroy_main_window(struct MainWindow *main_window) {
     if (main_window->window != NULL) {
         SDL_DestroyWindow(main_window->window);
     }
-}
-
-static int load_bmp(const char *file, SDL_Surface **out) {
-    *out = SDL_LoadBMP(file);
-    if (*out == NULL) {
-        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-        return FAILURE;
-    }
-    return SUCCESS;
 }
 
 static inline void destroy_texture(SDL_Texture *texture) {
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
         error = FAILURE;
         goto out;
     }
-    SDL_FreeSurface(test_bmp_surface);
+    free_surface(test_bmp_surface);
     test_bmp_surface = NULL;
 
     while (event_loop_status == RUN) {
