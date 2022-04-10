@@ -63,12 +63,12 @@ static void parse_args(int argc, char *argv[], struct Config *config) {
     }
 }
 
-static char *create_test_bmp_path(const struct Config *config, const char *test_bmp_file) {
-    size_t len = (size_t)snprintf(NULL, 0, "%s/%s", config->asset_path, test_bmp_file);
+static char *init_asset_path(const struct Config *config, const char *sub_path) {
+    size_t len = (size_t)snprintf(NULL, 0, "%s/%s", config->asset_path, sub_path);
     len += 1; /* for null-termination */
     char *ret = calloc(len, sizeof(char));
     if (ret != NULL) {
-        snprintf(ret, len, "%s/%s", config->asset_path, test_bmp_file);
+        snprintf(ret, len, "%s/%s", config->asset_path, sub_path);
     }
     return ret;
 }
@@ -87,7 +87,7 @@ static int load_bmp(const char *file, SDL_Surface **out) {
     return SUCCESS;
 }
 
-static int create_main_window(struct Config *config, const char *title, struct MainWindow *out) {
+static int init_main_window(struct Config *config, const char *title, struct MainWindow *out) {
     out->window = SDL_CreateWindow(title,
                                    SDL_WINDOWPOS_CENTERED,
                                    SDL_WINDOWPOS_CENTERED,
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 
     parse_args(argc, argv, &default_config);
 
-    const char *test_bmp_path = create_test_bmp_path(&default_config, TEST_BMP_FILE);
+    char *test_bmp_path = init_asset_path(&default_config, TEST_BMP_FILE);
     if (test_bmp_path == NULL) {
         goto out;
     }
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    error = create_main_window(&default_config, window_title, &main_window);
+    error = init_main_window(&default_config, window_title, &main_window);
     if (error != SUCCESS) {
         goto out;
     }
@@ -223,5 +223,6 @@ out:
     free_surface(test_bmp_surface);
     destroy_main_window(&main_window);
     SDL_Quit();
+    free(test_bmp_path);
     return error;
 }
