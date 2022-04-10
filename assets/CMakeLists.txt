@@ -1,7 +1,7 @@
 find_package(Python3)
 
 # generate.py targets
-set(TARGETS EBGaramond12 ucs-fonts dummy)
+set(TARGETS EBGaramond12 ucs-fonts)
 
 foreach(TARGET ${TARGETS})
   STRING(MAKE_C_IDENTIFIER ${TARGET} TARGET_NAME)
