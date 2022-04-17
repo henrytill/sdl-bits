@@ -48,9 +48,9 @@ static const char *const TEST_BMP_FILE = "test.bmp";
 static inline void log_sdl_error(int category, char *file, int line) {
     const char *sdl_err = SDL_GetError();
     if (strlen(sdl_err) != 0) {
-        SDL_LogError((category), "%s:%d: %s", file, line, sdl_err);
+        SDL_LogError(category, "%s:%d: %s", file, line, sdl_err);
     } else {
-        SDL_LogError((category), "%s:%d", file, line);
+        SDL_LogError(category, "%s:%d", file, line);
     }
 }
 
