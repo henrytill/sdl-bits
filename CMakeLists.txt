@@ -8,6 +8,9 @@ project(sdl-bits C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
+include(BuildType)
+
 # https://stackoverflow.com/a/58711983
 string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
@@ -18,18 +21,6 @@ macro(SET_COMPILER_OPTIONS target)
     target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror -Wconversion -Wsign-conversion)
   endif()
 endmacro(SET_COMPILER_OPTIONS)
-
-# https://blog.kitware.com/cmake-and-the-default-build-type/
-set(default_build_type "Debug")
-
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
-
-  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE STRING "Choose the type of build." FORCE)
-
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
 
 # For dependency management, we use vcpkg.
 # If that's not available, we use the default package manager and pkg-config for Linux and MinGW.
