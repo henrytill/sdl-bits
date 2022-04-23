@@ -23,9 +23,9 @@ enum LoopStatus {
 };
 
 struct Config {
-    unsigned int window_width_pixels;
-    unsigned int window_height_pixels;
-    unsigned int target_frame_rate;
+    int window_width_pixels;
+    int window_height_pixels;
+    int target_frame_rate;
     char *asset_path;
 };
 
@@ -55,7 +55,7 @@ static inline void log_sdl_error(int category, char *file, int line) {
 }
 
 static void parse_args(int argc, char *argv[], struct Config *config) {
-    for (size_t i = 0; i < (size_t)argc;) {
+    for (int i = 0; i < argc;) {
         char *arg = argv[i++];
         if (strcmp(arg, ARG_ASSET_PATH) == 0) {
             config->asset_path = argv[i];
@@ -73,7 +73,7 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
     return ret;
 }
 
-static inline float calculate_frame_time_millis(unsigned int frames_per_second) {
+static inline float calculate_frame_time_millis(int frames_per_second) {
     const float second_millis = 1000;
     return second_millis / (float)frames_per_second;
 }
@@ -91,8 +91,8 @@ static int init_main_window(struct Config *config, const char *title, struct Mai
     out->window = SDL_CreateWindow(title,
                                    SDL_WINDOWPOS_CENTERED,
                                    SDL_WINDOWPOS_CENTERED,
-                                   (int)config->window_width_pixels,
-                                   (int)config->window_height_pixels,
+                                   config->window_width_pixels,
+                                   config->window_height_pixels,
                                    SDL_WINDOW_SHOWN);
     if (out->window == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
     SDL_Texture *test_bmp_texture = NULL;
     SDL_Rect window_rect = {.x = 0,
                             .y = 0,
-                            .w = (int)default_config.window_width_pixels,
-                            .h = (int)default_config.window_height_pixels};
+                            .w = default_config.window_width_pixels,
+                            .h = default_config.window_height_pixels};
     SDL_Event event;
     uint32_t loop_start;
     uint32_t loop_duration;
