@@ -4,7 +4,9 @@
 #include "test.h"
 #include "bmp.h"
 
-enum { SUCCESS = 0 };
+enum {
+    SUCCESS = 0
+};
 
 static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
 

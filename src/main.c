@@ -15,7 +15,9 @@ enum {
     FAILURE = 1,
 };
 
-enum { UNHANDLED = SDL_LOG_CATEGORY_CUSTOM };
+enum {
+    UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
+};
 
 enum LoopStatus {
     STOP = 0,
