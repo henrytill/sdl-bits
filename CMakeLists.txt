@@ -22,6 +22,14 @@ macro(SET_COMPILER_OPTIONS target)
   endif()
 endmacro(SET_COMPILER_OPTIONS)
 
+macro(TARGET_LINK_SDL target)
+  # On MinGW builds, this call to target_link_libraries must be before the call for SDL2::SDL2main
+  if(MINGW)
+    target_link_libraries(${target} PRIVATE mingw32)
+  endif()
+  target_link_libraries(${target} PRIVATE SDL2::SDL2main SDL2::SDL2)
+endmacro(TARGET_LINK_SDL)
+
 # For dependency management, we use vcpkg.
 # If that's not available, we use the default package manager and pkg-config for Linux and MinGW.
 set(VCPKG_FOUND ${VCPKG_TOOLCHAIN} CACHE INTERNAL "")
