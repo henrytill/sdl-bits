@@ -7,25 +7,13 @@ target_link_libraries(generate_test_bitmap PRIVATE bmp)
 # Executable: get_displays
 add_executable(get_displays get_displays.c)
 SET_COMPILER_OPTIONS(get_displays)
-
-# On MinGW builds, this call to target_link_libraries must be before the call for SDL2::SDL2main
-if(MINGW)
-  target_link_libraries(get_displays PRIVATE mingw32)
-endif()
-
-target_link_libraries(get_displays PRIVATE SDL2::SDL2main SDL2::SDL2)
+TARGET_LINK_SDL(get_displays)
 
 
 # Executable: library_versions
 add_executable(library_versions library_versions.c)
 SET_COMPILER_OPTIONS(library_versions)
-
-# On MinGW builds, this call to target_link_libraries must be before the call for SDL2::SDL2main
-if(MINGW)
-  target_link_libraries(library_versions PRIVATE mingw32)
-endif()
-
-target_link_libraries(library_versions PRIVATE SDL2::SDL2main SDL2::SDL2)
+TARGET_LINK_SDL(library_versions)
 
 if(VCPKG_FOUND)
   target_link_libraries(library_versions PRIVATE SDL2::SDL2_ttf)

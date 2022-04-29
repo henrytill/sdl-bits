@@ -16,10 +16,5 @@ target_include_directories(util INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 # Executable: main
 add_executable(main main.c)
 SET_COMPILER_OPTIONS(main)
-
-# On MinGW builds, this call to target_link_libraries must be before the call for SDL2::SDL2main
-if(MINGW)
-  target_link_libraries(main PRIVATE mingw32)
-endif()
-
-target_link_libraries(main PRIVATE util SDL2::SDL2main SDL2::SDL2)
+TARGET_LINK_SDL(main)
+target_link_libraries(main PRIVATE util)
