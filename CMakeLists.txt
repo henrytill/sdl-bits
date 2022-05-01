@@ -28,7 +28,6 @@ endif()
 if(UNIX)
   list(APPEND CMAKE_REQUIRED_LIBRARIES "m")
 endif()
-
 check_symbol_exists(ceil math.h HAVE_CEIL)
 
 # Dependency: SDL
