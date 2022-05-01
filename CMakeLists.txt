@@ -64,6 +64,24 @@ macro(target_link_SDL2 target)
   target_link_libraries(${target} PRIVATE SDL2::SDL2main SDL2::SDL2)
 endmacro(target_link_SDL2)
 
+macro(target_link_SDL2_ttf target)
+  if(VCPKG_FOUND)
+    target_link_libraries(${target} PRIVATE SDL2::SDL2_ttf)
+  elseif(PKG_CONFIG_FOUND AND SDL2_ttf_FOUND)
+    target_include_directories(${target} PRIVATE ${SDL2_ttf_INCLUDE_DIRS})
+    target_link_libraries(${target} PRIVATE ${SDL2_ttf_LIBRARIES})
+  endif()
+endmacro(target_link_SDL2_ttf)
+
+macro(target_link_freetype target)
+  if(VCPKG_FOUND)
+    target_link_libraries(${target} PRIVATE freetype)
+  elseif(PKG_CONFIG_FOUND AND FREETYPE2_FOUND)
+    target_include_directories(${target} PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+    target_link_libraries(${target} PRIVATE ${FREETYPE2_LIBRARIES})
+  endif()
+endmacro(target_link_freetype)
+
 # Directory: assets
 add_subdirectory(assets)
 
