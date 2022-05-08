@@ -14,10 +14,3 @@ add_test(NAME read_bitmap_v4
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND test_read_bitmap_v4)
 add_dependencies(test_read_bitmap_v4 test_bmp)
-
-# uint32_sat_sub
-add_executable(test_util_uint32_sat_sub util_uint32_sat_sub.c)
-target_compile_options_default(test_util_uint32_sat_sub)
-target_link_libraries(test_util_uint32_sat_sub PRIVATE util)
-add_test(NAME uint32_sat_sub
-         COMMAND test_util_uint32_sat_sub)
