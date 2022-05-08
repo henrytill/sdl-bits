@@ -8,13 +8,7 @@ if(UNIX)
   target_link_libraries(bmp PRIVATE m)
 endif()
 
-# Library: util
-add_library(util util.c)
-target_compile_options_default(util)
-target_include_directories(util INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-
 # Executable: main
 add_executable(main main.c)
 target_compile_options_default(main)
 target_link_SDL2(main)
-target_link_libraries(main PRIVATE util)

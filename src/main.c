@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,9 +7,9 @@
 
 #include <SDL.h>
 
-#include "util.h"
-
 #define ARG_ASSET_PATH "--asset-path"
+
+#define now() SDL_GetPerformanceCounter()
 
 enum {
     SUCCESS = 0,
@@ -36,7 +37,13 @@ struct MainWindow {
     SDL_Renderer *renderer;
 };
 
-static const char *const window_title = "Hello, world!";
+static const float SECOND_MS = 1000.0f;
+
+static const char *const WINDOW_TITLE = "Hello, world!";
+
+static const char *const TEST_BMP_FILE = "test.bmp";
+
+static uint64_t perf_freq = 0;
 
 static struct Config default_config = {
     .window_width_pixels = 640,
@@ -44,8 +51,6 @@ static struct Config default_config = {
     .target_frame_rate = 60,
     .asset_path = "./assets",
 };
-
-static const char *const TEST_BMP_FILE = "test.bmp";
 
 static inline void log_sdl_error(int category, char *file, int line) {
     const char *sdl_err = SDL_GetError();
@@ -75,9 +80,27 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
     return ret;
 }
 
-static inline float calculate_frame_time_millis(int frames_per_second) {
-    const float second_millis = 1000;
-    return second_millis / (float)frames_per_second;
+static inline float calculate_frame_time_ms(int frames_per_second) {
+    assert(frames_per_second > 0);
+    return SECOND_MS / (float)frames_per_second;
+}
+
+static inline float get_duration_ms(uint64_t last, uint64_t current) {
+    assert(perf_freq != 0);
+    const uint64_t duration_ticks = current - last;
+    return ((float)duration_ticks * SECOND_MS) / (float)perf_freq;
+}
+
+static inline void delay(float target_frame_time_ms, uint64_t begin_ticks) {
+    if (get_duration_ms(begin_ticks, now()) < target_frame_time_ms) {
+        const float delay_ms = target_frame_time_ms - get_duration_ms(begin_ticks, now());
+        if ((uint32_t)delay_ms > 0) {
+            SDL_Delay((uint32_t)delay_ms);
+        }
+        while (get_duration_ms(begin_ticks, now()) < target_frame_time_ms) {
+            /* wait */
+        }
+    }
 }
 
 static int load_bmp(const char *file, SDL_Surface **out) {
@@ -144,9 +167,7 @@ int main(int argc, char *argv[]) {
                             .w = default_config.window_width_pixels,
                             .h = default_config.window_height_pixels};
     SDL_Event event;
-    uint32_t loop_start;
-    uint32_t loop_duration;
-    uint32_t frame_delay;
+    uint64_t begin_ticks;
 
     (void)argc;
     (void)argv;
@@ -160,7 +181,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    const float frame_time_millis = calculate_frame_time_millis(default_config.target_frame_rate);
+    const float target_frame_time_ms = calculate_frame_time_ms(default_config.target_frame_rate);
 
     error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     if (error != SUCCESS) {
@@ -168,7 +189,9 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    error = init_main_window(&default_config, window_title, &main_window);
+    perf_freq = SDL_GetPerformanceFrequency();
+
+    error = init_main_window(&default_config, WINDOW_TITLE, &main_window);
     if (error != SUCCESS) {
         goto out;
     }
@@ -187,9 +210,8 @@ int main(int argc, char *argv[]) {
     free_surface(test_bmp_surface);
     test_bmp_surface = NULL;
 
+    begin_ticks = now();
     while (event_loop_status == RUN) {
-        loop_start = SDL_GetTicks();
-
         while (SDL_PollEvent(&event) != 0) {
             switch (event.type) {
             case SDL_QUIT:
@@ -214,11 +236,9 @@ int main(int argc, char *argv[]) {
 
         SDL_RenderPresent(main_window.renderer);
 
-        loop_duration = SDL_GetTicks() - loop_start;
-        frame_delay = util_uint32_sat_sub((uint32_t)frame_time_millis, loop_duration);
-        if (frame_delay > 0) {
-            SDL_Delay(frame_delay);
-        }
+        delay(target_frame_time_ms, begin_ticks);
+
+        begin_ticks = now();
     }
 out:
     destroy_texture(test_bmp_texture);
