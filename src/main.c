@@ -134,6 +134,25 @@ static int init_main_window(struct Config *config, const char *title, struct Mai
     return SUCCESS;
 }
 
+static int get_window_rect(struct MainWindow *main_window, SDL_Rect *out) {
+    int width;
+    int height;
+
+    if (main_window == NULL || main_window->renderer == NULL) {
+        return FAILURE;
+    }
+    int error = SDL_GetRendererOutputSize(main_window->renderer, &width, &height);
+    if (error != SUCCESS) {
+        log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+        return error;
+    }
+    out->x = 0;
+    out->y = 0;
+    out->w = width;
+    out->h = height;
+    return SUCCESS;
+}
+
 static inline void destroy_main_window(struct MainWindow *main_window) {
     if (main_window == NULL) {
         return;
@@ -178,10 +197,7 @@ int main(int argc, char *argv[]) {
     struct MainWindow main_window = {.window = NULL, .renderer = NULL};
     SDL_Surface *test_bmp_surface = NULL;
     SDL_Texture *test_bmp_texture = NULL;
-    SDL_Rect window_rect = {.x = 0,
-                            .y = 0,
-                            .w = default_config.window_width_pixels,
-                            .h = default_config.window_height_pixels};
+    SDL_Rect main_window_rect;
     SDL_Event event;
     uint64_t begin_ticks;
     uint64_t end_ticks;
@@ -210,6 +226,11 @@ int main(int argc, char *argv[]) {
     perf_freq = SDL_GetPerformanceFrequency();
 
     error = init_main_window(&default_config, WINDOW_TITLE, &main_window);
+    if (error != SUCCESS) {
+        goto out;
+    }
+
+    error = get_window_rect(&main_window, &main_window_rect);
     if (error != SUCCESS) {
         goto out;
     }
@@ -254,7 +275,7 @@ int main(int argc, char *argv[]) {
                 goto out;
             }
 
-            error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
+            error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &main_window_rect);
             if (error != SUCCESS) {
                 log_sdl_error(UNHANDLED, __FILE__, __LINE__);
                 goto out;
