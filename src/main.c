@@ -37,7 +37,7 @@ struct MainWindow {
     SDL_Renderer *renderer;
 };
 
-static const float SECOND_MS = 1000.0f;
+static const float MS_PER_SECOND = 1000.0f;
 
 static const char *const WINDOW_TITLE = "Hello, world!";
 
@@ -46,8 +46,8 @@ static const char *const TEST_BMP_FILE = "test.bmp";
 static uint64_t perf_freq = 0;
 
 static struct Config default_config = {
-    .window_width_pixels = 640,
-    .window_height_pixels = 480,
+    .window_width_pixels = 1920,
+    .window_height_pixels = 1080,
     .target_frame_rate = 60,
     .asset_path = "./assets",
 };
@@ -82,22 +82,22 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
 
 static inline float calculate_frame_time_ms(int frames_per_second) {
     assert(frames_per_second > 0);
-    return SECOND_MS / (float)frames_per_second;
+    return MS_PER_SECOND / (float)frames_per_second;
 }
 
-static inline float get_duration_ms(uint64_t last, uint64_t current) {
+static inline float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks) {
     assert(perf_freq != 0);
-    const uint64_t duration_ticks = current - last;
-    return ((float)duration_ticks * SECOND_MS) / (float)perf_freq;
+    const float delta_ticks = (float)(end_ticks - begin_ticks);
+    return (delta_ticks * MS_PER_SECOND) / (float)perf_freq;
 }
 
 static inline void delay(float target_frame_time_ms, uint64_t begin_ticks) {
-    if (get_duration_ms(begin_ticks, now()) < target_frame_time_ms) {
-        const float delay_ms = target_frame_time_ms - get_duration_ms(begin_ticks, now());
+    if (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
+        const float delay_ms = target_frame_time_ms - calculate_delta_ms(begin_ticks, now()) - 1;
         if ((uint32_t)delay_ms > 0) {
             SDL_Delay((uint32_t)delay_ms);
         }
-        while (get_duration_ms(begin_ticks, now()) < target_frame_time_ms) {
+        while (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
             /* wait */
         }
     }
@@ -113,17 +113,19 @@ static int load_bmp(const char *file, SDL_Surface **out) {
 }
 
 static int init_main_window(struct Config *config, const char *title, struct MainWindow *out) {
+    uint32_t window_flags = SDL_WINDOW_FULLSCREEN_DESKTOP; /* "borderless fullscreen" */
+    uint32_t renderer_flags = SDL_RENDERER_ACCELERATED;
     out->window = SDL_CreateWindow(title,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   SDL_WINDOWPOS_CENTERED,
+                                   SDL_WINDOWPOS_UNDEFINED,
+                                   SDL_WINDOWPOS_UNDEFINED,
                                    config->window_width_pixels,
                                    config->window_height_pixels,
-                                   SDL_WINDOW_SHOWN);
+                                   window_flags);
     if (out->window == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         return FAILURE;
     }
-    out->renderer = SDL_CreateRenderer(out->window, -1, SDL_RENDERER_ACCELERATED);
+    out->renderer = SDL_CreateRenderer(out->window, -1, renderer_flags);
     if (out->renderer == NULL) {
         log_sdl_error(UNHANDLED, __FILE__, __LINE__);
         return FAILURE;
@@ -156,6 +158,20 @@ static inline void free_surface(SDL_Surface *surface) {
     }
 }
 
+static void handle_key(SDL_Event *event, enum LoopStatus *event_loop_status) {
+    switch (event->key.keysym.sym) {
+    case SDLK_ESCAPE:
+        *event_loop_status = STOP;
+        break;
+    default:
+        break;
+    }
+}
+
+static void update(float delta_ms) {
+    (void)delta_ms;
+}
+
 int main(int argc, char *argv[]) {
     int error = FAILURE;
     enum LoopStatus event_loop_status = RUN;
@@ -168,11 +184,13 @@ int main(int argc, char *argv[]) {
                             .h = default_config.window_height_pixels};
     SDL_Event event;
     uint64_t begin_ticks;
+    uint64_t end_ticks;
+    float delta_time_ms;
 
     (void)argc;
     (void)argv;
 
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
     parse_args(argc, argv, &default_config);
 
@@ -210,6 +228,7 @@ int main(int argc, char *argv[]) {
     free_surface(test_bmp_surface);
     test_bmp_surface = NULL;
 
+    delta_time_ms = target_frame_time_ms;
     begin_ticks = now();
     while (event_loop_status == RUN) {
         while (SDL_PollEvent(&event) != 0) {
@@ -217,28 +236,38 @@ int main(int argc, char *argv[]) {
             case SDL_QUIT:
                 event_loop_status = STOP;
                 break;
+            case SDL_KEYDOWN:
+                handle_key(&event, &event_loop_status);
+                break;
             default:
                 break;
             }
         }
 
-        error = SDL_RenderClear(main_window.renderer);
-        if (error != SUCCESS) {
-            log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-            goto out;
-        }
+        update(delta_time_ms);
 
-        error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
-        if (error != SUCCESS) {
-            log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-            goto out;
-        }
+        /* render */
+        {
+            error = SDL_RenderClear(main_window.renderer);
+            if (error != SUCCESS) {
+                log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+                goto out;
+            }
 
-        SDL_RenderPresent(main_window.renderer);
+            error = SDL_RenderCopy(main_window.renderer, test_bmp_texture, NULL, &window_rect);
+            if (error != SUCCESS) {
+                log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+                goto out;
+            }
+
+            SDL_RenderPresent(main_window.renderer);
+        }
 
         delay(target_frame_time_ms, begin_ticks);
 
-        begin_ticks = now();
+        end_ticks = now();
+        delta_time_ms = calculate_delta_ms(begin_ticks, end_ticks);
+        begin_ticks = end_ticks;
     }
 out:
     destroy_texture(test_bmp_texture);
