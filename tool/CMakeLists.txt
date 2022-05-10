@@ -24,3 +24,11 @@ target_compile_options_default(render_bdf_font_to_file)
 target_compile_definitions(render_bdf_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_link_libraries(render_bdf_font_to_file PRIVATE bmp)
 target_link_freetype(render_bdf_font_to_file)
+
+
+# Executable: render_ttf_font_to_file
+add_executable(render_ttf_font_to_file render_ttf_font_to_file.c)
+target_compile_options_default(render_ttf_font_to_file)
+target_compile_definitions(render_ttf_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_link_SDL2(render_ttf_font_to_file)
+target_link_SDL2_ttf(render_ttf_font_to_file)
