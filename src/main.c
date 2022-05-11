@@ -177,10 +177,10 @@ static inline void free_surface(SDL_Surface *surface) {
     }
 }
 
-static void handle_key(SDL_Event *event, enum LoopStatus *event_loop_status) {
+static void handle_keydown(SDL_Event *event, enum LoopStatus *loop_status) {
     switch (event->key.keysym.sym) {
     case SDLK_ESCAPE:
-        *event_loop_status = STOP;
+        *loop_status = STOP;
         break;
     default:
         break;
@@ -193,7 +193,7 @@ static void update(float delta_ms) {
 
 int main(int argc, char *argv[]) {
     int error = FAILURE;
-    enum LoopStatus event_loop_status = RUN;
+    enum LoopStatus main_loop_status = RUN;
     struct MainWindow main_window = {.window = NULL, .renderer = NULL};
     SDL_Surface *test_bmp_surface = NULL;
     SDL_Texture *test_bmp_texture = NULL;
@@ -251,14 +251,14 @@ int main(int argc, char *argv[]) {
 
     delta_time_ms = target_frame_time_ms;
     begin_ticks = now();
-    while (event_loop_status == RUN) {
+    while (main_loop_status == RUN) {
         while (SDL_PollEvent(&event) != 0) {
             switch (event.type) {
             case SDL_QUIT:
-                event_loop_status = STOP;
+                main_loop_status = STOP;
                 break;
             case SDL_KEYDOWN:
-                handle_key(&event, &event_loop_status);
+                handle_keydown(&event, &main_loop_status);
                 break;
             default:
                 break;
