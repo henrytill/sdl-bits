@@ -65,7 +65,7 @@ static void parse_args(int argc, char *argv[], struct Config *config) {
     for (int i = 0; i < argc;) {
         char *arg = argv[i++];
         if (strcmp(arg, ARG_ASSET_PATH) == 0) {
-            config->asset_path = argv[i];
+            config->asset_path = argv[i++];
         }
     }
 }
