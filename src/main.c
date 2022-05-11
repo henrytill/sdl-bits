@@ -43,7 +43,7 @@ static const char *const WINDOW_TITLE = "Hello, world!";
 
 static const char *const TEST_BMP_FILE = "test.bmp";
 
-static uint64_t perf_freq = 0;
+static uint64_t counter_freq_hz = 0;
 
 static struct Config default_config = {
     .window_width_pixels = 1920,
@@ -86,9 +86,9 @@ static inline float calculate_frame_time_ms(int frames_per_second) {
 }
 
 static inline float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks) {
-    assert(perf_freq != 0);
+    assert(counter_freq_hz != 0);
     const float delta_ticks = (float)(end_ticks - begin_ticks);
-    return (delta_ticks * MS_PER_SECOND) / (float)perf_freq;
+    return (delta_ticks * MS_PER_SECOND) / (float)counter_freq_hz;
 }
 
 static inline void delay(float target_frame_time_ms, uint64_t begin_ticks) {
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    perf_freq = SDL_GetPerformanceFrequency();
+    counter_freq_hz = SDL_GetPerformanceFrequency();
 
     error = init_main_window(&default_config, WINDOW_TITLE, &main_window);
     if (error != SUCCESS) {
