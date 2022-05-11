@@ -18,25 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install SDL2
+    - name: Install dependencies
       run: |
-        pushd $(mktemp -d)
-        curl -LO https://github.com/libsdl-org/SDL/releases/download/release-2.0.20/SDL2-2.0.20.tar.gz
-        tar xvzf SDL2-2.0.20.tar.gz
-        cd SDL2-2.0.20
-        ./configure
-        make
-        sudo make install
-        popd
-    - name: Install SDL2_ttf
-      run: |
-        pushd $(mktemp -d)
-        curl -LO https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.0.18/SDL2_ttf-2.0.18.tar.gz
-        tar xvzf SDL2_ttf-2.0.18.tar.gz
-        cd SDL2_ttf-2.0.18
-        ./configure
-        sudo make install
-        popd
+        sudo apt install -yyq libsdl2-dev libsdl2-ttf-dev
 
     - uses: actions/checkout@v2
       with:
