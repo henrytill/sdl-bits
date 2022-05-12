@@ -5,6 +5,10 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+enum {
+    UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
+};
+
 static void log_freetype_version(void) {
     FT_Library library = NULL;
     FT_Int version_major;
@@ -13,11 +17,11 @@ static void log_freetype_version(void) {
 
     int error = FT_Init_FreeType(&library);
     if (error != 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to initialize FreeType");
+        SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
         return;
     }
     FT_Library_Version(library, &version_major, &version_minor, &version_patch);
-    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+    SDL_LogInfo(UNHANDLED,
                 "We are linking against FreeType version %u.%u.%u\n",
                 version_major,
                 version_minor,
@@ -31,12 +35,12 @@ static void log_sdl_version(void) {
 
     SDL_VERSION(&version_compiled);
     SDL_GetVersion(&version_linked);
-    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+    SDL_LogInfo(UNHANDLED,
                 "We compiled against SDL version %u.%u.%u ...\n",
                 version_compiled.major,
                 version_compiled.minor,
                 version_compiled.patch);
-    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+    SDL_LogInfo(UNHANDLED,
                 "... and we are linking against SDL version %u.%u.%u.\n",
                 version_linked.major,
                 version_linked.minor,
@@ -48,12 +52,12 @@ static void log_sdl_ttf_version(void) {
 
     SDL_TTF_VERSION(&version_compiled);
     const SDL_version *version_linked = TTF_Linked_Version();
-    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+    SDL_LogInfo(UNHANDLED,
                 "We compiled against SDL_ttf version %u.%u.%u ...\n",
                 version_compiled.major,
                 version_compiled.minor,
                 version_compiled.patch);
-    SDL_LogInfo(SDL_LOG_CATEGORY_TEST,
+    SDL_LogInfo(UNHANDLED,
                 "... and we are linking against SDL_ttf version %u.%u.%u.\n",
                 version_linked->major,
                 version_linked->minor,
@@ -63,6 +67,8 @@ static void log_sdl_ttf_version(void) {
 int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
+
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
     log_freetype_version();
     log_sdl_version();
