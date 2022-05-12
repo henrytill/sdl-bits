@@ -2,6 +2,8 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <lua.h>
+#include <lauxlib.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -27,6 +29,17 @@ static void log_freetype_version(void) {
                 version_minor,
                 version_patch);
     FT_Done_FreeType(library);
+}
+
+static void log_lua_version(void) {
+    lua_State *state = luaL_newstate();
+    if (state == NULL) {
+        SDL_LogError(UNHANDLED, "Failed to initialize Lua");
+        return;
+    }
+    const lua_Number *version = lua_version(state);
+    SDL_LogInfo(UNHANDLED, "We are linking against Lua version %.2f\n", *version);
+    lua_close(state);
 }
 
 static void log_sdl_version(void) {
@@ -71,6 +84,7 @@ int main(int argc, char *argv[]) {
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
     log_freetype_version();
+    log_lua_version();
     log_sdl_version();
     log_sdl_ttf_version();
     return EXIT_SUCCESS;
