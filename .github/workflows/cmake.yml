@@ -38,6 +38,11 @@ jobs:
         sudo make install
         popd
 
+    - name: Install Lua
+      run: |
+        sudo apt update
+        sudo apt install -yyq lua5.2 liblua5.2-dev
+
     - uses: actions/checkout@v2
       with:
         lfs: true

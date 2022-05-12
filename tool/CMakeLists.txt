@@ -16,6 +16,7 @@ target_compile_options_default(library_versions)
 target_link_SDL2(library_versions)
 target_link_SDL2_ttf(library_versions)
 target_link_freetype(library_versions)
+target_link_lua(library_versions)
 
 
 # Executable: render_bdf_font_to_file

@@ -47,6 +47,9 @@ elseif(PKG_CONFIG_FOUND)
   pkg_check_modules(FREETYPE2 REQUIRED freetype2)
 endif()
 
+# Dependency: Lua
+find_package(Lua REQUIRED)
+
 # Macros
 macro(target_compile_options_default target)
   if(MSVC)
@@ -81,6 +84,11 @@ macro(target_link_freetype target)
     target_link_libraries(${target} PRIVATE ${FREETYPE2_LIBRARIES})
   endif()
 endmacro(target_link_freetype)
+
+macro(target_link_lua target)
+  target_include_directories(${target} PRIVATE ${LUA_INCLUDE_DIR})
+  target_link_libraries(${target} PRIVATE ${LUA_LIBRARIES})
+endmacro(target_link_lua)
 
 # Directory: assets
 add_subdirectory(assets)
