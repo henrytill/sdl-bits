@@ -37,7 +37,7 @@ struct MainWindow {
     SDL_Renderer *renderer;
 };
 
-static const float MS_PER_SECOND = 1000.0f;
+static const float MS_PER_SECOND = 1000.0;
 
 static const char *const WINDOW_TITLE = "Hello, world!";
 
@@ -177,8 +177,8 @@ static inline void free_surface(SDL_Surface *surface) {
     }
 }
 
-static void handle_keydown(SDL_Event *event, enum LoopStatus *loop_status) {
-    switch (event->key.keysym.sym) {
+static void handle_keydown(SDL_KeyboardEvent *key, enum LoopStatus *loop_status) {
+    switch (key->keysym.sym) {
     case SDLK_ESCAPE:
         *loop_status = STOP;
         break;
@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
                 main_loop_status = STOP;
                 break;
             case SDL_KEYDOWN:
-                handle_keydown(&event, &main_loop_status);
+                handle_keydown(&event.key, &main_loop_status);
                 break;
             default:
                 break;
