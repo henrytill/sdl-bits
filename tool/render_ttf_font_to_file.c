@@ -32,11 +32,11 @@ int main(int argc, char *argv[]) {
         return error;
     }
 
-    for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
-        *(char_codes + i) = (char)(i + '!');
+    for (int i = 0; i < CHAR_CODES_SIZE; i++) {
+        char_codes[i] = (char)(i + '!');
     }
 
-    *(char_codes + CHAR_CODES_SIZE) = '\0';
+    char_codes[CHAR_CODES_SIZE] = '\0';
 
     printf("%s\n", char_codes);
 
