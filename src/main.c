@@ -40,7 +40,7 @@ struct MainWindow {
     SDL_Renderer *renderer;
 };
 
-static const float MS_PER_SECOND = 1000.0;
+static const float MS_PER_SECOND = 1000.0f;
 
 static const char *const WINDOW_TITLE = "Hello, world!";
 
@@ -136,7 +136,7 @@ static inline float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks)
 
 static inline void delay(float target_frame_time_ms, uint64_t begin_ticks) {
     if (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
-        const float delay_ms = target_frame_time_ms - calculate_delta_ms(begin_ticks, now()) - 1;
+        const float delay_ms = target_frame_time_ms - calculate_delta_ms(begin_ticks, now()) - 1.0f;
         if ((uint32_t)delay_ms > 0) {
             SDL_Delay((uint32_t)delay_ms);
         }
