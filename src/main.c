@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 #include <SDL.h>
 
 #define ARG_ASSET_PATH "--asset-path"
@@ -78,6 +81,46 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
         snprintf(ret, len, "%s/%s", config->asset_path, sub_path);
     }
     return ret;
+}
+
+static int load(char *filename, int *width, int *height) {
+    int error = FAILURE;
+
+    lua_State *L = luaL_newstate();
+    if (L == NULL) {
+        SDL_LogError(UNHANDLED, "Failed to initialize Lua");
+        return error;
+    }
+
+    luaopen_base(L);
+    luaopen_io(L);
+    luaopen_string(L);
+    luaopen_math(L);
+
+    if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
+        SDL_LogError(UNHANDLED, "could not load file: %s", filename);
+        error = FAILURE;
+        goto out;
+    }
+    lua_getglobal(L, "width");
+    lua_getglobal(L, "height");
+    if (!lua_isnumber(L, -2)) {
+        SDL_LogError(UNHANDLED, "width is not a number");
+        error = FAILURE;
+        goto out;
+    }
+    if (!lua_isnumber(L, -1)) {
+        SDL_LogError(UNHANDLED, "height is not a number");
+        error = FAILURE;
+        goto out;
+    }
+    *width = (int)lua_tonumber(L, -2);
+    *height = (int)lua_tonumber(L, -1);
+
+    error = SUCCESS;
+out:
+    lua_close(L);
+    return error;
 }
 
 static inline float calculate_frame_time_ms(int frames_per_second) {
@@ -209,6 +252,8 @@ int main(int argc, char *argv[]) {
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
     parse_args(argc, argv, &default_config);
+
+    load("config.lua", &default_config.window_width_pixels, &default_config.window_height_pixels);
 
     char *test_bmp_path = init_asset_path(&default_config, TEST_BMP_FILE);
     if (test_bmp_path == NULL) {
