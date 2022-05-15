@@ -1,7 +1,23 @@
-# Executable: generate_test_bitmap
-add_executable(generate_test_bitmap generate_test_bitmap.c)
-target_compile_options_default(generate_test_bitmap)
-target_link_libraries(generate_test_bitmap PRIVATE bmp)
+# Executable: generate_atlas_from_bdf
+add_executable(generate_atlas_from_bdf generate_atlas_from_bdf.c)
+target_compile_options_default(generate_atlas_from_bdf)
+target_compile_definitions(generate_atlas_from_bdf PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_link_libraries(generate_atlas_from_bdf PRIVATE bmp)
+target_link_freetype(generate_atlas_from_bdf)
+
+
+# Executable: generate_atlas_from_ttf
+add_executable(generate_atlas_from_ttf generate_atlas_from_ttf.c)
+target_compile_options_default(generate_atlas_from_ttf)
+target_compile_definitions(generate_atlas_from_ttf PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_link_SDL2(generate_atlas_from_ttf)
+target_link_SDL2_ttf(generate_atlas_from_ttf)
+
+
+# Executable: generate_test_bmp
+add_executable(generate_test_bmp generate_test_bmp.c)
+target_compile_options_default(generate_test_bmp)
+target_link_libraries(generate_test_bmp PRIVATE bmp)
 
 
 # Executable: get_displays
@@ -17,19 +33,3 @@ target_link_SDL2(library_versions)
 target_link_SDL2_ttf(library_versions)
 target_link_freetype(library_versions)
 target_link_lua(library_versions)
-
-
-# Executable: render_bdf_font_to_file
-add_executable(render_bdf_font_to_file render_bdf_font_to_file.c)
-target_compile_options_default(render_bdf_font_to_file)
-target_compile_definitions(render_bdf_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
-target_link_libraries(render_bdf_font_to_file PRIVATE bmp)
-target_link_freetype(render_bdf_font_to_file)
-
-
-# Executable: render_ttf_font_to_file
-add_executable(render_ttf_font_to_file render_ttf_font_to_file.c)
-target_compile_options_default(render_ttf_font_to_file)
-target_compile_definitions(render_ttf_font_to_file PRIVATE _CRT_SECURE_NO_WARNINGS)
-target_link_SDL2(render_ttf_font_to_file)
-target_link_SDL2_ttf(render_ttf_font_to_file)
