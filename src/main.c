@@ -129,7 +129,7 @@ static inline float calculate_frame_time_ms(int frames_per_second) {
 }
 
 static inline float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks) {
-    assert(counter_freq_hz != 0);
+    assert(counter_freq_hz > 0);
     const float delta_ticks = (float)(end_ticks - begin_ticks);
     return (delta_ticks * MS_PER_SECOND) / (float)counter_freq_hz;
 }
