@@ -44,6 +44,8 @@ static const float MS_PER_SECOND = 1000.0f;
 
 static const char *const WINDOW_TITLE = "Hello, world!";
 
+static const char *const CONFIG_LUA_FILE = "config.lua";
+
 static const char *const TEST_BMP_FILE = "test.bmp";
 
 static uint64_t counter_freq_hz = 0;
@@ -83,12 +85,12 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
     return ret;
 }
 
-static int load(char *filename, int *width, int *height) {
+static int config_load(const char *filename, struct Config *config) {
     int error = FAILURE;
 
     lua_State *L = luaL_newstate();
     if (L == NULL) {
-        SDL_LogError(UNHANDLED, "Failed to initialize Lua");
+        SDL_LogError(UNHANDLED, "%s: failed to initialize Lua", __func__);
         return error;
     }
 
@@ -98,24 +100,24 @@ static int load(char *filename, int *width, int *height) {
     luaopen_math(L);
 
     if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
-        SDL_LogError(UNHANDLED, "could not load file: %s", filename);
+        SDL_LogError(UNHANDLED, "%s: failed to load file: %s", __func__, filename);
         error = FAILURE;
         goto out;
     }
     lua_getglobal(L, "width");
     lua_getglobal(L, "height");
     if (!lua_isnumber(L, -2)) {
-        SDL_LogError(UNHANDLED, "width is not a number");
+        SDL_LogError(UNHANDLED, "%s: width is not a number", __func__);
         error = FAILURE;
         goto out;
     }
     if (!lua_isnumber(L, -1)) {
-        SDL_LogError(UNHANDLED, "height is not a number");
+        SDL_LogError(UNHANDLED, "%s: height is not a number", __func__);
         error = FAILURE;
         goto out;
     }
-    *width = (int)lua_tonumber(L, -2);
-    *height = (int)lua_tonumber(L, -1);
+    config->window_width_pixels = (int)lua_tonumber(L, -2);
+    config->window_height_pixels = (int)lua_tonumber(L, -1);
 
     error = SUCCESS;
 out:
@@ -253,7 +255,7 @@ int main(int argc, char *argv[]) {
 
     parse_args(argc, argv, &default_config);
 
-    load("config.lua", &default_config.window_width_pixels, &default_config.window_height_pixels);
+    config_load(CONFIG_LUA_FILE, &default_config);
 
     char *test_bmp_path = init_asset_path(&default_config, TEST_BMP_FILE);
     if (test_bmp_path == NULL) {
