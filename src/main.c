@@ -28,7 +28,15 @@ enum LoopStatus {
     RUN = 1
 };
 
+enum WindowType {
+    WINDOWED = 0,
+    FULLSCREEN = 1,
+    FULLSCREEN_BORDERLESS = 2,
+    NUM_WINDOW_TYPES
+};
+
 struct Config {
+    enum WindowType window_type;
     int window_width_pixels;
     int window_height_pixels;
     int target_frame_rate;
@@ -50,9 +58,22 @@ static const char *const TEST_BMP_FILE = "test.bmp";
 
 static uint64_t counter_freq_hz = 0;
 
+static const uint32_t base_window_flags[] = {
+    [WINDOWED] = SDL_WINDOW_SHOWN,
+    [FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
+    [FULLSCREEN_BORDERLESS] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
+};
+
+static const char *const window_description[] = {
+    [WINDOWED] = "Windowed",
+    [FULLSCREEN] = "Fullscreen",
+    [FULLSCREEN_BORDERLESS] = "Borderless Fullscreen",
+};
+
 static struct Config default_config = {
-    .window_width_pixels = 1920,
-    .window_height_pixels = 1080,
+    .window_type = WINDOWED,
+    .window_width_pixels = 1280,
+    .window_height_pixels = 720,
     .target_frame_rate = 60,
     .asset_path = "./assets",
 };
@@ -158,8 +179,9 @@ static int load_bmp(const char *file, SDL_Surface **out) {
 }
 
 static int init_main_window(struct Config *config, const char *title, struct MainWindow *out) {
-    uint32_t window_flags = SDL_WINDOW_FULLSCREEN_DESKTOP; /* "borderless fullscreen" */
+    uint32_t window_flags = base_window_flags[config->window_type];
     uint32_t renderer_flags = SDL_RENDERER_ACCELERATED;
+    SDL_LogInfo(UNHANDLED, "Window type: %s\n", window_description[config->window_type]);
     out->window = SDL_CreateWindow(title,
                                    SDL_WINDOWPOS_UNDEFINED,
                                    SDL_WINDOWPOS_UNDEFINED,
