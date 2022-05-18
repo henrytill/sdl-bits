@@ -2,8 +2,8 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -37,9 +37,9 @@ static void log_lua_version(void) {
         SDL_LogError(UNHANDLED, "Failed to initialize Lua");
         return;
     }
-    const lua_Number *version_linked = lua_version(state);
+    const lua_Number version_linked = lua_version(state);
     SDL_LogInfo(UNHANDLED, "We compiled against %s ...\n", LUA_RELEASE);
-    SDL_LogInfo(UNHANDLED, "... and we are linking against Lua %.2f\n", *version_linked);
+    SDL_LogInfo(UNHANDLED, "... and we are linking against Lua %.2f\n", version_linked);
     lua_close(state);
 }
 

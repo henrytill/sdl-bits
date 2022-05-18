@@ -48,7 +48,7 @@ elseif(PKG_CONFIG_FOUND)
 endif()
 
 # Dependency: Lua
-find_package(Lua REQUIRED)
+add_subdirectory(third-party/lua)
 
 # Macros
 macro(target_compile_options_default target)
@@ -86,8 +86,7 @@ macro(target_link_freetype target)
 endmacro(target_link_freetype)
 
 macro(target_link_lua target)
-  target_include_directories(${target} PRIVATE ${LUA_INCLUDE_DIR})
-  target_link_libraries(${target} PRIVATE ${LUA_LIBRARIES})
+  target_link_libraries(${target} PRIVATE lua)
 endmacro(target_link_lua)
 
 # Directory: assets
