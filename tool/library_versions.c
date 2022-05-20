@@ -2,10 +2,11 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "lua.h"
-#include "lauxlib.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
+
+#include "lua.h"
+#include "lauxlib.h"
 
 enum {
     UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
