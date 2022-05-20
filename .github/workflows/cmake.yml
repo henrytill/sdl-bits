@@ -18,30 +18,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Install SDL2
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+        submodules: recursive
+
+    - name: Cache deps directory
+      id: cache-deps
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-deps
+      with:
+        path: ~/deps
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-v0
+
+    - if: ${{ steps.cache-deps.outputs.cache-hit == false }}
+      name: Create deps directory
       run: |
-        pushd $(mktemp -d)
+        mkdir -p $HOME/deps
+
+    - if: ${{ steps.cache-deps.outputs.cache-hit == false }}
+      name: Build SDL2
+      run: |
+        pushd $HOME/deps
         curl -LO https://github.com/libsdl-org/SDL/releases/download/release-2.0.20/SDL2-2.0.20.tar.gz
         tar xvzf SDL2-2.0.20.tar.gz
         cd SDL2-2.0.20
         ./configure
         make
+        popd
+
+    - name: Install SDL2
+      run: |
+        pushd $HOME/deps/SDL2-2.0.20
         sudo make install
         popd
-    - name: Install SDL2_ttf
+
+    - if: ${{ steps.cache-deps.outputs.cache-hit == false }}
+      name: Build SDL2_ttf
       run: |
-        pushd $(mktemp -d)
+        pushd $HOME/deps
         curl -LO https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.0.18/SDL2_ttf-2.0.18.tar.gz
         tar xvzf SDL2_ttf-2.0.18.tar.gz
         cd SDL2_ttf-2.0.18
         ./configure
-        sudo make install
+        make
         popd
 
-    - uses: actions/checkout@v2
-      with:
-        lfs: true
-        submodules: recursive
+    - name: Install SDL2_ttf
+      run: |
+        pushd $HOME/deps/SDL2_ttf-2.0.18
+        sudo make install
+        popd
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
