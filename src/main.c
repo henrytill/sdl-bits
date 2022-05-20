@@ -5,10 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <SDL.h>
+
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
-#include <SDL.h>
 
 #define ARG_ASSET_PATH "--asset-path"
 
