@@ -1,7 +1,9 @@
 # Library: bmp
 add_library(bmp bmp.c)
 target_compile_options_default(bmp)
-target_compile_definitions(bmp PRIVATE _CRT_SECURE_NO_WARNINGS)
+if(WIN32)
+  target_compile_definitions(bmp PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 target_include_directories(bmp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(UNIX)
