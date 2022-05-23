@@ -6,10 +6,12 @@ cbd.py: CMake Build Driver
 
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
 
+system = platform.system()
 
 cmake = shutil.which('cmake')
 
@@ -25,9 +27,15 @@ def update_env(env):
 
 
 def capture_env(cmd):
+    cmd = cmd.copy()
     env = os.environ.copy()
     encoding = sys.stdout.encoding
-    cmd.extend(['>NUL', '&&', 'set'])
+    if system == 'Windows':
+        cmd.extend(['>NUL', '&&', 'set'])
+    elif system == 'Linux' or system == 'Darwin':
+        cmd = ". %s >/dev/null && env" % cmd[0]
+    else:
+        exit(1)
     try:
         output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, env=env).stdout.read().decode(encoding).splitlines()
         for elem in output:
