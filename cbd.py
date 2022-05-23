@@ -78,21 +78,27 @@ def clean_cmd(spec):
 
 def configure(target):
     try:
-        subprocess.run(configure_cmd(target['spec']), env=handle_env(target), check=True)
+        cmd = configure_cmd(target['spec'])
+        env = handle_env(target)
+        subprocess.run(cmd, env=env, check=True)
     except subprocess.CalledProcessError as error:
         exit(error.returncode)
 
 
 def build(target):
     try:
-        subprocess.run(build_cmd(target['spec']), env=handle_env(target), check=True)
+        cmd = build_cmd(target['spec'])
+        env = handle_env(target)
+        subprocess.run(cmd, env=env, check=True)
     except subprocess.CalledProcessError as error:
         exit(error.returncode)
 
 
 def clean(target):
     try:
-        subprocess.run(clean_cmd(target['spec']), env=handle_env(target), check=True)
+        cmd = clean_cmd(target['spec'])
+        env = handle_env(target)
+        subprocess.run(cmd, env=env, check=True)
     except subprocess.CalledProcessError as error:
         exit(error.returncode)
 
