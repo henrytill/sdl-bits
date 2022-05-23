@@ -4,59 +4,12 @@
 cbd.py: CMake Build Driver
 """
 
+import json
 import os
 import shutil
 import subprocess
 import sys
 
-TARGETS = {
-    'debug-clang': {
-        'env': {
-            'PATH': 'C:\\Users\\henry\\opt\\LLVM\\bin',
-            'CC': 'C:\\Users\\henry\\opt\\LLVM\\bin\\clang',
-            'CXX': 'C:\\Users\\henry\\opt\\LLVM\\bin\\clang++'
-        },
-        'spec': {
-            'options': {
-                'CMAKE_BUILD_TYPE': 'Debug',
-                'CMAKE_EXPORT_COMPILE_COMMANDS': 'y',
-                'CMAKE_TOOLCHAIN_FILE': 'C:\\Users\\henry\\src\\third-party\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake',
-                'VCPKG_TARGET_TRIPLET': 'x64-windows-static'
-            },
-            'generator': 'Ninja',
-            'build_dir': 'build-debug-clang'
-        }
-    },
-    'debug-mingw64': {
-        'env': {
-            'PATH': 'C:\\msys64\\mingw64\\bin',
-            'CC': 'C:\\msys64\\mingw64\\bin\\gcc.exe',
-            'CXX': 'C:\\msys64\\mingw64\\bin\\g++.exe'
-        },
-        'spec': {
-            'options': {
-                'CMAKE_BUILD_TYPE': 'Debug',
-                'CMAKE_EXPORT_COMPILE_COMMANDS': 'y',
-            },
-            'generator': 'Ninja',
-            'build_dir': 'build-debug-mingw64'
-        }
-    },
-    'debug-msvc': {
-        'script': ['C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat',
-                   'amd64'],
-        'spec': {
-            'options': {
-                'CMAKE_BUILD_TYPE': 'Debug',
-                'CMAKE_EXPORT_COMPILE_COMMANDS': 'y',
-                'CMAKE_TOOLCHAIN_FILE': 'C:\\Users\\henry\\src\\third-party\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake',
-                'VCPKG_TARGET_TRIPLET': 'x64-windows-static'
-            },
-            'generator': 'Ninja',
-            'build_dir': 'build-debug-msvc'
-        }
-    }
-}
 
 cmake = shutil.which('cmake')
 
@@ -164,15 +117,17 @@ def clean_all(targets):
 
 def main():
     argv = sys.argv
+    with open("cbd-targets.json", "r") as file:
+        targets = json.loads(file.read())
     if len(argv) == 1:
-        configure_all(TARGETS)
-        build_all(TARGETS)
+        configure_all(targets)
+        build_all(targets)
     elif argv[1] == 'cfg' or argv[1] == 'configure':
-        configure_all(TARGETS)
+        configure_all(targets)
     elif argv[1] == 'build':
-        build_all(TARGETS)
+        build_all(targets)
     elif argv[1] == 'clean':
-        clean_all(TARGETS)
+        clean_all(targets)
 
 
 if __name__ == '__main__':
