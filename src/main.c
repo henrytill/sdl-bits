@@ -11,7 +11,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-#define ARG_ASSET_PATH "--asset-path"
+#define ARG_CONFIG_PATH "--config-path"
 
 #define now() SDL_GetPerformanceCounter()
 
@@ -36,6 +36,10 @@ enum WindowType {
     NUM_WINDOW_TYPES
 };
 
+struct Arguments {
+    char *config_path;
+};
+
 struct Config {
     enum WindowType window_type;
     int window_width_pixels;
@@ -53,8 +57,6 @@ static const float MS_PER_SECOND = 1000.0f;
 
 static const char *const WINDOW_TITLE = "Hello, world!";
 
-static const char *const CONFIG_LUA_FILE = "config.lua";
-
 static const char *const TEST_BMP_FILE = "test.bmp";
 
 static uint64_t counter_freq_hz = 0;
@@ -69,6 +71,10 @@ static const char *const window_description[] = {
     [WINDOWED] = "Windowed",
     [FULLSCREEN] = "Fullscreen",
     [FULLSCREEN_BORDERLESS] = "Borderless Fullscreen",
+};
+
+static struct Arguments default_args = {
+    .config_path = "config.lua"
 };
 
 static struct Config default_config = {
@@ -88,11 +94,11 @@ static inline void log_sdl_error(int category, char *file, int line) {
     }
 }
 
-static void parse_args(int argc, char *argv[], struct Config *config) {
+static void parse_args(int argc, char *argv[], struct Arguments *args) {
     for (int i = 0; i < argc;) {
         char *arg = argv[i++];
-        if (strcmp(arg, ARG_ASSET_PATH) == 0) {
-            config->asset_path = argv[i++];
+        if (strcmp(arg, ARG_CONFIG_PATH) == 0) {
+            args->config_path = argv[i++];
         }
     }
 }
@@ -276,9 +282,9 @@ int main(int argc, char *argv[]) {
 
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-    parse_args(argc, argv, &default_config);
+    parse_args(argc, argv, &default_args);
 
-    config_load(CONFIG_LUA_FILE, &default_config);
+    config_load(default_args.config_path, &default_config);
 
     char *test_bmp_path = init_asset_path(&default_config, TEST_BMP_FILE);
     if (test_bmp_path == NULL) {
