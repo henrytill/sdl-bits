@@ -110,40 +110,40 @@ static char *init_asset_path(const struct Config *config, const char *sub_path) 
 static int config_load(const char *filename, struct Config *config) {
     int error = FAILURE;
 
-    lua_State *L = luaL_newstate();
-    if (L == NULL) {
+    lua_State *state = luaL_newstate();
+    if (state == NULL) {
         SDL_LogError(UNHANDLED, "%s: failed to initialize Lua", __func__);
         return error;
     }
 
-    luaopen_base(L);
-    luaopen_io(L);
-    luaopen_string(L);
-    luaopen_math(L);
+    luaopen_base(state);
+    luaopen_io(state);
+    luaopen_string(state);
+    luaopen_math(state);
 
-    if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
+    if (luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0)) {
         SDL_LogError(UNHANDLED, "%s: failed to load file: %s", __func__, filename);
         error = FAILURE;
         goto out;
     }
-    lua_getglobal(L, "width");
-    lua_getglobal(L, "height");
-    if (!lua_isnumber(L, -2)) {
+    lua_getglobal(state, "width");
+    lua_getglobal(state, "height");
+    if (!lua_isnumber(state, -2)) {
         SDL_LogError(UNHANDLED, "%s: width is not a number", __func__);
         error = FAILURE;
         goto out;
     }
-    if (!lua_isnumber(L, -1)) {
+    if (!lua_isnumber(state, -1)) {
         SDL_LogError(UNHANDLED, "%s: height is not a number", __func__);
         error = FAILURE;
         goto out;
     }
-    config->window_width_pixels = (int)lua_tonumber(L, -2);
-    config->window_height_pixels = (int)lua_tonumber(L, -1);
+    config->window_width_pixels = (int)lua_tonumber(state, -2);
+    config->window_height_pixels = (int)lua_tonumber(state, -1);
 
     error = SUCCESS;
 out:
-    lua_close(L);
+    lua_close(state);
     return error;
 }
 
