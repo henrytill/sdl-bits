@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         return error;
     }
 
-    for (int i = 0; i < CHAR_CODES_SIZE; i++) {
+    for (int i = 0; i < CHAR_CODES_SIZE; ++i) {
         char_codes[i] = (char)(i + '!');
     }
 

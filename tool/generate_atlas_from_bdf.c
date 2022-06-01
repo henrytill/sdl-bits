@@ -45,7 +45,7 @@ static int alloc_image(unsigned char ***image, size_t height, size_t width) {
     if (*image == NULL) {
         return FAILURE;
     }
-    for (size_t i = 0; i < height; i++) {
+    for (size_t i = 0; i < height; ++i) {
         *(*image + i) = calloc(width, sizeof(unsigned char));
         if (*(*image + i) == NULL) {
             return FAILURE;
@@ -58,7 +58,7 @@ static void free_image(unsigned char ***image, size_t height) {
     if (image == NULL) {
         return;
     }
-    for (size_t i = 0; i < height; i++) {
+    for (size_t i = 0; i < height; ++i) {
         free(*(*image + i));
     }
     free(*image);
@@ -72,9 +72,9 @@ static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset
     unsigned int pitch = (unsigned int)abs(slot->bitmap.pitch);
     unsigned char datum;
 
-    for (size_t y = 0, p = 0; y < rows; y++, p += pitch) {
-        for (size_t i = 0; i < pitch; i++) {
-            for (size_t j = 0, x; j < CHAR_BIT; j++) {
+    for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
+        for (size_t i = 0; i < pitch; ++i) {
+            for (size_t j = 0, x; j < CHAR_BIT; ++j) {
                 datum = get_bit(*(buffer + p + i), j);
 
                 x = j + (i * CHAR_BIT);
@@ -88,9 +88,9 @@ static void render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset
 
 #ifdef DRAW_IMAGE
 static void draw_image(unsigned char **image, size_t width_pixels, size_t height_pixels) {
-    for (size_t y = 0; y < height_pixels; y++) {
+    for (size_t y = 0; y < height_pixels; ++y) {
         printf("%2zd|", y);
-        for (size_t x = 0; x < width_pixels; x++) {
+        for (size_t x = 0; x < width_pixels; ++x) {
             putchar(image[y][x] ? '*' : ' ');
         }
         printf("|\n");
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
     (void)argc;
     (void)argv;
 
-    for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
+    for (size_t i = 0; i < CHAR_CODES_SIZE; ++i) {
         char_codes[i] = (char)(i + '!');
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
         goto out;
     }
 
-    for (size_t i = 0; i < CHAR_CODES_SIZE; i++) {
+    for (size_t i = 0; i < CHAR_CODES_SIZE; ++i) {
         error = FT_Load_Char(face, (FT_ULong)char_codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
         if (error != SUCCESS) {
             print_error(error, __FILE__, __LINE__);
@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t y = height_pixels, i = 0; y-- > 0;) {
-        for (size_t x = 0; x < width_pixels; x++, i++) {
+        for (size_t x = 0; x < width_pixels; ++x, ++i) {
             *(target_buff + i) = *(*(image + y) + x) ? BLACK : WHITE;
         }
     }
