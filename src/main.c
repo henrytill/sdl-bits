@@ -122,16 +122,16 @@ static int config_load(const char *filename, struct Config *config) {
         return error;
     }
 
-    luaopen_base(state);
-    luaopen_io(state);
-    luaopen_string(state);
-    luaopen_math(state);
+    luaL_openlibs(state);
 
-    if (luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0)) {
-        SDL_LogError(UNHANDLED, "%s: failed to load file: %s", __func__, filename);
+    error = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
+    if (error != LUA_OK) {
+        SDL_LogError(UNHANDLED, "%s: failed to load file: %s, %s", __func__, filename, lua_tostring(state, -1));
+        lua_pop(state, 1);
         error = FAILURE;
         goto out;
     }
+
     lua_getglobal(state, "width");
     lua_getglobal(state, "height");
     if (!lua_isnumber(state, -2)) {
