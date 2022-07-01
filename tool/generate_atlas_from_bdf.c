@@ -26,7 +26,7 @@ static const char *const BMP_FILE = "./10x20.bmp";
 static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
-static inline void print_error(int error, char *file, int line) {
+static void print_error(int error, char *file, int line) {
     fprintf(stderr, "ERROR: %s:%d: %d", file, line, error);
 }
 
