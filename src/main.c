@@ -85,7 +85,7 @@ static struct Config default_config = {
     .asset_path = "./assets",
 };
 
-static inline void log_sdl_error(int category, char *file, int line) {
+static void log_sdl_error(int category, char *file, int line) {
     const char *sdl_err = SDL_GetError();
     if (strlen(sdl_err) != 0) {
         SDL_LogError(category, "%s:%d: %s", file, line, sdl_err);
@@ -153,18 +153,18 @@ out:
     return error;
 }
 
-static inline float calculate_frame_time_ms(int frames_per_second) {
+static float calculate_frame_time_ms(int frames_per_second) {
     assert(frames_per_second > 0);
     return MS_PER_SECOND / (float)frames_per_second;
 }
 
-static inline float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks) {
+static float calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks) {
     assert(counter_freq_hz > 0);
     const float delta_ticks = (float)(end_ticks - begin_ticks);
     return (delta_ticks * MS_PER_SECOND) / (float)counter_freq_hz;
 }
 
-static inline void delay(float target_frame_time_ms, uint64_t begin_ticks) {
+static void delay(float target_frame_time_ms, uint64_t begin_ticks) {
     if (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
         const float delay_ms = target_frame_time_ms - calculate_delta_ms(begin_ticks, now()) - 1.0f;
         if ((uint32_t)delay_ms > 0) {
@@ -227,7 +227,7 @@ static int get_window_rect(struct MainWindow *main_window, SDL_Rect *out) {
     return SUCCESS;
 }
 
-static inline void destroy_main_window(struct MainWindow *main_window) {
+static void destroy_main_window(struct MainWindow *main_window) {
     if (main_window == NULL) {
         return;
     }
@@ -239,13 +239,13 @@ static inline void destroy_main_window(struct MainWindow *main_window) {
     }
 }
 
-static inline void destroy_texture(SDL_Texture *texture) {
+static void destroy_texture(SDL_Texture *texture) {
     if (texture != NULL) {
         SDL_DestroyTexture(texture);
     }
 }
 
-static inline void free_surface(SDL_Surface *surface) {
+static void free_surface(SDL_Surface *surface) {
     if (surface != NULL) {
         SDL_FreeSurface(surface);
     }
