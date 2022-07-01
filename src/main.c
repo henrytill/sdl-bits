@@ -71,9 +71,7 @@ static const char *const window_description[] = {
     [FULLSCREEN_BORDERLESS] = "Borderless Fullscreen",
 };
 
-static struct Arguments default_args = {
-    .config_path = "config.lua"
-};
+static struct Arguments default_args = {.config_path = "config.lua"};
 
 static struct Config default_config = {
     .window_type = WINDOWED,
@@ -128,7 +126,11 @@ static int config_load(const char *filename, struct Config *config) {
 
     error = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
     if (error != LUA_OK) {
-        SDL_LogError(UNHANDLED, "%s: failed to load file: %s, %s", __func__, filename, lua_tostring(state, -1));
+        SDL_LogError(UNHANDLED,
+                     "%s: failed to load file: %s, %s",
+                     __func__,
+                     filename,
+                     lua_tostring(state, -1));
         lua_pop(state, 1);
         error = FAILURE;
         goto out;
