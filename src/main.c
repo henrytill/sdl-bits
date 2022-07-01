@@ -11,10 +11,6 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-#define ARG_CONFIG_PATH "--config-path"
-
-#define now() SDL_GetPerformanceCounter()
-
 enum {
     SUCCESS = 0,
     FAILURE = 1,
@@ -55,6 +51,8 @@ struct MainWindow {
 
 static const float MS_PER_SECOND = 1000.0f;
 
+static const char *const ARG_CONFIG_PATH = "--config-path";
+
 static const char *const WINDOW_TITLE = "Hello, world!";
 
 static const char *const TEST_BMP_FILE = "test.bmp";
@@ -84,6 +82,10 @@ static struct Config default_config = {
     .target_frame_rate = 60,
     .asset_path = "./assets",
 };
+
+static inline uint64_t now(void) {
+    return SDL_GetPerformanceCounter();
+}
 
 static void log_sdl_error(int category, char *file, int line) {
     const char *sdl_err = SDL_GetError();
