@@ -26,14 +26,14 @@ static const SDL_Color color_foreground = {0x00, 0x00, 0x00, 0xFF};
 int
 main(int argc, char *argv[])
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 
 	(void)argc;
 	(void)argv;
 
 	char *char_codes = calloc(CHAR_CODES_SIZE + 1, sizeof(char));
 	if (char_codes == NULL) {
-		return error;
+		return rc;
 	}
 
 	for (int i = 0; i < CHAR_CODES_SIZE; ++i) {
@@ -44,14 +44,14 @@ main(int argc, char *argv[])
 
 	printf("%s\n", char_codes);
 
-	error = TTF_Init();
-	if (error != SUCCESS) {
+	rc = TTF_Init();
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
 	TTF_Font *font = TTF_OpenFont(FONT_FILE, 64);
 	if (font == NULL) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
@@ -60,13 +60,13 @@ main(int argc, char *argv[])
 	SDL_Surface *surface =
 		TTF_RenderText_Blended(font, char_codes, color_foreground);
 	if (surface == NULL) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
-	error = SDL_SaveBMP(surface, BMP_FILE);
+	rc = SDL_SaveBMP(surface, BMP_FILE);
 out:
 	TTF_Quit();
 	free(char_codes);
-	return error;
+	return rc;
 }

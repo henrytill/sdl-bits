@@ -20,8 +20,8 @@ log_freetype_version(void)
 	FT_Int version_minor;
 	FT_Int version_patch;
 
-	int error = FT_Init_FreeType(&library);
-	if (error != 0) {
+	int rc = FT_Init_FreeType(&library);
+	if (rc != 0) {
 		SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
 		return;
 	}
