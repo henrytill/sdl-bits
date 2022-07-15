@@ -25,15 +25,10 @@ log_freetype_version(void)
 		SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
 		return;
 	}
-	FT_Library_Version(library,
-		&version_major,
-		&version_minor,
+	FT_Library_Version(library, &version_major, &version_minor,
 		&version_patch);
-	SDL_LogInfo(UNHANDLED,
-		"We are linking against FreeType %u.%u.%u\n",
-		version_major,
-		version_minor,
-		version_patch);
+	SDL_LogInfo(UNHANDLED, "We are linking against FreeType %u.%u.%u\n",
+		version_major, version_minor, version_patch);
 	FT_Done_FreeType(library);
 }
 
@@ -47,8 +42,7 @@ log_lua_version(void)
 	}
 	const lua_Number version_linked = lua_version(state);
 	SDL_LogInfo(UNHANDLED, "We compiled against %s ...\n", LUA_RELEASE);
-	SDL_LogInfo(UNHANDLED,
-		"... and we are linking against Lua %.2f\n",
+	SDL_LogInfo(UNHANDLED, "... and we are linking against Lua %.2f\n",
 		version_linked);
 	lua_close(state);
 }
@@ -61,15 +55,11 @@ log_sdl_version(void)
 
 	SDL_VERSION(&version_compiled);
 	SDL_GetVersion(&version_linked);
-	SDL_LogInfo(UNHANDLED,
-		"We compiled against SDL %u.%u.%u ...\n",
-		version_compiled.major,
-		version_compiled.minor,
+	SDL_LogInfo(UNHANDLED, "We compiled against SDL %u.%u.%u ...\n",
+		version_compiled.major, version_compiled.minor,
 		version_compiled.patch);
-	SDL_LogInfo(UNHANDLED,
-		"... and we are linking against SDL %u.%u.%u.\n",
-		version_linked.major,
-		version_linked.minor,
+	SDL_LogInfo(UNHANDLED, "... and we are linking against SDL %u.%u.%u.\n",
+		version_linked.major, version_linked.minor,
 		version_linked.patch);
 }
 
@@ -80,15 +70,12 @@ log_sdl_ttf_version(void)
 
 	SDL_TTF_VERSION(&version_compiled);
 	const SDL_version *version_linked = TTF_Linked_Version();
-	SDL_LogInfo(UNHANDLED,
-		"We compiled against SDL_ttf %u.%u.%u ...\n",
-		version_compiled.major,
-		version_compiled.minor,
+	SDL_LogInfo(UNHANDLED, "We compiled against SDL_ttf %u.%u.%u ...\n",
+		version_compiled.major, version_compiled.minor,
 		version_compiled.patch);
 	SDL_LogInfo(UNHANDLED,
 		"... and we are linking against SDL_ttf %u.%u.%u.\n",
-		version_linked->major,
-		version_linked->minor,
+		version_linked->major, version_linked->minor,
 		version_linked->patch);
 }
 

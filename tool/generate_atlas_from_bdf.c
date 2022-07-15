@@ -163,8 +163,7 @@ main(int argc, char *argv[])
 	}
 
 	for (size_t i = 0; i < CHAR_CODES_SIZE; ++i) {
-		error = FT_Load_Char(face,
-			(FT_ULong)char_codes[i],
+		error = FT_Load_Char(face, (FT_ULong)char_codes[i],
 			FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (error != SUCCESS) {
 			print_error(error, __FILE__, __LINE__);
@@ -206,9 +205,7 @@ main(int argc, char *argv[])
 		}
 	}
 
-	error = bmp_write_bitmap_v4(target_buff,
-		width_pixels,
-		height_pixels,
+	error = bmp_write_bitmap_v4(target_buff, width_pixels, height_pixels,
 		BMP_FILE);
 out:
 	free(target_buff);

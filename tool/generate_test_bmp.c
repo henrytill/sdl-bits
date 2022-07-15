@@ -24,8 +24,6 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	return bmp_write_bitmap_v4(TARGET_BUFF,
-		WIDTH_PIXELS,
-		HEIGHT_PIXELS,
+	return bmp_write_bitmap_v4(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS,
 		BMP_FILE);
 }

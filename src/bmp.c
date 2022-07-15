@@ -28,8 +28,8 @@ static const uint32_t ARGB32_G_MASK = 0x0000FF00;
 static const uint32_t ARGB32_B_MASK = 0x000000FF;
 static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
-static const struct bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE =
-	{0, 0, 0, 0, 0, 0, 0, 0, 0};
+static const struct bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0,
+	0, 0, 0};
 
 static const char *const MODE_READ = "r";
 static const char *const MODE_WRITE = "wb";
@@ -43,9 +43,7 @@ bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels)
 
 int
 bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
-	size_t width_pixels,
-	size_t height_pixels,
-	const char *file)
+	size_t width_pixels, size_t height_pixels, const char *file)
 {
 	int error = FAILURE;
 	size_t writes;
@@ -111,9 +109,7 @@ bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
 		goto out;
 	}
 
-	writes = fwrite(&bitmap_v4_header,
-		sizeof(struct bmp_BitmapV4Header),
-		1,
+	writes = fwrite(&bitmap_v4_header, sizeof(struct bmp_BitmapV4Header), 1,
 		file_h);
 	if (writes != 1) {
 		goto out;
@@ -131,10 +127,8 @@ out:
 }
 
 int
-bmp_read_bitmap(const char *file,
-	struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapInfoHeader *bitmap_info_header_out,
-	char **image_out)
+bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
+	struct bmp_BitmapInfoHeader *bitmap_info_header_out, char **image_out)
 {
 	int error = FAILURE;
 	uint32_t dib_header_size_bytes;
@@ -146,9 +140,7 @@ bmp_read_bitmap(const char *file,
 		return error;
 	}
 
-	reads = fread(file_header_out,
-		sizeof(struct bmp_FileHeader),
-		1,
+	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
 		file_h);
 	if (reads != 1) {
 		goto out;
@@ -176,9 +168,7 @@ bmp_read_bitmap(const char *file,
 	}
 
 	reads = fread(bitmap_info_header_out,
-		sizeof(struct bmp_BitmapInfoHeader),
-		1,
-		file_h);
+		sizeof(struct bmp_BitmapInfoHeader), 1, file_h);
 	if (reads != 1) {
 		error = FAILURE;
 		goto out;
@@ -206,10 +196,8 @@ out:
 }
 
 int
-bmp_read_bitmap_v4(const char *file,
-	struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapV4Header *bitmap_v4_header_out,
-	char **image_out)
+bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
+	struct bmp_BitmapV4Header *bitmap_v4_header_out, char **image_out)
 {
 	int error = FAILURE;
 	uint32_t dib_header_size_bytes;
@@ -221,9 +209,7 @@ bmp_read_bitmap_v4(const char *file,
 		return error;
 	}
 
-	reads = fread(file_header_out,
-		sizeof(struct bmp_FileHeader),
-		1,
+	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
 		file_h);
 	if (reads != 1) {
 		goto out;
@@ -250,10 +236,8 @@ bmp_read_bitmap_v4(const char *file,
 		goto out;
 	}
 
-	reads = fread(bitmap_v4_header_out,
-		sizeof(struct bmp_BitmapV4Header),
-		1,
-		file_h);
+	reads = fread(bitmap_v4_header_out, sizeof(struct bmp_BitmapV4Header),
+		1, file_h);
 	if (reads != 1) {
 		error = FAILURE;
 		goto out;

@@ -2,7 +2,7 @@ AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: true
-AlignOperands: AlignAfterOperator
+AlignOperands: DontAlign
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -11,13 +11,11 @@ AllowShortEnumsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: Never
 AlwaysBreakAfterReturnType: AllDefinitions
 BasedOnStyle: LLVM
-BinPackArguments: false
-BinPackParameters: false
-ColumnLimit: 80
-ContinuationIndentWidth: 8
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: true
+ColumnLimit: 80
+ContinuationIndentWidth: 8
 DerivePointerAlignment: false
 IndentCaseLabels: false
 IndentWidth: 8
