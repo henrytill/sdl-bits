@@ -91,18 +91,12 @@ struct bmp_PixelARGB32 {
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
 
 int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
-	size_t width_pixels,
-	size_t height_pixels,
-	const char *file);
+	size_t width_pixels, size_t height_pixels, const char *file);
 
-int bmp_read_bitmap(const char *file,
-	struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapInfoHeader *bitmap_info_header_out,
-	char **image_out);
+int bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
+	struct bmp_BitmapInfoHeader *bitmap_info_header_out, char **image_out);
 
-int bmp_read_bitmap_v4(const char *file,
-	struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapV4Header *bitmap_v4_header_out,
-	char **image_out);
+int bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
+	struct bmp_BitmapV4Header *bitmap_v4_header_out, char **image_out);
 
 #endif /* SDL_BITS_BMP_H */

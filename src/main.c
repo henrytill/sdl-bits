@@ -113,8 +113,8 @@ parse_args(int argc, char *argv[], struct Arguments *args)
 static char *
 init_asset_path(const struct Config *config, const char *sub_path)
 {
-	size_t len = (size_t)
-		snprintf(NULL, 0, "%s/%s", config->asset_path, sub_path);
+	size_t len = (size_t)snprintf(NULL, 0, "%s/%s", config->asset_path,
+		sub_path);
 	len += 1; /* for null-termination */
 	char *ret = calloc(len, sizeof(char));
 	if (ret != NULL) {
@@ -130,8 +130,7 @@ config_load(const char *filename, struct Config *config)
 
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
-		SDL_LogError(UNHANDLED,
-			"%s: failed to initialize Lua",
+		SDL_LogError(UNHANDLED, "%s: failed to initialize Lua",
 			__func__);
 		return error;
 	}
@@ -140,11 +139,8 @@ config_load(const char *filename, struct Config *config)
 
 	error = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
 	if (error != LUA_OK) {
-		SDL_LogError(UNHANDLED,
-			"%s: failed to load file: %s, %s",
-			__func__,
-			filename,
-			lua_tostring(state, -1));
+		SDL_LogError(UNHANDLED, "%s: failed to load file: %s, %s",
+			__func__, filename, lua_tostring(state, -1));
 		lua_pop(state, 1);
 		error = FAILURE;
 		goto out;
@@ -191,8 +187,7 @@ delay(float target_frame_time_ms, uint64_t begin_ticks)
 {
 	if (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
 		const float delay_ms = target_frame_time_ms
-				     - calculate_delta_ms(begin_ticks, now())
-				     - 1.0f;
+			- calculate_delta_ms(begin_ticks, now()) - 1.0f;
 		if ((uint32_t)delay_ms > 0) {
 			SDL_Delay((uint32_t)delay_ms);
 		}
@@ -215,21 +210,16 @@ load_bmp(const char *file, SDL_Surface **out)
 }
 
 static int
-init_main_window(struct Config *config,
-	const char *title,
+init_main_window(struct Config *config, const char *title,
 	struct MainWindow *out)
 {
 	uint32_t window_flags = base_window_flags[config->window_type];
 	uint32_t renderer_flags = SDL_RENDERER_ACCELERATED;
-	SDL_LogInfo(UNHANDLED,
-		"Window type: %s\n",
+	SDL_LogInfo(UNHANDLED, "Window type: %s\n",
 		window_description[config->window_type]);
-	out->window = SDL_CreateWindow(title,
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
-		config->window_width_pixels,
-		config->window_height_pixels,
-		window_flags);
+	out->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, config->window_width_pixels,
+		config->window_height_pixels, window_flags);
 	if (out->window == NULL) {
 		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
 		return FAILURE;
@@ -252,8 +242,7 @@ get_window_rect(struct MainWindow *main_window, SDL_Rect *out)
 	if (main_window == NULL || main_window->renderer == NULL) {
 		return FAILURE;
 	}
-	int error = SDL_GetRendererOutputSize(main_window->renderer,
-		&width,
+	int error = SDL_GetRendererOutputSize(main_window->renderer, &width,
 		&height);
 	if (error != SUCCESS) {
 		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
@@ -405,9 +394,7 @@ main(int argc, char *argv[])
 			}
 
 			error = SDL_RenderCopy(main_window.renderer,
-				test_bmp_texture,
-				NULL,
-				&main_window_rect);
+				test_bmp_texture, NULL, &main_window_rect);
 			if (error != SUCCESS) {
 				log_sdl_error(UNHANDLED, __FILE__, __LINE__);
 				goto out;

@@ -31,14 +31,11 @@ main(int argc, char *argv[])
 			const char *error_msg = SDL_GetError();
 			SDL_Log("Failed to get display mode for display #%d: "
 				"%s",
-				i,
-				error_msg);
+				i, error_msg);
 			break;
 		}
-		SDL_Log("Display #%d: display mode is %dx%d @ %d hz.",
-			i,
-			display_mode.w,
-			display_mode.h,
+		SDL_Log("Display #%d: display mode is %dx%d @ %d hz.", i,
+			display_mode.w, display_mode.h,
 			display_mode.refresh_rate);
 	}
 out:

@@ -14,7 +14,8 @@ enum {
 };
 
 static const char *const FONT_FILE =
-	"./EBGaramond12/EBGaramond12-e608414f52e532b68e2182f96b4ce9db35335593/"
+	"./EBGaramond12/"
+	"EBGaramond12-e608414f52e532b68e2182f96b4ce9db35335593/"
 	"fonts/ttf/"
 	"EBGaramond-Regular.ttf";
 

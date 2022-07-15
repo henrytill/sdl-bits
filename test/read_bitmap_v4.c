@@ -21,9 +21,7 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	error = bmp_read_bitmap_v4(BMP_FILE,
-		&file_header,
-		&bitmap_v4_header,
+	error = bmp_read_bitmap_v4(BMP_FILE, &file_header, &bitmap_v4_header,
 		&image);
 	if (error != SUCCESS) {
 		goto out;
