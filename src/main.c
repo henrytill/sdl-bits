@@ -126,23 +126,23 @@ init_asset_path(const struct Config *config, const char *sub_path)
 static int
 config_load(const char *filename, struct Config *config)
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
 		SDL_LogError(UNHANDLED, "%s: failed to initialize Lua",
 			__func__);
-		return error;
+		return rc;
 	}
 
 	luaL_openlibs(state);
 
-	error = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
-	if (error != LUA_OK) {
+	rc = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
+	if (rc != LUA_OK) {
 		SDL_LogError(UNHANDLED, "%s: failed to load file: %s, %s",
 			__func__, filename, lua_tostring(state, -1));
 		lua_pop(state, 1);
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
@@ -150,21 +150,21 @@ config_load(const char *filename, struct Config *config)
 	lua_getglobal(state, "height");
 	if (!lua_isnumber(state, -2)) {
 		SDL_LogError(UNHANDLED, "%s: width is not a number", __func__);
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 	if (!lua_isnumber(state, -1)) {
 		SDL_LogError(UNHANDLED, "%s: height is not a number", __func__);
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 	config->window_width_pixels = (int)lua_tonumber(state, -2);
 	config->window_height_pixels = (int)lua_tonumber(state, -1);
 
-	error = SUCCESS;
+	rc = SUCCESS;
 out:
 	lua_close(state);
-	return error;
+	return rc;
 }
 
 static float
@@ -242,11 +242,11 @@ get_window_rect(struct MainWindow *main_window, SDL_Rect *out)
 	if (main_window == NULL || main_window->renderer == NULL) {
 		return FAILURE;
 	}
-	int error = SDL_GetRendererOutputSize(main_window->renderer, &width,
+	int rc = SDL_GetRendererOutputSize(main_window->renderer, &width,
 		&height);
-	if (error != SUCCESS) {
+	if (rc != SUCCESS) {
 		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-		return error;
+		return rc;
 	}
 	out->x = 0;
 	out->y = 0;
@@ -306,7 +306,7 @@ update(float delta_ms)
 int
 main(int argc, char *argv[])
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 	enum LoopStatus main_loop_status = RUN;
 	struct MainWindow main_window = {.window = NULL, .renderer = NULL};
 	SDL_Surface *test_bmp_surface = NULL;
@@ -334,26 +334,26 @@ main(int argc, char *argv[])
 	const float target_frame_time_ms =
 		calculate_frame_time_ms(default_config.target_frame_rate);
 
-	error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-	if (error != SUCCESS) {
+	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+	if (rc != SUCCESS) {
 		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
 		goto out;
 	}
 
 	counter_freq_hz = SDL_GetPerformanceFrequency();
 
-	error = init_main_window(&default_config, WINDOW_TITLE, &main_window);
-	if (error != SUCCESS) {
+	rc = init_main_window(&default_config, WINDOW_TITLE, &main_window);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	error = get_window_rect(&main_window, &main_window_rect);
-	if (error != SUCCESS) {
+	rc = get_window_rect(&main_window, &main_window_rect);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	error = load_bmp(test_bmp_path, &test_bmp_surface);
-	if (error != SUCCESS) {
+	rc = load_bmp(test_bmp_path, &test_bmp_surface);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
@@ -361,7 +361,7 @@ main(int argc, char *argv[])
 		test_bmp_surface);
 	if (test_bmp_texture == NULL) {
 		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 	free_surface(test_bmp_surface);
@@ -387,15 +387,15 @@ main(int argc, char *argv[])
 
 		/* render */
 		{
-			error = SDL_RenderClear(main_window.renderer);
-			if (error != SUCCESS) {
+			rc = SDL_RenderClear(main_window.renderer);
+			if (rc != SUCCESS) {
 				log_sdl_error(UNHANDLED, __FILE__, __LINE__);
 				goto out;
 			}
 
-			error = SDL_RenderCopy(main_window.renderer,
+			rc = SDL_RenderCopy(main_window.renderer,
 				test_bmp_texture, NULL, &main_window_rect);
-			if (error != SUCCESS) {
+			if (rc != SUCCESS) {
 				log_sdl_error(UNHANDLED, __FILE__, __LINE__);
 				goto out;
 			}
@@ -415,5 +415,5 @@ out:
 	destroy_main_window(&main_window);
 	SDL_Quit();
 	free(test_bmp_path);
-	return error;
+	return rc;
 }

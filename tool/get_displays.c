@@ -9,7 +9,7 @@ int
 main(int argc, char *argv[])
 {
 	SDL_DisplayMode display_mode;
-	int error = FAILURE;
+	int rc = FAILURE;
 
 	(void)argc;
 	(void)argv;
@@ -21,13 +21,13 @@ main(int argc, char *argv[])
 		const char *error_msg = SDL_GetError();
 		SDL_Log("Failed to get number of video displays: %s",
 			error_msg);
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
 	for (int i = 0; i < num_displays; ++i) {
-		error = SDL_GetCurrentDisplayMode(i, &display_mode);
-		if (error != SUCCESS) {
+		rc = SDL_GetCurrentDisplayMode(i, &display_mode);
+		if (rc != SUCCESS) {
 			const char *error_msg = SDL_GetError();
 			SDL_Log("Failed to get display mode for display #%d: "
 				"%s",
@@ -40,5 +40,5 @@ main(int argc, char *argv[])
 	}
 out:
 	SDL_Quit();
-	return error;
+	return rc;
 }

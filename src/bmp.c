@@ -45,27 +45,27 @@ int
 bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
 	size_t width_pixels, size_t height_pixels, const char *file)
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 	size_t writes;
 
 	if (source_buff == NULL || file == NULL) {
-		return error;
+		return rc;
 	}
 
 	if (width_pixels > INT32_MAX || height_pixels > INT32_MAX) {
-		return error;
+		return rc;
 	}
 
 	const size_t image_size_bytes =
 		(width_pixels * height_pixels) * sizeof(struct bmp_PixelARGB32);
 	if (image_size_bytes > UINT32_MAX) {
-		return error;
+		return rc;
 	}
 
 	const size_t file_size_bytes =
 		BITMAP_V4_OFFSET_BYTES + image_size_bytes;
 	if (file_size_bytes > UINT32_MAX) {
-		return error;
+		return rc;
 	}
 
 	struct bmp_FileHeader file_header = {
@@ -101,7 +101,7 @@ bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
 
 	FILE *file_h = fopen(file, MODE_WRITE);
 	if (file_h == NULL) {
-		return error;
+		return rc;
 	}
 
 	writes = fwrite(&file_header, sizeof(struct bmp_FileHeader), 1, file_h);
@@ -120,24 +120,24 @@ bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
 		goto out;
 	}
 
-	error = SUCCESS;
+	rc = SUCCESS;
 out:
 	fclose(file_h);
-	return error;
+	return rc;
 }
 
 int
 bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
 	struct bmp_BitmapInfoHeader *bitmap_info_header_out, char **image_out)
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 	uint32_t dib_header_size_bytes;
 	size_t reads;
 	fpos_t pos;
 
 	FILE *file_h = fopen(file, MODE_READ);
 	if (file_h == NULL) {
-		return error;
+		return rc;
 	}
 
 	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
@@ -146,31 +146,31 @@ bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
 		goto out;
 	}
 
-	error = fgetpos(file_h, &pos);
-	if (error != SUCCESS) {
+	rc = fgetpos(file_h, &pos);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
 	reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
-	error = fsetpos(file_h, &pos);
-	if (error != SUCCESS) {
+	rc = fsetpos(file_h, &pos);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
 	if (dib_header_size_bytes != BITMAPINFOHEADER) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
 	reads = fread(bitmap_info_header_out,
 		sizeof(struct bmp_BitmapInfoHeader), 1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
@@ -179,34 +179,34 @@ bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
 
 	*image_out = calloc(image_size_bytes, sizeof(char));
 	if (*image_out == NULL) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
 	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
-	assert(error == SUCCESS);
+	assert(rc == SUCCESS);
 out:
 	fclose(file_h);
-	return error;
+	return rc;
 }
 
 int
 bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
 	struct bmp_BitmapV4Header *bitmap_v4_header_out, char **image_out)
 {
-	int error = FAILURE;
+	int rc = FAILURE;
 	uint32_t dib_header_size_bytes;
 	size_t reads;
 	fpos_t pos;
 
 	FILE *file_h = fopen(file, MODE_READ);
 	if (file_h == NULL) {
-		return error;
+		return rc;
 	}
 
 	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
@@ -215,31 +215,31 @@ bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
 		goto out;
 	}
 
-	error = fgetpos(file_h, &pos);
-	if (error != SUCCESS) {
+	rc = fgetpos(file_h, &pos);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
 	reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
-	error = fsetpos(file_h, &pos);
-	if (error != SUCCESS) {
+	rc = fsetpos(file_h, &pos);
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
 	if (dib_header_size_bytes != BITMAPV4HEADER) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
 	reads = fread(bitmap_v4_header_out, sizeof(struct bmp_BitmapV4Header),
 		1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
@@ -248,18 +248,18 @@ bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
 
 	*image_out = calloc(image_size_bytes, sizeof(char));
 	if (*image_out == NULL) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
 	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
 	if (reads != 1) {
-		error = FAILURE;
+		rc = FAILURE;
 		goto out;
 	}
 
-	assert(error == SUCCESS);
+	assert(rc == SUCCESS);
 out:
 	fclose(file_h);
-	return error;
+	return rc;
 }

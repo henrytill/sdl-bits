@@ -16,14 +16,14 @@ main(int argc, char *argv[])
 	char *image = NULL;
 	struct bmp_FileHeader file_header;
 	struct bmp_BitmapInfoHeader bitmap_info_header;
-	int error;
+	int rc;
 
 	(void)argc;
 	(void)argv;
 
-	error = bmp_read_bitmap(BMP_FILE, &file_header, &bitmap_info_header,
+	rc = bmp_read_bitmap(BMP_FILE, &file_header, &bitmap_info_header,
 		&image);
-	if (error != SUCCESS) {
+	if (rc != SUCCESS) {
 		goto out;
 	}
 
@@ -31,20 +31,20 @@ main(int argc, char *argv[])
 
 	if (pixel->blue != 0) {
 		print_failure(__FILE__, __LINE__);
-		error = EXIT_FAILURE;
+		rc = EXIT_FAILURE;
 		goto out;
 	}
 	if (pixel->green != 0) {
 		print_failure(__FILE__, __LINE__);
-		error = EXIT_FAILURE;
+		rc = EXIT_FAILURE;
 		goto out;
 	}
 	if (pixel->red != 255) {
 		print_failure(__FILE__, __LINE__);
-		error = EXIT_FAILURE;
+		rc = EXIT_FAILURE;
 		goto out;
 	}
 out:
 	free(image);
-	return error;
+	return rc;
 }
