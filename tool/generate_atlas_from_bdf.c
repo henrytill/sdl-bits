@@ -89,8 +89,7 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 
 				x = j + (i * CHAR_BIT);
 				if (x < width) {
-					*(*(target + y) + x
-						+ (offset * width)) = datum;
+					target[y][x + (offset * width)] = datum;
 				}
 			}
 		}
@@ -203,8 +202,7 @@ main(int argc, char *argv[])
 
 	for (size_t y = height_pixels, i = 0; y-- > 0;) {
 		for (size_t x = 0; x < width_pixels; ++x, ++i) {
-			*(target_buff + i) =
-				*(*(image + y) + x) ? BLACK : WHITE;
+			target_buff[i] = image[y][x] ? BLACK : WHITE;
 		}
 	}
 
