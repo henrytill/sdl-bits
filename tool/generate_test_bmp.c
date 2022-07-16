@@ -1,11 +1,11 @@
 #include "bmp.h"
 
 enum {
-	WIDTH_PIXELS = 4,
-	HEIGHT_PIXELS = 2,
+	WIDTH = 4,
+	HEIGHT = 2,
 };
 
-static const struct bmp_Pixel32 TARGET_BUFF[] = {
+static const struct bmp_Pixel32 BUF[] = {
 	{0xFF, 0x00, 0x00, 0x7F},
 	{0x00, 0xFF, 0x00, 0x7F},
 	{0x00, 0x00, 0xFF, 0x7F},
@@ -16,7 +16,7 @@ static const struct bmp_Pixel32 TARGET_BUFF[] = {
 	{0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static const char *const BMP_FILE = "./test.bmp";
+static const char *const BMPFILE = "./test.bmp";
 
 int
 main(int argc, char *argv[])
@@ -24,5 +24,5 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	return bmp_v4write(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
+	return bmp_v4write(BUF, WIDTH, HEIGHT, BMPFILE);
 }

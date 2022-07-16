@@ -10,18 +10,18 @@ enum {
 };
 
 enum {
-	CHAR_CODES_SIZE = 94, // ('~' - '!') + 1
+	CODESZ = 94, // ('~' - '!') + 1
 };
 
-static const char *const FONT_FILE =
+static const char *const FONTFILE =
 	"./EBGaramond12/"
 	"EBGaramond12-e608414f52e532b68e2182f96b4ce9db35335593/"
 	"fonts/ttf/"
 	"EBGaramond-Regular.ttf";
 
-static const char *const BMP_FILE = "./EBGaramond-Regular.bmp";
+static const char *const BMPFILE = "./EBGaramond-Regular.bmp";
 
-static const SDL_Color color_foreground = {0x00, 0x00, 0x00, 0xFF};
+static const SDL_Color fgcolor = {0x00, 0x00, 0x00, 0xFF};
 
 int
 main(int argc, char *argv[])
@@ -31,25 +31,25 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	char *char_codes = calloc(CHAR_CODES_SIZE + 1, sizeof(char));
-	if (char_codes == NULL) {
+	char *code = calloc(CODESZ + 1, sizeof(char));
+	if (code == NULL) {
 		return rc;
 	}
 
-	for (int i = 0; i < CHAR_CODES_SIZE; ++i) {
-		char_codes[i] = (char)(i + '!');
+	for (int i = 0; i < CODESZ; ++i) {
+		code[i] = (char)(i + '!');
 	}
 
-	char_codes[CHAR_CODES_SIZE] = '\0';
+	code[CODESZ] = '\0';
 
-	printf("%s\n", char_codes);
+	printf("%s\n", code);
 
 	rc = TTF_Init();
 	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	TTF_Font *font = TTF_OpenFont(FONT_FILE, 64);
+	TTF_Font *font = TTF_OpenFont(FONTFILE, 64);
 	if (font == NULL) {
 		rc = FAILURE;
 		goto out;
@@ -57,16 +57,15 @@ main(int argc, char *argv[])
 
 	TTF_SetFontKerning(font, 1);
 
-	SDL_Surface *surface =
-		TTF_RenderText_Blended(font, char_codes, color_foreground);
+	SDL_Surface *surface = TTF_RenderText_Blended(font, code, fgcolor);
 	if (surface == NULL) {
 		rc = FAILURE;
 		goto out;
 	}
 
-	rc = SDL_SaveBMP(surface, BMP_FILE);
+	rc = SDL_SaveBMP(surface, BMPFILE);
 out:
 	TTF_Quit();
-	free(char_codes);
+	free(code);
 	return rc;
 }

@@ -13,70 +13,63 @@ enum {
 };
 
 static void
-log_freetype_version(void)
+freetype(void)
 {
-	FT_Library library = NULL;
-	FT_Int version_major;
-	FT_Int version_minor;
-	FT_Int version_patch;
+	FT_Library ftlib = NULL;
+	FT_Int major;
+	FT_Int minor;
+	FT_Int patch;
 
-	int rc = FT_Init_FreeType(&library);
+	int rc = FT_Init_FreeType(&ftlib);
 	if (rc != 0) {
 		SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
 		return;
 	}
-	FT_Library_Version(library, &version_major, &version_minor,
-		&version_patch);
-	SDL_LogInfo(UNHANDLED, "We are linking against FreeType %u.%u.%u\n",
-		version_major, version_minor, version_patch);
-	FT_Done_FreeType(library);
+	FT_Library_Version(ftlib, &major, &minor, &patch);
+	SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u\n", major,
+		minor, patch);
+	FT_Done_FreeType(ftlib);
 }
 
 static void
-log_lua_version(void)
+lua(void)
 {
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
 		SDL_LogError(UNHANDLED, "Failed to initialize Lua");
 		return;
 	}
-	const lua_Number version_linked = lua_version(state);
-	SDL_LogInfo(UNHANDLED, "We compiled against %s ...\n", LUA_RELEASE);
-	SDL_LogInfo(UNHANDLED, "... and we are linking against Lua %.2f\n",
-		version_linked);
+	const lua_Number linked = lua_version(state);
+	SDL_LogInfo(UNHANDLED, "Compiled against Lua %s ...\n", LUA_RELEASE);
+	SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f\n", linked);
 	lua_close(state);
 }
 
 static void
-log_sdl_version(void)
+sdl(void)
 {
-	SDL_version version_compiled;
-	SDL_version version_linked;
+	SDL_version compiled;
+	SDL_version linked;
 
-	SDL_VERSION(&version_compiled);
-	SDL_GetVersion(&version_linked);
-	SDL_LogInfo(UNHANDLED, "We compiled against SDL %u.%u.%u ...\n",
-		version_compiled.major, version_compiled.minor,
-		version_compiled.patch);
-	SDL_LogInfo(UNHANDLED, "... and we are linking against SDL %u.%u.%u.\n",
-		version_linked.major, version_linked.minor,
-		version_linked.patch);
+	SDL_VERSION(&compiled);
+	SDL_GetVersion(&linked);
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n",
+		compiled.major, compiled.minor, compiled.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n",
+		linked.major, linked.minor, linked.patch);
 }
 
 static void
-log_sdl_ttf_version(void)
+sdl_ttf(void)
 {
-	SDL_version version_compiled;
+	SDL_version compiled;
 
-	SDL_TTF_VERSION(&version_compiled);
-	const SDL_version *version_linked = TTF_Linked_Version();
-	SDL_LogInfo(UNHANDLED, "We compiled against SDL_ttf %u.%u.%u ...\n",
-		version_compiled.major, version_compiled.minor,
-		version_compiled.patch);
-	SDL_LogInfo(UNHANDLED,
-		"... and we are linking against SDL_ttf %u.%u.%u.\n",
-		version_linked->major, version_linked->minor,
-		version_linked->patch);
+	SDL_TTF_VERSION(&compiled);
+	const SDL_version *linked = TTF_Linked_Version();
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n",
+		compiled.major, compiled.minor, compiled.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n",
+		linked->major, linked->minor, linked->patch);
 }
 
 int
@@ -87,9 +80,9 @@ main(int argc, char *argv[])
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-	log_freetype_version();
-	log_lua_version();
-	log_sdl_version();
-	log_sdl_ttf_version();
+	freetype();
+	lua();
+	sdl();
+	sdl_ttf();
 	return EXIT_SUCCESS;
 }
