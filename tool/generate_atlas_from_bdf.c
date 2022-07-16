@@ -14,38 +14,36 @@ enum {
 };
 
 enum {
-	EXPECTED_CHAR_BIT = 8,
-	FONT_WIDTH_PIXELS = 10,
-	FONT_HEIGHT_PIXELS = 20,
-	CHAR_CODES_SIZE = 94, /* ('~' - '!') + 1 */
+	WIDTH = 10,
+	HEIGHT = 20,
+	CODESZ = 94, /* ('~' - '!') + 1 */
 };
 
-static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
-static const char *const BMP_FILE = "./10x20.bmp";
+static const char *const FONTFILE = "./ucs-fonts/10x20.bdf";
+static const char *const BMPFILE = "./10x20.bmp";
 
 static const struct bmp_Pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_Pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 static void
-print_error(int error, char *file, int line)
+error(int error, char *file, int line)
 {
 	fprintf(stderr, "ERROR: %s:%d: %d", file, line, error);
 }
 
 /* pos = 0 is MSB */
 static unsigned char
-get_bit(unsigned char source, size_t pos)
+getbit(unsigned char c, size_t pos)
 {
-	assert(CHAR_BIT == EXPECTED_CHAR_BIT);
 	if (pos >= CHAR_BIT) {
 		return 0;
 	}
-	/* Also: source & (1 << (CHAR_BIT + ~pos)); */
-	return (source >> (CHAR_BIT + ~pos)) & 1;
+	/* Alternately: c & (1 << (CHAR_BIT + ~pos)); */
+	return (c >> (CHAR_BIT + ~pos)) & 1;
 }
 
 static int
-alloc_image(unsigned char ***image, size_t height, size_t width)
+allocimage(unsigned char ***image, size_t height, size_t width)
 {
 	*image = calloc(height, sizeof(unsigned char *));
 	if (*image == NULL) {
@@ -61,7 +59,7 @@ alloc_image(unsigned char ***image, size_t height, size_t width)
 }
 
 static void
-free_image(unsigned char ***image, size_t height)
+freeimage(unsigned char ***image, size_t height)
 {
 	if (image == NULL) {
 		return;
@@ -74,22 +72,22 @@ free_image(unsigned char ***image, size_t height)
 }
 
 static void
-render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
+renderchar(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 {
 	unsigned char *buffer = slot->bitmap.buffer;
 	unsigned int rows = (unsigned int)slot->bitmap.rows;
 	unsigned int width = (unsigned int)slot->bitmap.width;
 	unsigned int pitch = (unsigned int)abs(slot->bitmap.pitch);
-	unsigned char datum;
+	unsigned char bit;
 
 	for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
 		for (size_t i = 0; i < pitch; ++i) {
 			for (size_t j = 0, x; j < CHAR_BIT; ++j) {
-				datum = get_bit(*(buffer + p + i), j);
+				bit = getbit(*(buffer + p + i), j);
 
 				x = j + (i * CHAR_BIT);
 				if (x < width) {
-					target[y][x + (offset * width)] = datum;
+					target[y][x + (offset * width)] = bit;
 				}
 			}
 		}
@@ -98,7 +96,7 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 
 #ifdef DRAW_IMAGE
 static void
-draw_image(unsigned char **image, size_t width, size_t height)
+drawimage(unsigned char **image, size_t width, size_t height)
 {
 	for (size_t y = 0; y < height; ++y) {
 		printf("%2zd|", y);
@@ -110,7 +108,7 @@ draw_image(unsigned char **image, size_t width, size_t height)
 }
 #else
 static inline void
-draw_image(unsigned char **image, size_t width, size_t height)
+drawimage(unsigned char **image, size_t width, size_t height)
 {
 	(void)image;
 	(void)width;
@@ -121,59 +119,59 @@ draw_image(unsigned char **image, size_t width, size_t height)
 int
 main(int argc, char *argv[])
 {
-	FT_Library library = NULL;
+	FT_Library ftlib = NULL;
 	FT_Face face = NULL;
 	FT_GlyphSlot slot = NULL;
 	unsigned char **image = NULL;
 	struct bmp_Pixel32 *buf = NULL;
-	const size_t width = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-	const size_t height = FONT_HEIGHT_PIXELS;
-	char char_codes[CHAR_CODES_SIZE];
+	const size_t width = WIDTH * CODESZ;
+	const size_t height = HEIGHT;
+	char code[CODESZ];
 	int rc;
 
 	(void)argc;
 	(void)argv;
 
-	for (size_t i = 0; i < CHAR_CODES_SIZE; ++i) {
-		char_codes[i] = (char)(i + '!');
+	for (size_t i = 0; i < CODESZ; ++i) {
+		code[i] = (char)(i + '!');
 	}
 
-	rc = alloc_image(&image, height, width);
+	rc = allocimage(&image, height, width);
 	if (rc != SUCCESS) {
-		print_error(rc, __FILE__, __LINE__);
+		error(rc, __FILE__, __LINE__);
 		goto out;
 	}
 
-	rc = FT_Init_FreeType(&library);
+	rc = FT_Init_FreeType(&ftlib);
 	if (rc != SUCCESS) {
-		print_error(rc, __FILE__, __LINE__);
+		error(rc, __FILE__, __LINE__);
 		goto out;
 	}
 
-	rc = FT_New_Face(library, FONT_FILE, 0, &face);
+	rc = FT_New_Face(ftlib, FONTFILE, 0, &face);
 	if (rc != SUCCESS) {
-		print_error(rc, __FILE__, __LINE__);
+		error(rc, __FILE__, __LINE__);
 		goto out;
 	}
 
-	rc = FT_Set_Pixel_Sizes(face, FONT_WIDTH_PIXELS, FONT_HEIGHT_PIXELS);
+	rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
 	if (rc != SUCCESS) {
-		print_error(rc, __FILE__, __LINE__);
+		error(rc, __FILE__, __LINE__);
 		goto out;
 	}
 
-	for (size_t i = 0; i < CHAR_CODES_SIZE; ++i) {
-		rc = FT_Load_Char(face, (FT_ULong)char_codes[i],
+	for (size_t i = 0; i < CODESZ; ++i) {
+		rc = FT_Load_Char(face, (FT_ULong)code[i],
 			FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != SUCCESS) {
-			print_error(rc, __FILE__, __LINE__);
+			error(rc, __FILE__, __LINE__);
 			goto out;
 		}
 
 		slot = face->glyph;
 		rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
 		if (rc != SUCCESS) {
-			print_error(rc, __FILE__, __LINE__);
+			error(rc, __FILE__, __LINE__);
 			goto out;
 		}
 		if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
@@ -187,10 +185,10 @@ main(int argc, char *argv[])
 			goto out;
 		}
 
-		render_char(slot, image, i);
+		renderchar(slot, image, i);
 	}
 
-	draw_image(image, width, height);
+	drawimage(image, width, height);
 
 	buf = calloc(width * height, sizeof(struct bmp_Pixel32));
 	if (buf == NULL) {
@@ -204,11 +202,11 @@ main(int argc, char *argv[])
 		}
 	}
 
-	rc = bmp_v4write(buf, width, height, BMP_FILE);
+	rc = bmp_v4write(buf, width, height, BMPFILE);
 out:
 	free(buf);
 	FT_Done_Face(face);
-	FT_Done_FreeType(library);
-	free_image(&image, height);
+	FT_Done_FreeType(ftlib);
+	freeimage(&image, height);
 	return rc;
 }
