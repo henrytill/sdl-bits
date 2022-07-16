@@ -259,14 +259,6 @@ destroytexture(SDL_Texture *t)
 }
 
 static void
-freesurface(SDL_Surface *s)
-{
-	if (s != NULL) {
-		SDL_FreeSurface(s);
-	}
-}
-
-static void
 keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat)
 {
 	switch (key->keysym.sym) {
@@ -343,7 +335,7 @@ main(int argc, char *argv[])
 		rc = FAILURE;
 		goto out;
 	}
-	freesurface(s);
+	SDL_FreeSurface(s);
 	s = NULL;
 
 	delta = calcframetime(cfg.framerate);
@@ -389,7 +381,7 @@ main(int argc, char *argv[])
 	}
 out:
 	destroytexture(t);
-	freesurface(s);
+	SDL_FreeSurface(s);
 	destroywin(&win);
 	SDL_Quit();
 	free(bmpfile);
