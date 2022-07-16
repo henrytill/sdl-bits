@@ -139,25 +139,28 @@ main(int argc, char *argv[])
 	rc = allocimage(&image, height, width);
 	if (rc != SUCCESS) {
 		error(rc, __FILE__, __LINE__);
-		goto out;
+		return EXIT_FAILURE;
 	}
 
 	rc = FT_Init_FreeType(&ftlib);
 	if (rc != SUCCESS) {
 		error(rc, __FILE__, __LINE__);
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out0;
 	}
 
 	rc = FT_New_Face(ftlib, FONTFILE, 0, &face);
 	if (rc != SUCCESS) {
 		error(rc, __FILE__, __LINE__);
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out1;
 	}
 
 	rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
 	if (rc != SUCCESS) {
 		error(rc, __FILE__, __LINE__);
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out1;
 	}
 
 	for (size_t i = 0; i < CODESZ; ++i) {
@@ -165,24 +168,26 @@ main(int argc, char *argv[])
 			FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != SUCCESS) {
 			error(rc, __FILE__, __LINE__);
-			goto out;
+			rc = EXIT_FAILURE;
+			goto out1;
 		}
 
 		slot = face->glyph;
 		rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
 		if (rc != SUCCESS) {
 			error(rc, __FILE__, __LINE__);
-			goto out;
+			rc = EXIT_FAILURE;
+			goto out1;
 		}
 		if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
 			fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-			rc = FAILURE;
-			goto out;
+			rc = EXIT_FAILURE;
+			goto out1;
 		}
 		if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
 			fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-			rc = FAILURE;
-			goto out;
+			rc = EXIT_FAILURE;
+			goto out1;
 		}
 
 		renderchar(slot, image, i);
@@ -193,7 +198,7 @@ main(int argc, char *argv[])
 	buf = calloc(width * height, sizeof(struct bmp_Pixel32));
 	if (buf == NULL) {
 		rc = FAILURE;
-		goto out;
+		goto out2;
 	}
 
 	for (size_t y = height, i = 0; y-- > 0;) {
@@ -203,10 +208,19 @@ main(int argc, char *argv[])
 	}
 
 	rc = bmp_v4write(buf, width, height, BMPFILE);
-out:
+	if (rc != SUCCESS) {
+		rc = EXIT_FAILURE;
+		goto out3;
+	}
+
+	rc = EXIT_SUCCESS;
+out3:
 	free(buf);
+out2:
 	FT_Done_Face(face);
+out1:
 	FT_Done_FreeType(ftlib);
+out0:
 	freeimage(&image, height);
 	return rc;
 }

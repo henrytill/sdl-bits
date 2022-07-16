@@ -42,7 +42,13 @@ main(int argc, char *argv[])
 	SDL_Init(SDL_INIT_VIDEO);
 
 	rc = enumdisp();
+	if (rc != SUCCESS) {
+		rc = EXIT_FAILURE;
+		goto out;
+	}
 
+	rc = EXIT_SUCCESS;
+out:
 	SDL_Quit();
 	return rc;
 }

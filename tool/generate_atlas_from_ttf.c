@@ -33,7 +33,7 @@ main(int argc, char *argv[])
 
 	char *code = calloc(CODESZ + 1, sizeof(char));
 	if (code == NULL) {
-		return rc;
+		return EXIT_FAILURE;
 	}
 
 	for (int i = 0; i < CODESZ; ++i) {
@@ -46,26 +46,38 @@ main(int argc, char *argv[])
 
 	rc = TTF_Init();
 	if (rc != SUCCESS) {
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out0;
 	}
 
 	TTF_Font *font = TTF_OpenFont(FONTFILE, 64);
 	if (font == NULL) {
-		rc = FAILURE;
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out1;
 	}
 
 	TTF_SetFontKerning(font, 1);
 
 	SDL_Surface *surface = TTF_RenderText_Blended(font, code, fgcolor);
 	if (surface == NULL) {
-		rc = FAILURE;
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out2;
 	}
 
 	rc = SDL_SaveBMP(surface, BMPFILE);
-out:
+	if (rc != SUCCESS) {
+		rc = EXIT_FAILURE;
+		goto out3;
+	}
+
+	rc = EXIT_SUCCESS;
+out3:
+	SDL_FreeSurface(surface);
+out2:
+	TTF_CloseFont(font);
+out1:
 	TTF_Quit();
+out0:
 	free(code);
 	return rc;
 }
