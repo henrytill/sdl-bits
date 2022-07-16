@@ -215,27 +215,6 @@ createwin(struct Config *cfg, const char *title, struct Window *win)
 	return SUCCESS;
 }
 
-static int
-getrect(struct Window *win, SDL_Rect *rect)
-{
-	int w;
-	int h;
-
-	if (win == NULL || win->r == NULL) {
-		return FAILURE;
-	}
-	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
-	if (rc != SUCCESS) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
-		return rc;
-	}
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = w;
-	rect->h = h;
-	return SUCCESS;
-}
-
 static void
 destroywin(struct Window *win)
 {
@@ -250,12 +229,25 @@ destroywin(struct Window *win)
 	}
 }
 
-static void
-destroytexture(SDL_Texture *t)
+static int
+getrect(struct Window *win, SDL_Rect *rect)
 {
-	if (t != NULL) {
-		SDL_DestroyTexture(t);
+	int w = 0;
+	int h = 0;
+
+	if (win == NULL || win->r == NULL) {
+		return FAILURE;
 	}
+	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
+	if (rc != SUCCESS) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		return rc;
+	}
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = w;
+	rect->h = h;
+	return SUCCESS;
 }
 
 static void
@@ -288,9 +280,9 @@ main(int argc, char *argv[])
 	SDL_Event ev;
 	const char *const wintitle = "Hello, world!";
 	const char *const testbmp = "test.bmp";
-	uint64_t begin;
-	uint64_t end;
-	float delta;
+	uint64_t begin = 0;
+	uint64_t end = 0;
+	float delta = 0.0f;
 
 	(void)argc;
 	(void)argv;
@@ -303,37 +295,41 @@ main(int argc, char *argv[])
 
 	char *bmpfile = joinpath(cfg.assetdir, testbmp);
 	if (bmpfile == NULL) {
-		goto out;
+		return EXIT_FAILURE;
 	}
 
 	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != SUCCESS) {
 		logsdlerror(UNHANDLED, __FILE__, __LINE__);
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out0;
 	}
 
 	pfreq = SDL_GetPerformanceFrequency();
 
 	rc = createwin(&cfg, wintitle, &win);
 	if (rc != SUCCESS) {
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out1;
 	}
 
 	rc = getrect(&win, &winrect);
 	if (rc != SUCCESS) {
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out2;
 	}
 
 	rc = loadbmp(bmpfile, &s);
 	if (rc != SUCCESS) {
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out2;
 	}
 
 	t = SDL_CreateTextureFromSurface(win.r, s);
 	if (t == NULL) {
 		logsdlerror(UNHANDLED, __FILE__, __LINE__);
-		rc = FAILURE;
-		goto out;
+		rc = EXIT_FAILURE;
+		goto out3;
 	}
 	SDL_FreeSurface(s);
 	s = NULL;
@@ -361,13 +357,15 @@ main(int argc, char *argv[])
 			rc = SDL_RenderClear(win.r);
 			if (rc != SUCCESS) {
 				logsdlerror(UNHANDLED, __FILE__, __LINE__);
-				goto out;
+				rc = EXIT_FAILURE;
+				goto out4;
 			}
 
 			rc = SDL_RenderCopy(win.r, t, NULL, &winrect);
 			if (rc != SUCCESS) {
 				logsdlerror(UNHANDLED, __FILE__, __LINE__);
-				goto out;
+				rc = EXIT_FAILURE;
+				goto out4;
 			}
 
 			SDL_RenderPresent(win.r);
@@ -379,11 +377,17 @@ main(int argc, char *argv[])
 		delta = calcdelta(begin, end);
 		begin = end;
 	}
-out:
-	destroytexture(t);
+
+	rc = EXIT_SUCCESS;
+out4:
+	SDL_DestroyTexture(t);
+out3:
 	SDL_FreeSurface(s);
+out2:
 	destroywin(&win);
+out1:
 	SDL_Quit();
+out0:
 	free(bmpfile);
 	return rc;
 }
