@@ -5,7 +5,7 @@ enum {
 	HEIGHT_PIXELS = 2,
 };
 
-static const struct bmp_PixelARGB32 TARGET_BUFF[] = {
+static const struct bmp_Pixel32 TARGET_BUFF[] = {
 	{0xFF, 0x00, 0x00, 0x7F},
 	{0x00, 0xFF, 0x00, 0x7F},
 	{0x00, 0x00, 0xFF, 0x7F},
@@ -24,6 +24,5 @@ main(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
-	return bmp_write_bitmap_v4(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS,
-		BMP_FILE);
+	return bmp_v4write(TARGET_BUFF, WIDTH_PIXELS, HEIGHT_PIXELS, BMP_FILE);
 }

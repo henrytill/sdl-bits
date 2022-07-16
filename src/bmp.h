@@ -4,9 +4,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern const uint16_t FILETYPE;
+extern const uint32_t BI_BITFIELDS;
+extern const uint32_t LCS_WINDOWS_COLOR_SPACE;
+
 #pragma pack(push, 1)
 
-enum bmp_DIBHeaderSize {
+enum Headersz {
 	BITMAPCOREHEADER = 12,
 	OS22XBITMAPHEADER = 64,
 	BITMAPINFOHEADER = 40,
@@ -16,87 +20,87 @@ enum bmp_DIBHeaderSize {
 	BITMAPV5HEADER = 124
 };
 
-struct bmp_FileHeader {
-	uint16_t type;
-	uint32_t size_bytes;
+struct bmp_Filehdr {
+	uint16_t filetype;
+	uint32_t filesize;
 	uint16_t reserved1;
 	uint16_t reserved2;
-	uint32_t offset_bytes;
+	uint32_t offset;
 };
 
-struct bmp_BitmapInfoHeader {
-	uint32_t dib_header_size_bytes;
-	int32_t width_pixels;
-	int32_t height_pixels;
-	uint16_t num_planes;
-	uint16_t bits_per_pixel;
-	uint32_t compression;
-	uint32_t image_size_bytes;
-	int32_t x_resolution_ppm;
-	int32_t y_resolution_ppm;
-	uint32_t num_colors;
-	uint32_t num_important_colors;
+struct bmp_Infohdr {
+	uint32_t size;        /* DIB Header size (bytes) */
+	int32_t width;        /* Image width (pixels) */
+	int32_t height;       /* Image height (pixels) */
+	uint16_t planes;      /* Number of planes */
+	uint16_t bpp;         /* Bits per pixel */
+	uint32_t compression; /* Compression mode */
+	uint32_t imagesize;   /* Image size (bytes) */
+	int32_t hres;         /* Horizontal resolution (pixels per meter) */
+	int32_t vres;         /* Vertical resolution (pixels per meter) */
+	uint32_t colors;      /* Used colors */
+	uint32_t impcolors;   /* Important colors */
 };
 
-struct bmp_ColorSpaceTriple {
-	int32_t red_x;
-	int32_t red_y;
-	int32_t red_z;
-	int32_t green_x;
-	int32_t green_y;
-	int32_t green_z;
-	int32_t blue_x;
-	int32_t blue_y;
-	int32_t blue_z;
+struct bmp_Colorspace {
+	int32_t rx;
+	int32_t ry;
+	int32_t rz;
+	int32_t gx;
+	int32_t gy;
+	int32_t gz;
+	int32_t bx;
+	int32_t by;
+	int32_t bz;
 };
 
-struct bmp_BitmapV4Header {
-	uint32_t dib_header_size_bytes;
-	int32_t width_pixels;
-	int32_t height_pixels;
-	uint16_t num_planes;
-	uint16_t bits_per_pixel;
-	uint32_t compression;
-	uint32_t image_size_bytes;
-	int32_t x_resolution_ppm;
-	int32_t y_resolution_ppm;
-	uint32_t num_colors;
-	uint32_t num_important_colors;
-	uint32_t red_mask;
-	uint32_t green_mask;
-	uint32_t blue_mask;
-	uint32_t alpha_mask;
-	uint32_t color_space_type;
-	struct bmp_ColorSpaceTriple color_space_triple;
-	uint32_t red_gamma;
-	uint32_t green_gamma;
-	uint32_t blue_gamma;
+struct bmp_V4hdr {
+	uint32_t size;        /* DIB Header Size (bytes) */
+	int32_t width;        /* Image width (pixels) */
+	int32_t height;       /* Image height (pixels) */
+	uint16_t planes;      /* Number of planes */
+	uint16_t bpp;         /* Bits per pixel */
+	uint32_t compression; /* Compression mode */
+	uint32_t imagesize;   /* Image size (bytes) */
+	int32_t hres;         /* Horizontal resolution (pixels per meter) */
+	int32_t vres;         /* Vertical resolution (pixels per meter) */
+	uint32_t colors;      /* Used colors */
+	uint32_t impcolors;   /* Important colors */
+	uint32_t rmask;
+	uint32_t gmask;
+	uint32_t bmask;
+	uint32_t amask;
+	uint32_t colorspacetype;
+	struct bmp_Colorspace colorspace;
+	uint32_t rgamma;
+	uint32_t ggamma;
+	uint32_t bgamma;
 };
 
-struct bmp_PixelRGB24 {
-	uint8_t blue;
-	uint8_t green;
-	uint8_t red;
+struct bmp_Pixel24 {
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
 };
 
-struct bmp_PixelARGB32 {
-	uint8_t blue;
-	uint8_t green;
-	uint8_t red;
-	uint8_t alpha;
+struct bmp_Pixel32 {
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+	uint8_t a;
 };
 
 #pragma pack(pop)
 
-size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels);
+size_t bmp_rowsize(uint16_t bpp, int32_t width);
 
-int bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
-	size_t width_pixels, size_t height_pixels, const char *file);
+int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
+	struct bmp_Infohdr *infohdr, char **image);
 
-int bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapInfoHeader *bitmap_info_header_out, char **image_out);
+int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
+	struct bmp_V4hdr *v4hdr, char **image);
 
-int bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapV4Header *bitmap_v4_header_out, char **image_out);
+int bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height,
+	const char *file);
 
 #endif /* SDL_BITS_BMP_H */

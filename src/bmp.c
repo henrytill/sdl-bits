@@ -11,255 +11,233 @@ enum {
 };
 
 enum {
-	BITS_PER_DWORD = 32,
-	BYTES_PER_DWORD = 4,
+	DWORDBITS = 32,
+	DWORDBYTES = 4,
 };
 
-static const uint16_t BITMAP_FILE_TYPE = 0x4D42;
-static const size_t BITMAP_V4_OFFSET_BYTES =
-	sizeof(struct bmp_FileHeader) + sizeof(struct bmp_BitmapV4Header);
-
-static const uint16_t NUM_PLANES = 1;
-static const uint16_t BITS_PER_PIXEL = 32;
-static const uint32_t BI_BITFIELDS = 0x0003;
-static const uint32_t ARGB32_A_MASK = 0xFF000000;
-static const uint32_t ARGB32_R_MASK = 0x00FF0000;
-static const uint32_t ARGB32_G_MASK = 0x0000FF00;
-static const uint32_t ARGB32_B_MASK = 0x000000FF;
-static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
-
-static const struct bmp_ColorSpaceTriple COLOR_SPACE_TRIPLE = {0, 0, 0, 0, 0, 0,
-	0, 0, 0};
-
-static const char *const MODE_READ = "r";
-static const char *const MODE_WRITE = "wb";
+const uint16_t FILETYPE = 0x4D42;
+const uint32_t BI_BITFIELDS = 0x0003;
+const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 size_t
-bmp_row_size(uint16_t bits_per_pixel, int32_t width_pixels)
+bmp_rowsize(uint16_t bpp, int32_t width)
 {
-	double pixels_bits = (double)bits_per_pixel * width_pixels;
-	return (size_t)(ceil(pixels_bits / BITS_PER_DWORD)) * BYTES_PER_DWORD;
+	double pixelbits = (double)bpp * width;
+	return (size_t)(ceil(pixelbits / DWORDBITS)) * DWORDBYTES;
 }
 
 int
-bmp_write_bitmap_v4(const struct bmp_PixelARGB32 *source_buff,
-	size_t width_pixels, size_t height_pixels, const char *file)
+bmp_read(const char *file, struct bmp_Filehdr *filehdr,
+	struct bmp_Infohdr *infohdr, char **image)
+{
+	int rc = FAILURE;
+	uint32_t size;
+	size_t reads;
+	fpos_t pos;
+
+	FILE *fp = fopen(file, "r");
+	if (fp == NULL) {
+		return rc;
+	}
+
+	reads = fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp);
+	if (reads != 1) {
+		goto out;
+	}
+
+	rc = fgetpos(fp, &pos);
+	if (rc != SUCCESS) {
+		goto out;
+	}
+
+	reads = fread(&size, sizeof(uint32_t), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	rc = fsetpos(fp, &pos);
+	if (rc != SUCCESS) {
+		goto out;
+	}
+
+	if (size != BITMAPINFOHEADER) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	reads = fread(infohdr, sizeof(struct bmp_Infohdr), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	const uint32_t imagesize = infohdr->imagesize;
+
+	*image = calloc(imagesize, sizeof(char));
+	if (*image == NULL) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	reads = fread(*image, imagesize * sizeof(char), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	assert(rc == SUCCESS);
+out:
+	fclose(fp);
+	return rc;
+}
+
+int
+bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
+	struct bmp_V4hdr *v4hdr, char **image)
+{
+	int rc = FAILURE;
+	uint32_t size;
+	size_t reads;
+	fpos_t pos;
+
+	FILE *fp = fopen(file, "r");
+	if (fp == NULL) {
+		return rc;
+	}
+
+	reads = fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp);
+	if (reads != 1) {
+		goto out;
+	}
+
+	rc = fgetpos(fp, &pos);
+	if (rc != SUCCESS) {
+		goto out;
+	}
+
+	reads = fread(&size, sizeof(uint32_t), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	rc = fsetpos(fp, &pos);
+	if (rc != SUCCESS) {
+		goto out;
+	}
+
+	if (size != BITMAPV4HEADER) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	reads = fread(v4hdr, sizeof(struct bmp_V4hdr), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	const uint32_t imagesize = v4hdr->imagesize;
+
+	*image = calloc(imagesize, sizeof(char));
+	if (*image == NULL) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	reads = fread(*image, imagesize * sizeof(char), 1, fp);
+	if (reads != 1) {
+		rc = FAILURE;
+		goto out;
+	}
+
+	assert(rc == SUCCESS);
+out:
+	fclose(fp);
+	return rc;
+}
+
+int
+bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height,
+	const char *file)
 {
 	int rc = FAILURE;
 	size_t writes;
+	const size_t offset =
+		sizeof(struct bmp_Filehdr) + sizeof(struct bmp_V4hdr);
 
-	if (source_buff == NULL || file == NULL) {
+	if (buf == NULL || file == NULL) {
 		return rc;
 	}
 
-	if (width_pixels > INT32_MAX || height_pixels > INT32_MAX) {
+	if (width > INT32_MAX || height > INT32_MAX) {
 		return rc;
 	}
 
-	const size_t image_size_bytes =
-		(width_pixels * height_pixels) * sizeof(struct bmp_PixelARGB32);
-	if (image_size_bytes > UINT32_MAX) {
+	const size_t imagesize = (width * height) * sizeof(struct bmp_Pixel32);
+	if (imagesize > UINT32_MAX) {
 		return rc;
 	}
 
-	const size_t file_size_bytes =
-		BITMAP_V4_OFFSET_BYTES + image_size_bytes;
-	if (file_size_bytes > UINT32_MAX) {
+	const size_t filesize = offset + imagesize;
+	if (filesize > UINT32_MAX) {
 		return rc;
 	}
 
-	struct bmp_FileHeader file_header = {
-		.type = BITMAP_FILE_TYPE,
-		.size_bytes = (uint32_t)file_size_bytes,
+	struct bmp_Filehdr file_header = {
+		.filetype = FILETYPE,
+		.filesize = (uint32_t)filesize,
 		.reserved1 = 0,
 		.reserved2 = 0,
-		.offset_bytes = (uint32_t)BITMAP_V4_OFFSET_BYTES,
+		.offset = (uint32_t)offset,
 	};
 
-	struct bmp_BitmapV4Header bitmap_v4_header = {
-		.dib_header_size_bytes = BITMAPV4HEADER,
-		.width_pixels = (int32_t)width_pixels,
-		.height_pixels = (int32_t)height_pixels,
-		.num_planes = NUM_PLANES,
-		.bits_per_pixel = BITS_PER_PIXEL,
+	struct bmp_V4hdr bitmap_v4_header = {
+		.size = BITMAPV4HEADER,
+		.width = (int32_t)width,
+		.height = (int32_t)height,
+		.planes = 1,
+		.bpp = 32,
 		.compression = BI_BITFIELDS,
-		.image_size_bytes = (uint32_t)image_size_bytes,
-		.x_resolution_ppm = 0,
-		.y_resolution_ppm = 0,
-		.num_colors = 0,
-		.num_important_colors = 0,
-		.red_mask = ARGB32_R_MASK,
-		.green_mask = ARGB32_G_MASK,
-		.blue_mask = ARGB32_B_MASK,
-		.alpha_mask = ARGB32_A_MASK,
-		.color_space_type = LCS_WINDOWS_COLOR_SPACE,
-		.color_space_triple = COLOR_SPACE_TRIPLE,
-		.red_gamma = 0,
-		.green_gamma = 0,
-		.blue_gamma = 0,
+		.imagesize = (uint32_t)imagesize,
+		.hres = 0,
+		.vres = 0,
+		.colors = 0,
+		.impcolors = 0,
+		.rmask = 0x00FF0000,
+		.gmask = 0x0000FF00,
+		.bmask = 0x000000FF,
+		.amask = 0xFF000000,
+		.colorspacetype = LCS_WINDOWS_COLOR_SPACE,
+		.colorspace = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+		.rgamma = 0,
+		.ggamma = 0,
+		.bgamma = 0,
 	};
 
-	FILE *file_h = fopen(file, MODE_WRITE);
-	if (file_h == NULL) {
+	FILE *fp = fopen(file, "wb");
+	if (fp == NULL) {
 		return rc;
 	}
 
-	writes = fwrite(&file_header, sizeof(struct bmp_FileHeader), 1, file_h);
+	writes = fwrite(&file_header, sizeof(struct bmp_Filehdr), 1, fp);
 	if (writes != 1) {
 		goto out;
 	}
 
-	writes = fwrite(&bitmap_v4_header, sizeof(struct bmp_BitmapV4Header), 1,
-		file_h);
+	writes = fwrite(&bitmap_v4_header, sizeof(struct bmp_V4hdr), 1, fp);
 	if (writes != 1) {
 		goto out;
 	}
 
-	writes = fwrite(source_buff, image_size_bytes, 1, file_h);
+	writes = fwrite(buf, imagesize, 1, fp);
 	if (writes != 1) {
 		goto out;
 	}
 
 	rc = SUCCESS;
 out:
-	fclose(file_h);
-	return rc;
-}
-
-int
-bmp_read_bitmap(const char *file, struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapInfoHeader *bitmap_info_header_out, char **image_out)
-{
-	int rc = FAILURE;
-	uint32_t dib_header_size_bytes;
-	size_t reads;
-	fpos_t pos;
-
-	FILE *file_h = fopen(file, MODE_READ);
-	if (file_h == NULL) {
-		return rc;
-	}
-
-	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
-		file_h);
-	if (reads != 1) {
-		goto out;
-	}
-
-	rc = fgetpos(file_h, &pos);
-	if (rc != SUCCESS) {
-		goto out;
-	}
-
-	reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	rc = fsetpos(file_h, &pos);
-	if (rc != SUCCESS) {
-		goto out;
-	}
-
-	if (dib_header_size_bytes != BITMAPINFOHEADER) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	reads = fread(bitmap_info_header_out,
-		sizeof(struct bmp_BitmapInfoHeader), 1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	const uint32_t image_size_bytes =
-		bitmap_info_header_out->image_size_bytes;
-
-	*image_out = calloc(image_size_bytes, sizeof(char));
-	if (*image_out == NULL) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	assert(rc == SUCCESS);
-out:
-	fclose(file_h);
-	return rc;
-}
-
-int
-bmp_read_bitmap_v4(const char *file, struct bmp_FileHeader *file_header_out,
-	struct bmp_BitmapV4Header *bitmap_v4_header_out, char **image_out)
-{
-	int rc = FAILURE;
-	uint32_t dib_header_size_bytes;
-	size_t reads;
-	fpos_t pos;
-
-	FILE *file_h = fopen(file, MODE_READ);
-	if (file_h == NULL) {
-		return rc;
-	}
-
-	reads = fread(file_header_out, sizeof(struct bmp_FileHeader), 1,
-		file_h);
-	if (reads != 1) {
-		goto out;
-	}
-
-	rc = fgetpos(file_h, &pos);
-	if (rc != SUCCESS) {
-		goto out;
-	}
-
-	reads = fread(&dib_header_size_bytes, sizeof(uint32_t), 1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	rc = fsetpos(file_h, &pos);
-	if (rc != SUCCESS) {
-		goto out;
-	}
-
-	if (dib_header_size_bytes != BITMAPV4HEADER) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	reads = fread(bitmap_v4_header_out, sizeof(struct bmp_BitmapV4Header),
-		1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	const uint32_t image_size_bytes =
-		bitmap_v4_header_out->image_size_bytes;
-
-	*image_out = calloc(image_size_bytes, sizeof(char));
-	if (*image_out == NULL) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	reads = fread(*image_out, image_size_bytes * sizeof(char), 1, file_h);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	assert(rc == SUCCESS);
-out:
-	fclose(file_h);
+	fclose(fp);
 	return rc;
 }
