@@ -23,8 +23,8 @@ enum {
 static const char *const FONT_FILE = "./ucs-fonts/10x20.bdf";
 static const char *const BMP_FILE = "./10x20.bmp";
 
-static const struct bmp_PixelARGB32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
-static const struct bmp_PixelARGB32 BLACK = {0x00, 0x00, 0x00, 0xFF};
+static const struct bmp_Pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
+static const struct bmp_Pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 static void
 print_error(int error, char *file, int line)
@@ -98,11 +98,11 @@ render_char(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 
 #ifdef DRAW_IMAGE
 static void
-draw_image(unsigned char **image, size_t width_pixels, size_t height_pixels)
+draw_image(unsigned char **image, size_t width, size_t height)
 {
-	for (size_t y = 0; y < height_pixels; ++y) {
+	for (size_t y = 0; y < height; ++y) {
 		printf("%2zd|", y);
-		for (size_t x = 0; x < width_pixels; ++x) {
+		for (size_t x = 0; x < width; ++x) {
 			putchar(image[y][x] ? '*' : ' ');
 		}
 		printf("|\n");
@@ -110,11 +110,11 @@ draw_image(unsigned char **image, size_t width_pixels, size_t height_pixels)
 }
 #else
 static inline void
-draw_image(unsigned char **image, size_t width_pixels, size_t height_pixels)
+draw_image(unsigned char **image, size_t width, size_t height)
 {
 	(void)image;
-	(void)width_pixels;
-	(void)height_pixels;
+	(void)width;
+	(void)height;
 }
 #endif
 
@@ -125,9 +125,9 @@ main(int argc, char *argv[])
 	FT_Face face = NULL;
 	FT_GlyphSlot slot = NULL;
 	unsigned char **image = NULL;
-	struct bmp_PixelARGB32 *target_buff = NULL;
-	const size_t width_pixels = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
-	const size_t height_pixels = FONT_HEIGHT_PIXELS;
+	struct bmp_Pixel32 *buf = NULL;
+	const size_t width = FONT_WIDTH_PIXELS * CHAR_CODES_SIZE;
+	const size_t height = FONT_HEIGHT_PIXELS;
 	char char_codes[CHAR_CODES_SIZE];
 	int rc;
 
@@ -138,7 +138,7 @@ main(int argc, char *argv[])
 		char_codes[i] = (char)(i + '!');
 	}
 
-	rc = alloc_image(&image, height_pixels, width_pixels);
+	rc = alloc_image(&image, height, width);
 	if (rc != SUCCESS) {
 		print_error(rc, __FILE__, __LINE__);
 		goto out;
@@ -190,27 +190,25 @@ main(int argc, char *argv[])
 		render_char(slot, image, i);
 	}
 
-	draw_image(image, width_pixels, height_pixels);
+	draw_image(image, width, height);
 
-	target_buff = calloc(width_pixels * height_pixels,
-		sizeof(struct bmp_PixelARGB32));
-	if (target_buff == NULL) {
+	buf = calloc(width * height, sizeof(struct bmp_Pixel32));
+	if (buf == NULL) {
 		rc = FAILURE;
 		goto out;
 	}
 
-	for (size_t y = height_pixels, i = 0; y-- > 0;) {
-		for (size_t x = 0; x < width_pixels; ++x, ++i) {
-			target_buff[i] = image[y][x] ? BLACK : WHITE;
+	for (size_t y = height, i = 0; y-- > 0;) {
+		for (size_t x = 0; x < width; ++x, ++i) {
+			buf[i] = image[y][x] ? BLACK : WHITE;
 		}
 	}
 
-	rc = bmp_write_bitmap_v4(target_buff, width_pixels, height_pixels,
-		BMP_FILE);
+	rc = bmp_v4write(buf, width, height, BMP_FILE);
 out:
-	free(target_buff);
+	free(buf);
 	FT_Done_Face(face);
 	FT_Done_FreeType(library);
-	free_image(&image, height_pixels);
+	free_image(&image, height);
 	return rc;
 }
