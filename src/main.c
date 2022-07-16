@@ -20,66 +20,56 @@ enum {
 	UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
 };
 
-enum LoopStatus {
+enum Loopstat {
 	STOP = 0,
 	RUN = 1
 };
 
-enum WindowType {
-	WINDOWED = 0,
-	FULLSCREEN = 1,
-	FULLSCREEN_BORDERLESS = 2,
-	NUM_WINDOW_TYPES
-};
-
-struct Arguments {
-	char *config_path;
+struct Args {
+	char *cfgfile;
 };
 
 struct Config {
-	enum WindowType window_type;
-	int window_width_pixels;
-	int window_height_pixels;
-	int target_frame_rate;
-	char *asset_path;
+	enum {
+		WINDOWED = 0,
+		FULLSCREEN = 1,
+		BORDERLESS = 2,
+	} wtype;
+	int width;
+	int height;
+	int framerate;
+	char *assetdir;
 };
 
-struct MainWindow {
-	SDL_Window *window;
-	SDL_Renderer *renderer;
+struct Window {
+	SDL_Window *w;
+	SDL_Renderer *r;
 };
 
-static const float MS_PER_SECOND = 1000.0f;
+static const float SECOND = 1000.0f;
 
-static const char *const ARG_CONFIG_PATH = "--config-path";
-
-static const char *const WINDOW_TITLE = "Hello, world!";
-
-static const char *const TEST_BMP_FILE = "test.bmp";
-
-static uint64_t counter_freq_hz = 0;
-
-static const uint32_t base_window_flags[] = {
+static const uint32_t wflags[] = {
 	[WINDOWED] = SDL_WINDOW_SHOWN,
 	[FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
-	[FULLSCREEN_BORDERLESS] =
-		SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
+	[BORDERLESS] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
 };
 
-static const char *const window_description[] = {
+static const char *const wdesc[] = {
 	[WINDOWED] = "Windowed",
 	[FULLSCREEN] = "Fullscreen",
-	[FULLSCREEN_BORDERLESS] = "Borderless Fullscreen",
+	[BORDERLESS] = "Borderless Fullscreen",
 };
 
-static struct Arguments default_args = {.config_path = "config.lua"};
+static uint64_t pfreq = 0;
 
-static struct Config default_config = {
-	.window_type = WINDOWED,
-	.window_width_pixels = 1280,
-	.window_height_pixels = 720,
-	.target_frame_rate = 60,
-	.asset_path = "./assets",
+static struct Args args = {.cfgfile = "config.lua"};
+
+static struct Config cfg = {
+	.wtype = WINDOWED,
+	.width = 1280,
+	.height = 720,
+	.framerate = 60,
+	.assetdir = "./assets",
 };
 
 static inline uint64_t
@@ -89,58 +79,56 @@ now(void)
 }
 
 static void
-log_sdl_error(int category, char *file, int line)
+logsdlerror(int category, char *file, int line)
 {
-	const char *sdl_err = SDL_GetError();
-	if (strlen(sdl_err) != 0) {
-		SDL_LogError(category, "%s:%d: %s", file, line, sdl_err);
+	const char *err = SDL_GetError();
+	if (strlen(err) != 0) {
+		SDL_LogError(category, "%s:%d: %s", file, line, err);
 	} else {
 		SDL_LogError(category, "%s:%d", file, line);
 	}
 }
 
 static void
-parse_args(int argc, char *argv[], struct Arguments *args)
+parseargs(int argc, char *argv[], struct Args *args)
 {
 	for (int i = 0; i < argc;) {
 		char *arg = argv[i++];
-		if (strcmp(arg, ARG_CONFIG_PATH) == 0) {
-			args->config_path = argv[i++];
+		if (strcmp(arg, "-c") == 0) {
+			args->cfgfile = argv[i++];
 		}
 	}
 }
 
 static char *
-init_asset_path(const struct Config *config, const char *sub_path)
+joinpath(const char *a, const char *b)
 {
-	size_t len = (size_t)snprintf(NULL, 0, "%s/%s", config->asset_path,
-		sub_path);
+	size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
 	len += 1; /* for null-termination */
 	char *ret = calloc(len, sizeof(char));
 	if (ret != NULL) {
-		snprintf(ret, len, "%s/%s", config->asset_path, sub_path);
+		snprintf(ret, len, "%s/%s", a, b);
 	}
 	return ret;
 }
 
 static int
-config_load(const char *filename, struct Config *config)
+loadcfg(const char *f, struct Config *cfg)
 {
 	int rc = FAILURE;
 
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
-		SDL_LogError(UNHANDLED, "%s: failed to initialize Lua",
-			__func__);
+		SDL_LogError(UNHANDLED, "%s: luaL_newstate failed", __func__);
 		return rc;
 	}
 
 	luaL_openlibs(state);
 
-	rc = luaL_loadfile(state, filename) || lua_pcall(state, 0, 0, 0);
+	rc = luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0);
 	if (rc != LUA_OK) {
-		SDL_LogError(UNHANDLED, "%s: failed to load file: %s, %s",
-			__func__, filename, lua_tostring(state, -1));
+		SDL_LogError(UNHANDLED, "%s: failed to load %s, %s", __func__,
+			f, lua_tostring(state, -1));
 		lua_pop(state, 1);
 		rc = FAILURE;
 		goto out;
@@ -158,8 +146,8 @@ config_load(const char *filename, struct Config *config)
 		rc = FAILURE;
 		goto out;
 	}
-	config->window_width_pixels = (int)lua_tonumber(state, -2);
-	config->window_height_pixels = (int)lua_tonumber(state, -1);
+	cfg->width = (int)lua_tonumber(state, -2);
+	cfg->height = (int)lua_tonumber(state, -1);
 
 	rc = SUCCESS;
 out:
@@ -168,129 +156,122 @@ out:
 }
 
 static float
-calculate_frame_time_ms(int frames_per_second)
+calcframetime(int fps)
 {
-	assert(frames_per_second > 0);
-	return MS_PER_SECOND / (float)frames_per_second;
+	assert(fps > 0);
+	return SECOND / (float)fps;
 }
 
 static float
-calculate_delta_ms(uint64_t begin_ticks, uint64_t end_ticks)
+calcdelta(uint64_t begin, uint64_t end)
 {
-	assert(counter_freq_hz > 0);
-	const float delta_ticks = (float)(end_ticks - begin_ticks);
-	return (delta_ticks * MS_PER_SECOND) / (float)counter_freq_hz;
+	assert(pfreq > 0);
+	const float delta_ticks = (float)(end - begin);
+	return (delta_ticks * SECOND) / (float)pfreq;
 }
 
 static void
-delay(float target_frame_time_ms, uint64_t begin_ticks)
+delay(float frametime, uint64_t begin)
 {
-	if (calculate_delta_ms(begin_ticks, now()) < target_frame_time_ms) {
-		const float delay_ms = target_frame_time_ms
-			- calculate_delta_ms(begin_ticks, now()) - 1.0f;
-		if ((uint32_t)delay_ms > 0) {
-			SDL_Delay((uint32_t)delay_ms);
+	if (calcdelta(begin, now()) < frametime) {
+		const float delay = frametime - calcdelta(begin, now()) - 1.0f;
+		if ((uint32_t)delay > 0) {
+			SDL_Delay((uint32_t)delay);
 		}
-		while (calculate_delta_ms(begin_ticks, now())
-			< target_frame_time_ms) {
+		while (calcdelta(begin, now()) < frametime) {
 			/* wait */
 		}
 	}
 }
 
 static int
-load_bmp(const char *file, SDL_Surface **out)
+loadbmp(const char *file, SDL_Surface **s)
 {
-	*out = SDL_LoadBMP(file);
-	if (*out == NULL) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+	*s = SDL_LoadBMP(file);
+	if (*s == NULL) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		return FAILURE;
 	}
 	return SUCCESS;
 }
 
 static int
-init_main_window(struct Config *config, const char *title,
-	struct MainWindow *out)
+createwin(struct Config *cfg, const char *title, struct Window *win)
 {
-	uint32_t window_flags = base_window_flags[config->window_type];
-	uint32_t renderer_flags = SDL_RENDERER_ACCELERATED;
-	SDL_LogInfo(UNHANDLED, "Window type: %s\n",
-		window_description[config->window_type]);
-	out->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, config->window_width_pixels,
-		config->window_height_pixels, window_flags);
-	if (out->window == NULL) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+	SDL_LogInfo(UNHANDLED, "Window type: %s\n", wdesc[cfg->wtype]);
+	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height,
+		wflags[cfg->wtype]);
+	if (win->w == NULL) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		return FAILURE;
 	}
-	out->renderer = SDL_CreateRenderer(out->window, -1, renderer_flags);
-	if (out->renderer == NULL) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+	win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED);
+	if (win->r == NULL) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		return FAILURE;
 	}
-	SDL_SetRenderDrawColor(out->renderer, 0x00, 0x00, 0x00, 0xFF);
+	SDL_SetRenderDrawColor(win->r, 0x00, 0x00, 0x00, 0xFF);
 	return SUCCESS;
 }
 
 static int
-get_window_rect(struct MainWindow *main_window, SDL_Rect *out)
+getrect(struct Window *win, SDL_Rect *rect)
 {
-	int width;
-	int height;
+	int w;
+	int h;
 
-	if (main_window == NULL || main_window->renderer == NULL) {
+	if (win == NULL || win->r == NULL) {
 		return FAILURE;
 	}
-	int rc = SDL_GetRendererOutputSize(main_window->renderer, &width,
-		&height);
+	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
 	if (rc != SUCCESS) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		return rc;
 	}
-	out->x = 0;
-	out->y = 0;
-	out->w = width;
-	out->h = height;
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = w;
+	rect->h = h;
 	return SUCCESS;
 }
 
 static void
-destroy_main_window(struct MainWindow *main_window)
+destroywin(struct Window *win)
 {
-	if (main_window == NULL) {
+	if (win == NULL) {
 		return;
 	}
-	if (main_window->renderer != NULL) {
-		SDL_DestroyRenderer(main_window->renderer);
+	if (win->r != NULL) {
+		SDL_DestroyRenderer(win->r);
 	}
-	if (main_window->window != NULL) {
-		SDL_DestroyWindow(main_window->window);
+	if (win->w != NULL) {
+		SDL_DestroyWindow(win->w);
 	}
 }
 
 static void
-destroy_texture(SDL_Texture *texture)
+destroytexture(SDL_Texture *t)
 {
-	if (texture != NULL) {
-		SDL_DestroyTexture(texture);
+	if (t != NULL) {
+		SDL_DestroyTexture(t);
 	}
 }
 
 static void
-free_surface(SDL_Surface *surface)
+freesurface(SDL_Surface *s)
 {
-	if (surface != NULL) {
-		SDL_FreeSurface(surface);
+	if (s != NULL) {
+		SDL_FreeSurface(s);
 	}
 }
 
 static void
-handle_keydown(SDL_KeyboardEvent *key, enum LoopStatus *loop_status)
+keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat)
 {
 	switch (key->keysym.sym) {
 	case SDLK_ESCAPE:
-		*loop_status = STOP;
+		*loopstat = STOP;
 		break;
 	default:
 		break;
@@ -307,113 +288,110 @@ int
 main(int argc, char *argv[])
 {
 	int rc = FAILURE;
-	enum LoopStatus main_loop_status = RUN;
-	struct MainWindow main_window = {.window = NULL, .renderer = NULL};
-	SDL_Surface *test_bmp_surface = NULL;
-	SDL_Texture *test_bmp_texture = NULL;
-	SDL_Rect main_window_rect;
-	SDL_Event event;
-	uint64_t begin_ticks;
-	uint64_t end_ticks;
-	float delta_time_ms;
+	enum Loopstat loopstat = RUN;
+	struct Window win = {.w = NULL, .r = NULL};
+	SDL_Rect winrect;
+	SDL_Surface *s = NULL;
+	SDL_Texture *t = NULL;
+	SDL_Event ev;
+	const char *const wintitle = "Hello, world!";
+	const char *const testbmp = "test.bmp";
+	uint64_t begin;
+	uint64_t end;
+	float delta;
 
 	(void)argc;
 	(void)argv;
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-	parse_args(argc, argv, &default_args);
+	parseargs(argc, argv, &args);
 
-	config_load(default_args.config_path, &default_config);
+	loadcfg(args.cfgfile, &cfg);
 
-	char *test_bmp_path = init_asset_path(&default_config, TEST_BMP_FILE);
-	if (test_bmp_path == NULL) {
+	char *bmpfile = joinpath(cfg.assetdir, testbmp);
+	if (bmpfile == NULL) {
 		goto out;
 	}
-
-	const float target_frame_time_ms =
-		calculate_frame_time_ms(default_config.target_frame_rate);
 
 	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != SUCCESS) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		goto out;
 	}
 
-	counter_freq_hz = SDL_GetPerformanceFrequency();
+	pfreq = SDL_GetPerformanceFrequency();
 
-	rc = init_main_window(&default_config, WINDOW_TITLE, &main_window);
+	rc = createwin(&cfg, wintitle, &win);
 	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	rc = get_window_rect(&main_window, &main_window_rect);
+	rc = getrect(&win, &winrect);
 	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	rc = load_bmp(test_bmp_path, &test_bmp_surface);
+	rc = loadbmp(bmpfile, &s);
 	if (rc != SUCCESS) {
 		goto out;
 	}
 
-	test_bmp_texture = SDL_CreateTextureFromSurface(main_window.renderer,
-		test_bmp_surface);
-	if (test_bmp_texture == NULL) {
-		log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+	t = SDL_CreateTextureFromSurface(win.r, s);
+	if (t == NULL) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		rc = FAILURE;
 		goto out;
 	}
-	free_surface(test_bmp_surface);
-	test_bmp_surface = NULL;
+	freesurface(s);
+	s = NULL;
 
-	delta_time_ms = target_frame_time_ms;
-	begin_ticks = now();
-	while (main_loop_status == RUN) {
-		while (SDL_PollEvent(&event) != 0) {
-			switch (event.type) {
+	delta = calcframetime(cfg.framerate);
+	begin = now();
+	while (loopstat == RUN) {
+		while (SDL_PollEvent(&ev) != 0) {
+			switch (ev.type) {
 			case SDL_QUIT:
-				main_loop_status = STOP;
+				loopstat = STOP;
 				break;
 			case SDL_KEYDOWN:
-				handle_keydown(&event.key, &main_loop_status);
+				keydown(&ev.key, &loopstat);
 				break;
 			default:
 				break;
 			}
 		}
 
-		update(delta_time_ms);
+		update(delta);
 
 		/* render */
 		{
-			rc = SDL_RenderClear(main_window.renderer);
+			rc = SDL_RenderClear(win.r);
 			if (rc != SUCCESS) {
-				log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+				logsdlerror(UNHANDLED, __FILE__, __LINE__);
 				goto out;
 			}
 
-			rc = SDL_RenderCopy(main_window.renderer,
-				test_bmp_texture, NULL, &main_window_rect);
+			rc = SDL_RenderCopy(win.r, t, NULL, &winrect);
 			if (rc != SUCCESS) {
-				log_sdl_error(UNHANDLED, __FILE__, __LINE__);
+				logsdlerror(UNHANDLED, __FILE__, __LINE__);
 				goto out;
 			}
 
-			SDL_RenderPresent(main_window.renderer);
+			SDL_RenderPresent(win.r);
 		}
 
-		delay(target_frame_time_ms, begin_ticks);
+		delay(delta, begin);
 
-		end_ticks = now();
-		delta_time_ms = calculate_delta_ms(begin_ticks, end_ticks);
-		begin_ticks = end_ticks;
+		end = now();
+		delta = calcdelta(begin, end);
+		begin = end;
 	}
 out:
-	destroy_texture(test_bmp_texture);
-	free_surface(test_bmp_surface);
-	destroy_main_window(&main_window);
+	destroytexture(t);
+	freesurface(s);
+	destroywin(&win);
 	SDL_Quit();
-	free(test_bmp_path);
+	free(bmpfile);
 	return rc;
 }
