@@ -25,6 +25,9 @@ static const char *const BMPFILE = "./10x20.bmp";
 static const struct bmp_Pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_Pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
+static char **allocimage(size_t height, size_t width);
+static void freeimage(char **image, size_t height);
+
 static void
 error(int error, char *file, int line)
 {
@@ -32,7 +35,7 @@ error(int error, char *file, int line)
 }
 
 /* pos = 0 is MSB */
-static unsigned char
+static char
 getbit(unsigned char c, size_t pos)
 {
 	if (pos >= CHAR_BIT) {
@@ -42,48 +45,48 @@ getbit(unsigned char c, size_t pos)
 	return (c >> (CHAR_BIT + ~pos)) & 1;
 }
 
-static int
-allocimage(unsigned char ***image, size_t height, size_t width)
+static char **
+allocimage(size_t height, size_t width)
 {
-	*image = calloc(height, sizeof(unsigned char *));
-	if (*image == NULL) {
-		return FAILURE;
+	char **ret = calloc(height, sizeof(char *));
+	if (ret == NULL) {
+		return ret;
 	}
 	for (size_t i = 0; i < height; ++i) {
-		*(*image + i) = calloc(width, sizeof(unsigned char));
-		if (*(*image + i) == NULL) {
-			return FAILURE;
+		ret[i] = calloc(width, sizeof(char));
+		if (ret[i] == NULL) {
+			freeimage(ret, i);
+			return NULL;
 		}
 	}
-	return SUCCESS;
+	return ret;
 }
 
 static void
-freeimage(unsigned char ***image, size_t height)
+freeimage(char **image, size_t height)
 {
 	if (image == NULL) {
 		return;
 	}
 	for (size_t i = 0; i < height; ++i) {
-		free(*(*image + i));
+		free(image[i]);
 	}
-	free(*image);
-	*image = NULL;
+	free(image);
 }
 
 static void
-renderchar(FT_GlyphSlot slot, unsigned char **target, size_t offset)
+renderchar(FT_GlyphSlot slot, char **target, size_t offset)
 {
 	unsigned char *buffer = slot->bitmap.buffer;
-	unsigned int rows = (unsigned int)slot->bitmap.rows;
-	unsigned int width = (unsigned int)slot->bitmap.width;
-	unsigned int pitch = (unsigned int)abs(slot->bitmap.pitch);
-	unsigned char bit;
+	size_t rows = slot->bitmap.rows;
+	size_t width = slot->bitmap.width;
+	size_t pitch = (size_t)abs(slot->bitmap.pitch);
+	char bit;
 
 	for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
 		for (size_t i = 0; i < pitch; ++i) {
 			for (size_t j = 0, x; j < CHAR_BIT; ++j) {
-				bit = getbit(*(buffer + p + i), j);
+				bit = getbit(buffer[p + i], j);
 
 				x = j + (i * CHAR_BIT);
 				if (x < width) {
@@ -96,7 +99,7 @@ renderchar(FT_GlyphSlot slot, unsigned char **target, size_t offset)
 
 #ifdef DRAW_IMAGE
 static void
-drawimage(unsigned char **image, size_t width, size_t height)
+drawimage(char **image, size_t width, size_t height)
 {
 	for (size_t y = 0; y < height; ++y) {
 		printf("%2zd|", y);
@@ -108,7 +111,7 @@ drawimage(unsigned char **image, size_t width, size_t height)
 }
 #else
 static inline void
-drawimage(unsigned char **image, size_t width, size_t height)
+drawimage(char **image, size_t width, size_t height)
 {
 	(void)image;
 	(void)width;
@@ -122,8 +125,6 @@ main(int argc, char *argv[])
 	FT_Library ftlib = NULL;
 	FT_Face face = NULL;
 	FT_GlyphSlot slot = NULL;
-	unsigned char **image = NULL;
-	struct bmp_Pixel32 *buf = NULL;
 	const size_t width = WIDTH * CODESZ;
 	const size_t height = HEIGHT;
 	char code[CODESZ];
@@ -136,8 +137,9 @@ main(int argc, char *argv[])
 		code[i] = (char)(i + '!');
 	}
 
-	rc = allocimage(&image, height, width);
-	if (rc != SUCCESS) {
+	char **image = allocimage(height, width);
+	if (image == NULL) {
+		rc = FAILURE;
 		error(rc, __FILE__, __LINE__);
 		return EXIT_FAILURE;
 	}
@@ -195,7 +197,8 @@ main(int argc, char *argv[])
 
 	drawimage(image, width, height);
 
-	buf = calloc(width * height, sizeof(struct bmp_Pixel32));
+	struct bmp_Pixel32 *buf =
+		calloc(width * height, sizeof(struct bmp_Pixel32));
 	if (buf == NULL) {
 		rc = FAILURE;
 		goto out2;
@@ -221,6 +224,6 @@ out2:
 out1:
 	FT_Done_FreeType(ftlib);
 out0:
-	freeimage(&image, height);
+	freeimage(image, height);
 	return rc;
 }
