@@ -101,7 +101,7 @@ parseargs(int argc, char *argv[], struct Args *args)
 }
 
 static char *
-joinpath(const char *a, const char *b)
+allocpath(const char *a, const char *b)
 {
 	size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
 	len += 1; /* for null-termination */
@@ -293,7 +293,7 @@ main(int argc, char *argv[])
 
 	loadcfg(args.cfgfile, &cfg);
 
-	char *bmpfile = joinpath(cfg.assetdir, testbmp);
+	char *bmpfile = allocpath(cfg.assetdir, testbmp);
 	if (bmpfile == NULL) {
 		return EXIT_FAILURE;
 	}
