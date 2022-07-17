@@ -17,12 +17,13 @@ enum {
 };
 
 enum {
-	UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
+	APP = SDL_LOG_CATEGORY_CUSTOM,
+	ERR,
 };
 
 enum Loopstat {
 	STOP = 0,
-	RUN = 1
+	RUN = 1,
 };
 
 struct Args {
@@ -79,13 +80,13 @@ now(void)
 }
 
 static void
-logsdlerror(int category, char *file, int line)
+logsdlerr(int cat, char *file, int line)
 {
 	const char *err = SDL_GetError();
 	if (strlen(err) != 0) {
-		SDL_LogError(category, "%s:%d: %s", file, line, err);
+		SDL_LogError(cat, "%s:%d: %s", file, line, err);
 	} else {
-		SDL_LogError(category, "%s:%d", file, line);
+		SDL_LogError(cat, "%s:%d", file, line);
 	}
 }
 
@@ -118,7 +119,7 @@ loadcfg(const char *f, struct Config *cfg)
 
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
-		SDL_LogError(UNHANDLED, "%s: luaL_newstate failed", __func__);
+		SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
 		return rc;
 	}
 
@@ -126,8 +127,8 @@ loadcfg(const char *f, struct Config *cfg)
 
 	rc = luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0);
 	if (rc != LUA_OK) {
-		SDL_LogError(UNHANDLED, "%s: failed to load %s, %s", __func__,
-			f, lua_tostring(state, -1));
+		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__, f,
+			lua_tostring(state, -1));
 		lua_pop(state, 1);
 		rc = FAILURE;
 		goto out;
@@ -136,12 +137,12 @@ loadcfg(const char *f, struct Config *cfg)
 	lua_getglobal(state, "width");
 	lua_getglobal(state, "height");
 	if (!lua_isnumber(state, -2)) {
-		SDL_LogError(UNHANDLED, "%s: width is not a number", __func__);
+		SDL_LogError(ERR, "%s: width is not a number", __func__);
 		rc = FAILURE;
 		goto out;
 	}
 	if (!lua_isnumber(state, -1)) {
-		SDL_LogError(UNHANDLED, "%s: height is not a number", __func__);
+		SDL_LogError(ERR, "%s: height is not a number", __func__);
 		rc = FAILURE;
 		goto out;
 	}
@@ -186,17 +187,17 @@ delay(float frametime, uint64_t begin)
 static int
 initwin(struct Config *cfg, const char *title, struct Window *win)
 {
-	SDL_LogInfo(UNHANDLED, "Window type: %s\n", wdesc[cfg->wtype]);
+	SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
 	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height,
 		wflags[cfg->wtype]);
 	if (win->w == NULL) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		return FAILURE;
 	}
 	win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED);
 	if (win->r == NULL) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		return FAILURE;
 	}
 	SDL_SetRenderDrawColor(win->r, 0x00, 0x00, 0x00, 0xFF);
@@ -228,7 +229,7 @@ getrect(struct Window *win, SDL_Rect *rect)
 	}
 	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
 	if (rc != SUCCESS) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		return rc;
 	}
 	rect->x = 0;
@@ -251,9 +252,9 @@ keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat)
 }
 
 static void
-update(float delta_ms)
+update(float delta)
 {
-	(void)delta_ms;
+	(void)delta;
 }
 
 int
@@ -288,7 +289,7 @@ main(int argc, char *argv[])
 
 	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != SUCCESS) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		rc = EXIT_FAILURE;
 		goto out0;
 	}
@@ -309,14 +310,14 @@ main(int argc, char *argv[])
 
 	s = SDL_LoadBMP(bmpfile);
 	if (s == NULL) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		rc = EXIT_FAILURE;
 		goto out2;
 	}
 
 	t = SDL_CreateTextureFromSurface(win.r, s);
 	if (t == NULL) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
+		logsdlerr(ERR, __FILE__, __LINE__);
 		rc = EXIT_FAILURE;
 		goto out3;
 	}
@@ -345,14 +346,14 @@ main(int argc, char *argv[])
 		{
 			rc = SDL_RenderClear(win.r);
 			if (rc != SUCCESS) {
-				logsdlerror(UNHANDLED, __FILE__, __LINE__);
+				logsdlerr(ERR, __FILE__, __LINE__);
 				rc = EXIT_FAILURE;
 				goto out4;
 			}
 
 			rc = SDL_RenderCopy(win.r, t, NULL, &winrect);
 			if (rc != SUCCESS) {
-				logsdlerror(UNHANDLED, __FILE__, __LINE__);
+				logsdlerr(ERR, __FILE__, __LINE__);
 				rc = EXIT_FAILURE;
 				goto out4;
 			}
@@ -361,7 +362,6 @@ main(int argc, char *argv[])
 		}
 
 		delay(delta, begin);
-
 		end = now();
 		delta = calcdelta(begin, end);
 		begin = end;
