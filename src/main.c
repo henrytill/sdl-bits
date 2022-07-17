@@ -185,17 +185,6 @@ delay(float frametime, uint64_t begin)
 }
 
 static int
-loadbmp(const char *file, SDL_Surface **s)
-{
-	*s = SDL_LoadBMP(file);
-	if (*s == NULL) {
-		logsdlerror(UNHANDLED, __FILE__, __LINE__);
-		return FAILURE;
-	}
-	return SUCCESS;
-}
-
-static int
 initwin(struct Config *cfg, const char *title, struct Window *win)
 {
 	SDL_LogInfo(UNHANDLED, "Window type: %s\n", wdesc[cfg->wtype]);
@@ -319,8 +308,9 @@ main(int argc, char *argv[])
 		goto out2;
 	}
 
-	rc = loadbmp(bmpfile, &s);
-	if (rc != SUCCESS) {
+	s = SDL_LoadBMP(bmpfile);
+	if (s == NULL) {
+		logsdlerror(UNHANDLED, __FILE__, __LINE__);
 		rc = EXIT_FAILURE;
 		goto out2;
 	}
