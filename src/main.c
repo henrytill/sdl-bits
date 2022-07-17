@@ -196,7 +196,7 @@ loadbmp(const char *file, SDL_Surface **s)
 }
 
 static int
-createwin(struct Config *cfg, const char *title, struct Window *win)
+initwin(struct Config *cfg, const char *title, struct Window *win)
 {
 	SDL_LogInfo(UNHANDLED, "Window type: %s\n", wdesc[cfg->wtype]);
 	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
@@ -216,7 +216,7 @@ createwin(struct Config *cfg, const char *title, struct Window *win)
 }
 
 static void
-destroywin(struct Window *win)
+finishwin(struct Window *win)
 {
 	if (win == NULL) {
 		return;
@@ -307,7 +307,7 @@ main(int argc, char *argv[])
 
 	pfreq = SDL_GetPerformanceFrequency();
 
-	rc = createwin(&cfg, wintitle, &win);
+	rc = initwin(&cfg, wintitle, &win);
 	if (rc != SUCCESS) {
 		rc = EXIT_FAILURE;
 		goto out1;
@@ -384,7 +384,7 @@ out4:
 out3:
 	SDL_FreeSurface(s);
 out2:
-	destroywin(&win);
+	finishwin(&win);
 out1:
 	SDL_Quit();
 out0:
