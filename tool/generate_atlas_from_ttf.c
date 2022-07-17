@@ -58,13 +58,13 @@ main(int argc, char *argv[])
 
 	TTF_SetFontKerning(font, 1);
 
-	SDL_Surface *surface = TTF_RenderText_Blended(font, code, fgcolor);
-	if (surface == NULL) {
+	SDL_Surface *s = TTF_RenderText_Blended(font, code, fgcolor);
+	if (s == NULL) {
 		rc = EXIT_FAILURE;
 		goto out2;
 	}
 
-	rc = SDL_SaveBMP(surface, BMPFILE);
+	rc = SDL_SaveBMP(s, BMPFILE);
 	if (rc != SUCCESS) {
 		rc = EXIT_FAILURE;
 		goto out3;
@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 
 	rc = EXIT_SUCCESS;
 out3:
-	SDL_FreeSurface(surface);
+	SDL_FreeSurface(s);
 out2:
 	TTF_CloseFont(font);
 out1:
