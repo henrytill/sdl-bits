@@ -103,11 +103,10 @@ parseargs(int argc, char *argv[], struct Args *args)
 static char *
 allocpath(const char *a, const char *b)
 {
-	size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
-	len += 1; /* for null-termination */
-	char *ret = calloc(len, sizeof(char));
+	size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
+	char *ret = calloc(++n, sizeof(char)); /* incr for terminator */
 	if (ret != NULL) {
-		snprintf(ret, len, "%s/%s", a, b);
+		snprintf(ret, n, "%s/%s", a, b);
 	}
 	return ret;
 }
