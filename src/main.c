@@ -282,16 +282,10 @@ main(int argc, char *argv[])
 
 	loadcfg(args.cfgfile, &cfg);
 
-	char *bmpfile = allocpath(cfg.assetdir, testbmp);
-	if (bmpfile == NULL) {
-		return EXIT_FAILURE;
-	}
-
 	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != SUCCESS) {
 		logsdlerr(ERR, __FILE__, __LINE__);
-		rc = EXIT_FAILURE;
-		goto out0;
+		return EXIT_FAILURE;
 	}
 
 	pfreq = SDL_GetPerformanceFrequency();
@@ -299,13 +293,19 @@ main(int argc, char *argv[])
 	rc = initwin(&cfg, wintitle, &win);
 	if (rc != SUCCESS) {
 		rc = EXIT_FAILURE;
-		goto out1;
+		goto out0;
 	}
 
 	rc = getrect(&win, &winrect);
 	if (rc != SUCCESS) {
 		rc = EXIT_FAILURE;
-		goto out2;
+		goto out1;
+	}
+
+	char *bmpfile = allocpath(cfg.assetdir, testbmp);
+	if (bmpfile == NULL) {
+		rc = EXIT_FAILURE;
+		goto out1;
 	}
 
 	s = SDL_LoadBMP(bmpfile);
@@ -373,10 +373,10 @@ out4:
 out3:
 	SDL_FreeSurface(s);
 out2:
-	finishwin(&win);
-out1:
-	SDL_Quit();
-out0:
 	free(bmpfile);
+out1:
+	finishwin(&win);
+out0:
+	SDL_Quit();
 	return rc;
 }
