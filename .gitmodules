@@ -3,4 +3,4 @@
 	url = https://github.com/henrytill/cmake-modules.git
 [submodule "third-party/lua"]
 	path = third-party/lua
-	url = https://github.com/henrytill/lua.git
+	url = https://git.sr.ht/~henrytill/lua
