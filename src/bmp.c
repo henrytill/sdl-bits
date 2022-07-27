@@ -181,7 +181,7 @@ bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const ch
 		return rc;
 	}
 
-	struct bmp_Filehdr file_header = {
+	struct bmp_Filehdr filehdr = {
 		.filetype = FILETYPE,
 		.filesize = (uint32_t)filesize,
 		.reserved1 = 0,
@@ -189,7 +189,7 @@ bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const ch
 		.offset = (uint32_t)offset,
 	};
 
-	struct bmp_V4hdr bitmap_v4_header = {
+	struct bmp_V4hdr v4hdr = {
 		.size = BITMAPV4HEADER,
 		.width = (int32_t)width,
 		.height = (int32_t)height,
@@ -217,12 +217,12 @@ bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const ch
 		return rc;
 	}
 
-	writes = fwrite(&file_header, sizeof(struct bmp_Filehdr), 1, fp);
+	writes = fwrite(&filehdr, sizeof(struct bmp_Filehdr), 1, fp);
 	if (writes != 1) {
 		goto out;
 	}
 
-	writes = fwrite(&bitmap_v4_header, sizeof(struct bmp_V4hdr), 1, fp);
+	writes = fwrite(&v4hdr, sizeof(struct bmp_V4hdr), 1, fp);
 	if (writes != 1) {
 		goto out;
 	}

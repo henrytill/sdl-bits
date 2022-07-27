@@ -38,33 +38,33 @@ lua(void)
 		SDL_LogError(UNHANDLED, "Failed to initialize Lua");
 		return;
 	}
-	const lua_Number linked = lua_version(state);
+	const lua_Number lded = lua_version(state);
 	SDL_LogInfo(UNHANDLED, "Compiled against Lua %s ...\n", LUA_RELEASE);
-	SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f\n", linked);
+	SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f\n", lded);
 	lua_close(state);
 }
 
 static void
 sdl(void)
 {
-	SDL_version compiled;
-	SDL_version linked;
+	SDL_version cced;
+	SDL_version lded;
 
-	SDL_VERSION(&compiled);
-	SDL_GetVersion(&linked);
-	SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n", compiled.major, compiled.minor, compiled.patch);
-	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", linked.major, linked.minor, linked.patch);
+	SDL_VERSION(&cced);
+	SDL_GetVersion(&lded);
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n", cced.major, cced.minor, cced.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", lded.major, lded.minor, lded.patch);
 }
 
 static void
 sdl_ttf(void)
 {
-	SDL_version compiled;
+	SDL_version cced;
 
-	SDL_TTF_VERSION(&compiled);
-	const SDL_version *linked = TTF_Linked_Version();
-	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n", compiled.major, compiled.minor, compiled.patch);
-	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n", linked->major, linked->minor, linked->patch);
+	SDL_TTF_VERSION(&cced);
+	const SDL_version *lded = TTF_Linked_Version();
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n", cced.major, cced.minor, cced.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n", lded->major, lded->minor, lded->patch);
 }
 
 int
