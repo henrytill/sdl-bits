@@ -6,14 +6,6 @@ target_link_libraries(generate_atlas_from_bdf PRIVATE bmp)
 target_link_freetype(generate_atlas_from_bdf)
 
 
-# Executable: generate_atlas_from_ttf
-add_executable(generate_atlas_from_ttf generate_atlas_from_ttf.c)
-target_compile_options_default(generate_atlas_from_ttf)
-target_compile_definitions(generate_atlas_from_ttf PRIVATE _CRT_SECURE_NO_WARNINGS)
-target_link_SDL2(generate_atlas_from_ttf)
-target_link_SDL2_ttf(generate_atlas_from_ttf)
-
-
 # Executable: generate_test_bmp
 add_executable(generate_test_bmp generate_test_bmp.c)
 target_compile_options_default(generate_test_bmp)

@@ -1,10 +1,8 @@
 /cmake-*
 /build*
 /cbd-targets.json
-/assets/EBGaramond12*
 /assets/ucs-fonts*
 /assets/10x20.bmp
-/assets/EBGaramond-Regular.bmp
 /assets/test.bmp
 *.bat
 *.sh
