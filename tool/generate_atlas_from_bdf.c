@@ -166,8 +166,7 @@ main(int argc, char *argv[])
 	}
 
 	for (size_t i = 0; i < CODESZ; ++i) {
-		rc = FT_Load_Char(face, (FT_ULong)code[i],
-			FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+		rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != SUCCESS) {
 			error(rc, __FILE__, __LINE__);
 			rc = EXIT_FAILURE;
@@ -197,8 +196,7 @@ main(int argc, char *argv[])
 
 	drawimage(image, width, height);
 
-	struct bmp_Pixel32 *buf =
-		calloc(width * height, sizeof(struct bmp_Pixel32));
+	struct bmp_Pixel32 *buf = calloc(width * height, sizeof(struct bmp_Pixel32));
 	if (buf == NULL) {
 		rc = FAILURE;
 		goto out2;

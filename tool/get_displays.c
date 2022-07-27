@@ -21,12 +21,10 @@ enumdisp(void)
 		rc = SDL_GetCurrentDisplayMode(i, &mode);
 		if (rc != SUCCESS) {
 			const char *err = SDL_GetError();
-			SDL_Log("Failed to get mode for display #%d: %s", i,
-				err);
+			SDL_Log("Failed to get mode for display #%d: %s", i, err);
 			return rc;
 		}
-		SDL_Log("Display #%d: mode is %dx%d @ %d hz.", i, mode.w,
-			mode.h, mode.refresh_rate);
+		SDL_Log("Display #%d: mode is %dx%d @ %d hz.", i, mode.w, mode.h, mode.refresh_rate);
 	}
 	return SUCCESS;
 }

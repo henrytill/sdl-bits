@@ -7,8 +7,8 @@
 
 #include <SDL.h>
 
-#include "lua.h"
 #include "lauxlib.h"
+#include "lua.h"
 #include "lualib.h"
 
 enum {
@@ -127,8 +127,7 @@ loadcfg(const char *f, struct Config *cfg)
 
 	rc = luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0);
 	if (rc != LUA_OK) {
-		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__, f,
-			lua_tostring(state, -1));
+		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__, f, lua_tostring(state, -1));
 		lua_pop(state, 1);
 		rc = FAILURE;
 		goto out;
@@ -188,9 +187,7 @@ static int
 initwin(struct Config *cfg, const char *title, struct Window *win)
 {
 	SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
-	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height,
-		wflags[cfg->wtype]);
+	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height, wflags[cfg->wtype]);
 	if (win->w == NULL) {
 		logsdlerr(__FILE__, __LINE__);
 		return FAILURE;

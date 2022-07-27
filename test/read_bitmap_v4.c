@@ -1,8 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "test.h"
 #include "bmp.h"
+#include "test.h"
 
 enum {
 	SUCCESS = 0

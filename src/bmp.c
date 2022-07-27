@@ -27,8 +27,7 @@ bmp_rowsize(uint16_t bpp, int32_t width)
 }
 
 int
-bmp_read(const char *file, struct bmp_Filehdr *filehdr,
-	struct bmp_Infohdr *infohdr, char **image)
+bmp_read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_Infohdr *infohdr, char **image)
 {
 	int rc = FAILURE;
 	uint32_t size;
@@ -93,8 +92,7 @@ out:
 }
 
 int
-bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
-	struct bmp_V4hdr *v4hdr, char **image)
+bmp_v4read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_V4hdr *v4hdr, char **image)
 {
 	int rc = FAILURE;
 	uint32_t size;
@@ -159,13 +157,11 @@ out:
 }
 
 int
-bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height,
-	const char *file)
+bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const char *file)
 {
 	int rc = FAILURE;
 	size_t writes;
-	const size_t offset =
-		sizeof(struct bmp_Filehdr) + sizeof(struct bmp_V4hdr);
+	const size_t offset = sizeof(struct bmp_Filehdr) + sizeof(struct bmp_V4hdr);
 
 	if (buf == NULL || file == NULL) {
 		return rc;

@@ -13,11 +13,10 @@ enum {
 	CODESZ = 94, // ('~' - '!') + 1
 };
 
-static const char *const FONTFILE =
-	"./EBGaramond12/"
-	"EBGaramond12-e608414f52e532b68e2182f96b4ce9db35335593/"
-	"fonts/ttf/"
-	"EBGaramond-Regular.ttf";
+static const char *const FONTFILE = "./EBGaramond12/"
+				    "EBGaramond12-e608414f52e532b68e2182f96b4ce9db35335593/"
+				    "fonts/ttf/"
+				    "EBGaramond-Regular.ttf";
 
 static const char *const BMPFILE = "./EBGaramond-Regular.bmp";
 

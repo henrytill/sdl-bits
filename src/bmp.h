@@ -94,13 +94,10 @@ struct bmp_Pixel32 {
 
 size_t bmp_rowsize(uint16_t bpp, int32_t width);
 
-int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
-	struct bmp_Infohdr *infohdr, char **image);
+int bmp_read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_Infohdr *infohdr, char **image);
 
-int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
-	struct bmp_V4hdr *v4hdr, char **image);
+int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_V4hdr *v4hdr, char **image);
 
-int bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height,
-	const char *file);
+int bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const char *file);
 
 #endif /* SDL_BITS_BMP_H */

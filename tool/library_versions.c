@@ -5,8 +5,8 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#include "lua.h"
 #include "lauxlib.h"
+#include "lua.h"
 
 enum {
 	UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
@@ -26,8 +26,7 @@ freetype(void)
 		return;
 	}
 	FT_Library_Version(ftlib, &major, &minor, &patch);
-	SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u\n", major,
-		minor, patch);
+	SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u\n", major, minor, patch);
 	FT_Done_FreeType(ftlib);
 }
 
@@ -53,10 +52,8 @@ sdl(void)
 
 	SDL_VERSION(&compiled);
 	SDL_GetVersion(&linked);
-	SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n",
-		compiled.major, compiled.minor, compiled.patch);
-	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n",
-		linked.major, linked.minor, linked.patch);
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n", compiled.major, compiled.minor, compiled.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", linked.major, linked.minor, linked.patch);
 }
 
 static void
@@ -66,10 +63,8 @@ sdl_ttf(void)
 
 	SDL_TTF_VERSION(&compiled);
 	const SDL_version *linked = TTF_Linked_Version();
-	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n",
-		compiled.major, compiled.minor, compiled.patch);
-	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n",
-		linked->major, linked->minor, linked->patch);
+	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n", compiled.major, compiled.minor, compiled.patch);
+	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n", linked->major, linked->minor, linked->patch);
 }
 
 int

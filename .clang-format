@@ -1,4 +1,5 @@
 AlignAfterOpenBracket: DontAlign
+AlignArrayOfStructures: Right
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: true
@@ -14,13 +15,13 @@ BasedOnStyle: LLVM
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: true
-ColumnLimit: 80
+ColumnLimit: 0
 ContinuationIndentWidth: 8
 DerivePointerAlignment: false
 IndentCaseLabels: false
 IndentWidth: 8
 PointerAlignment: Right
 ReflowComments: true
-SortIncludes: false
+SortIncludes: true
 SpacesBeforeTrailingComments: 1
 UseTab: ForContinuationAndIndentation
