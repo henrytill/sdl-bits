@@ -80,13 +80,13 @@ now(void)
 }
 
 static void
-logsdlerr(char *file, int line)
+logsdlerr(char *msg)
 {
 	const char *err = SDL_GetError();
 	if (strlen(err) != 0) {
-		SDL_LogError(ERR, "%s:%d: %s", file, line, err);
+		SDL_LogError(ERR, "%s (%s)", msg, err);
 	} else {
-		SDL_LogError(ERR, "%s:%d", file, line);
+		SDL_LogError(ERR, "%s", msg);
 	}
 }
 
@@ -189,12 +189,12 @@ initwin(struct Config *cfg, const char *title, struct Window *win)
 	SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
 	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height, wflags[cfg->wtype]);
 	if (win->w == NULL) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_CreateWindow failed");
 		return FAILURE;
 	}
 	win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED);
 	if (win->r == NULL) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_CreateRenderer failed");
 		return FAILURE;
 	}
 	SDL_SetRenderDrawColor(win->r, 0x00, 0x00, 0x00, 0xFF);
@@ -226,7 +226,7 @@ getrect(struct Window *win, SDL_Rect *rect)
 	}
 	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
 	if (rc != SUCCESS) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_GetRendererOutputSize failed");
 		return rc;
 	}
 	rect->x = 0;
@@ -281,7 +281,7 @@ main(int argc, char *argv[])
 
 	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != SUCCESS) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_Init failed");
 		return EXIT_FAILURE;
 	}
 
@@ -307,14 +307,14 @@ main(int argc, char *argv[])
 
 	s = SDL_LoadBMP(bmpfile);
 	if (s == NULL) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_LoadBMP failed");
 		rc = EXIT_FAILURE;
 		goto out2;
 	}
 
 	t = SDL_CreateTextureFromSurface(win.r, s);
 	if (t == NULL) {
-		logsdlerr(__FILE__, __LINE__);
+		logsdlerr("SDL_CreateTextureFromSurface failed");
 		rc = EXIT_FAILURE;
 		goto out3;
 	}
@@ -343,14 +343,14 @@ main(int argc, char *argv[])
 		{
 			rc = SDL_RenderClear(win.r);
 			if (rc != SUCCESS) {
-				logsdlerr(__FILE__, __LINE__);
+				logsdlerr("SDL_RenderClear failed");
 				rc = EXIT_FAILURE;
 				goto out4;
 			}
 
 			rc = SDL_RenderCopy(win.r, t, NULL, &winrect);
 			if (rc != SUCCESS) {
-				logsdlerr(__FILE__, __LINE__);
+				logsdlerr("SDL_RenderCopy failed");
 				rc = EXIT_FAILURE;
 				goto out4;
 			}
