@@ -2,53 +2,36 @@
 #include <stdlib.h>
 
 #include "bmp.h"
-#include "test.h"
-
-enum {
-	SUCCESS = 0
-};
 
 static const char *const BMP_FILE = "./assets/test.bmp";
 
 int
 main(int argc, char *argv[])
 {
+	int ret = EXIT_FAILURE;
 	char *image = NULL;
 	struct bmp_Filehdr filehdr;
 	struct bmp_V4hdr v4hdr;
-	int rc;
 
 	(void)argc;
 	(void)argv;
 
-	rc = bmp_v4read(BMP_FILE, &filehdr, &v4hdr, &image);
-	if (rc != SUCCESS) {
+	if (bmp_v4read(BMP_FILE, &filehdr, &v4hdr, &image) != 0)
 		goto out;
-	}
 
 	struct bmp_Pixel32 *pixel = (struct bmp_Pixel32 *)image;
 
-	if (pixel->b != 255) {
-		print_failure(__FILE__, __LINE__);
-		rc = EXIT_FAILURE;
+	if (pixel->b != 255)
 		goto out;
-	}
-	if (pixel->g != 0) {
-		print_failure(__FILE__, __LINE__);
-		rc = EXIT_FAILURE;
+	if (pixel->g != 0)
 		goto out;
-	}
-	if (pixel->r != 0) {
-		print_failure(__FILE__, __LINE__);
-		rc = EXIT_FAILURE;
+	if (pixel->r != 0)
 		goto out;
-	}
-	if (pixel->a != 127) {
-		print_failure(__FILE__, __LINE__);
-		rc = EXIT_FAILURE;
+	if (pixel->a != 127)
 		goto out;
-	}
+
+	ret = EXIT_SUCCESS;
 out:
 	free(image);
-	return rc;
+	return ret;
 }

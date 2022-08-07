@@ -11,6 +11,8 @@
 #include "lua.h"
 #include "lualib.h"
 
+#define now SDL_GetPerformanceCounter
+
 enum {
 	SUCCESS = 0,
 	FAILURE = 1,
@@ -36,6 +38,8 @@ struct Config {
 		FULLSCREEN = 1,
 		BORDERLESS = 2,
 	} wtype;
+	int x;
+	int y;
 	int width;
 	int height;
 	int framerate;
@@ -63,31 +67,26 @@ static const char *const wdesc[] = {
 
 static uint64_t pfreq = 0;
 
-static struct Args args = {.cfgfile = "config.lua"};
+static struct Args dargs = {.cfgfile = "config.lua"};
 
-static struct Config cfg = {
+static struct Config dcfg = {
 	.wtype = WINDOWED,
+	.x = SDL_WINDOWPOS_CENTERED,
+	.y = SDL_WINDOWPOS_CENTERED,
 	.width = 1280,
 	.height = 720,
 	.framerate = 60,
 	.assetdir = "./assets",
 };
 
-static inline uint64_t
-now(void)
-{
-	return SDL_GetPerformanceCounter();
-}
-
 static void
 logsdlerr(char *msg)
 {
 	const char *err = SDL_GetError();
-	if (strlen(err) != 0) {
+	if (strlen(err) != 0)
 		SDL_LogError(ERR, "%s (%s)", msg, err);
-	} else {
+	else
 		SDL_LogError(ERR, "%s", msg);
-	}
 }
 
 static void
@@ -95,9 +94,8 @@ parseargs(int argc, char *argv[], struct Args *args)
 {
 	for (int i = 0; i < argc;) {
 		char *arg = argv[i++];
-		if (strcmp(arg, "-c") == 0) {
+		if (strcmp(arg, "-c") == 0)
 			args->cfgfile = argv[i++];
-		}
 	}
 }
 
@@ -106,52 +104,43 @@ allocpath(const char *a, const char *b)
 {
 	size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
 	char *ret = calloc(++n, sizeof(char)); /* incr for terminator */
-	if (ret != NULL) {
+	if (ret != NULL)
 		snprintf(ret, n, "%s/%s", a, b);
-	}
 	return ret;
 }
 
 static int
 loadcfg(const char *f, struct Config *cfg)
 {
-	int rc = FAILURE;
+	int ret = FAILURE;
 
 	lua_State *state = luaL_newstate();
 	if (state == NULL) {
 		SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
-		return rc;
+		return ret;
 	}
-
 	luaL_openlibs(state);
-
-	rc = luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0);
-	if (rc != LUA_OK) {
+	if (luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
 		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__, f, lua_tostring(state, -1));
-		lua_pop(state, 1);
-		rc = FAILURE;
 		goto out;
 	}
-
 	lua_getglobal(state, "width");
 	lua_getglobal(state, "height");
 	if (!lua_isnumber(state, -2)) {
 		SDL_LogError(ERR, "%s: width is not a number", __func__);
-		rc = FAILURE;
 		goto out;
 	}
 	if (!lua_isnumber(state, -1)) {
 		SDL_LogError(ERR, "%s: height is not a number", __func__);
-		rc = FAILURE;
 		goto out;
 	}
 	cfg->width = (int)lua_tonumber(state, -2);
 	cfg->height = (int)lua_tonumber(state, -1);
 
-	rc = SUCCESS;
+	ret = SUCCESS;
 out:
 	lua_close(state);
-	return rc;
+	return ret;
 }
 
 static float
@@ -172,28 +161,23 @@ calcdelta(uint64_t begin, uint64_t end)
 static void
 delay(float frametime, uint64_t begin)
 {
-	if (calcdelta(begin, now()) < frametime) {
-		const float delay = frametime - calcdelta(begin, now()) - 1.0f;
-		if ((uint32_t)delay > 0) {
-			SDL_Delay((uint32_t)delay);
-		}
-		while (calcdelta(begin, now()) < frametime) {
-			/* wait */
-		}
-	}
+	if (calcdelta(begin, now()) >= frametime)
+		return;
+	const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0f);
+	if (delay > 0)
+		SDL_Delay(delay);
+	while (calcdelta(begin, now()) < frametime) continue;
 }
 
 static int
 initwin(struct Config *cfg, const char *title, struct Window *win)
 {
 	SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
-	win->w = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, cfg->width, cfg->height, wflags[cfg->wtype]);
-	if (win->w == NULL) {
+	if ((win->w = SDL_CreateWindow(title, cfg->x, cfg->y, cfg->width, cfg->height, wflags[cfg->wtype])) == NULL) {
 		logsdlerr("SDL_CreateWindow failed");
 		return FAILURE;
 	}
-	win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED);
-	if (win->r == NULL) {
+	if ((win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED)) == NULL) {
 		logsdlerr("SDL_CreateRenderer failed");
 		return FAILURE;
 	}
@@ -204,15 +188,12 @@ initwin(struct Config *cfg, const char *title, struct Window *win)
 static void
 finishwin(struct Window *win)
 {
-	if (win == NULL) {
+	if (win == NULL)
 		return;
-	}
-	if (win->r != NULL) {
+	if (win->r != NULL)
 		SDL_DestroyRenderer(win->r);
-	}
-	if (win->w != NULL) {
+	if (win->w != NULL)
 		SDL_DestroyWindow(win->w);
-	}
 }
 
 static int
@@ -221,13 +202,11 @@ getrect(struct Window *win, SDL_Rect *rect)
 	int w = 0;
 	int h = 0;
 
-	if (win == NULL || win->r == NULL) {
+	if (win == NULL || win->r == NULL)
 		return FAILURE;
-	}
-	int rc = SDL_GetRendererOutputSize(win->r, &w, &h);
-	if (rc != SUCCESS) {
+	if (SDL_GetRendererOutputSize(win->r, &w, &h) != SUCCESS) {
 		logsdlerr("SDL_GetRendererOutputSize failed");
-		return rc;
+		return FAILURE;
 	}
 	rect->x = 0;
 	rect->y = 0;
@@ -243,8 +222,6 @@ keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat)
 	case SDLK_ESCAPE:
 		*loopstat = STOP;
 		break;
-	default:
-		break;
 	}
 }
 
@@ -257,7 +234,7 @@ update(float delta)
 int
 main(int argc, char *argv[])
 {
-	int rc = FAILURE;
+	int ret = EXIT_FAILURE;
 	enum Loopstat loopstat = RUN;
 	struct Window win = {.w = NULL, .r = NULL};
 	SDL_Rect winrect;
@@ -266,6 +243,7 @@ main(int argc, char *argv[])
 	SDL_Event ev;
 	const char *const wintitle = "Hello, world!";
 	const char *const testbmp = "test.bmp";
+	char *bmpfile;
 	uint64_t begin = 0;
 	uint64_t end = 0;
 	float delta = 0.0f;
@@ -275,56 +253,42 @@ main(int argc, char *argv[])
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-	parseargs(argc, argv, &args);
+	parseargs(argc, argv, &dargs);
 
-	loadcfg(args.cfgfile, &cfg);
+	loadcfg(dargs.cfgfile, &dcfg);
 
-	rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-	if (rc != SUCCESS) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != SUCCESS) {
 		logsdlerr("SDL_Init failed");
 		return EXIT_FAILURE;
 	}
 
 	pfreq = SDL_GetPerformanceFrequency();
 
-	rc = initwin(&cfg, wintitle, &win);
-	if (rc != SUCCESS) {
-		rc = EXIT_FAILURE;
+	if (initwin(&dcfg, wintitle, &win) != SUCCESS)
 		goto out0;
-	}
 
-	rc = getrect(&win, &winrect);
-	if (rc != SUCCESS) {
-		rc = EXIT_FAILURE;
+	if (getrect(&win, &winrect) != SUCCESS)
 		goto out1;
-	}
 
-	char *bmpfile = allocpath(cfg.assetdir, testbmp);
-	if (bmpfile == NULL) {
-		rc = EXIT_FAILURE;
+	if ((bmpfile = allocpath(dcfg.assetdir, testbmp)) == NULL)
 		goto out1;
-	}
 
-	s = SDL_LoadBMP(bmpfile);
-	if (s == NULL) {
+	if ((s = SDL_LoadBMP(bmpfile)) == NULL) {
 		logsdlerr("SDL_LoadBMP failed");
-		rc = EXIT_FAILURE;
 		goto out2;
 	}
 
-	t = SDL_CreateTextureFromSurface(win.r, s);
-	if (t == NULL) {
+	if ((t = SDL_CreateTextureFromSurface(win.r, s)) == NULL) {
 		logsdlerr("SDL_CreateTextureFromSurface failed");
-		rc = EXIT_FAILURE;
 		goto out3;
 	}
 	SDL_FreeSurface(s);
 	s = NULL;
 
-	delta = calcframetime(cfg.framerate);
+	delta = calcframetime(dcfg.framerate);
 	begin = now();
 	while (loopstat == RUN) {
-		while (SDL_PollEvent(&ev) != 0) {
+		while (SDL_PollEvent(&ev) != 0)
 			switch (ev.type) {
 			case SDL_QUIT:
 				loopstat = STOP;
@@ -332,31 +296,19 @@ main(int argc, char *argv[])
 			case SDL_KEYDOWN:
 				keydown(&ev.key, &loopstat);
 				break;
-			default:
-				break;
 			}
-		}
 
 		update(delta);
 
-		/* render */
-		{
-			rc = SDL_RenderClear(win.r);
-			if (rc != SUCCESS) {
-				logsdlerr("SDL_RenderClear failed");
-				rc = EXIT_FAILURE;
-				goto out4;
-			}
-
-			rc = SDL_RenderCopy(win.r, t, NULL, &winrect);
-			if (rc != SUCCESS) {
-				logsdlerr("SDL_RenderCopy failed");
-				rc = EXIT_FAILURE;
-				goto out4;
-			}
-
-			SDL_RenderPresent(win.r);
+		if (SDL_RenderClear(win.r) != SUCCESS) {
+			logsdlerr("SDL_RenderClear failed");
+			goto out4;
 		}
+		if (SDL_RenderCopy(win.r, t, NULL, &winrect) != SUCCESS) {
+			logsdlerr("SDL_RenderCopy failed");
+			goto out4;
+		}
+		SDL_RenderPresent(win.r);
 
 		delay(delta, begin);
 		end = now();
@@ -364,7 +316,7 @@ main(int argc, char *argv[])
 		begin = end;
 	}
 
-	rc = EXIT_SUCCESS;
+	ret = EXIT_SUCCESS;
 out4:
 	SDL_DestroyTexture(t);
 out3:
@@ -375,5 +327,5 @@ out1:
 	finishwin(&win);
 out0:
 	SDL_Quit();
-	return rc;
+	return ret;
 }

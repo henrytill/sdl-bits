@@ -2,10 +2,7 @@
 
 #include "bmp.h"
 
-enum {
-	SUCCESS = 0,
-	FAILURE = 1,
-};
+enum { SUCCESS = 0 };
 
 enum {
 	WIDTH = 4,
@@ -28,14 +25,11 @@ static const char *const BMPFILE = "./test.bmp";
 int
 main(int argc, char *argv[])
 {
-	int rc = FAILURE;
-
 	(void)argc;
 	(void)argv;
 
-	rc = bmp_v4write(BUF, WIDTH, HEIGHT, BMPFILE);
-	if (rc != SUCCESS) {
+	if (bmp_v4write(BUF, WIDTH, HEIGHT, BMPFILE) != SUCCESS)
 		return EXIT_FAILURE;
-	}
+
 	return EXIT_SUCCESS;
 }

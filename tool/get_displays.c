@@ -9,20 +9,18 @@ static int
 enumdisp(void)
 {
 	SDL_DisplayMode mode;
-	int rc = FAILURE;
 
 	int ndisp = SDL_GetNumVideoDisplays();
 	if (ndisp < 0) {
 		const char *err = SDL_GetError();
 		SDL_Log("Failed to get number of video displays: %s", err);
-		return rc;
+		return FAILURE;
 	}
 	for (int i = 0; i < ndisp; ++i) {
-		rc = SDL_GetCurrentDisplayMode(i, &mode);
-		if (rc != SUCCESS) {
+		if (SDL_GetCurrentDisplayMode(i, &mode) != SUCCESS) {
 			const char *err = SDL_GetError();
 			SDL_Log("Failed to get mode for display #%d: %s", i, err);
-			return rc;
+			return FAILURE;
 		}
 		SDL_Log("Display #%d: mode is %dx%d @ %d hz.", i, mode.w, mode.h, mode.refresh_rate);
 	}
@@ -32,21 +30,19 @@ enumdisp(void)
 int
 main(int argc, char *argv[])
 {
-	int rc = FAILURE;
+	int ret = EXIT_FAILURE;
 
 	(void)argc;
 	(void)argv;
 
-	SDL_Init(SDL_INIT_VIDEO);
+	if (SDL_Init(SDL_INIT_VIDEO) != SUCCESS)
+		return ret;
 
-	rc = enumdisp();
-	if (rc != SUCCESS) {
-		rc = EXIT_FAILURE;
+	if (enumdisp() != SUCCESS)
 		goto out;
-	}
 
-	rc = EXIT_SUCCESS;
+	ret = EXIT_SUCCESS;
 out:
 	SDL_Quit();
-	return rc;
+	return ret;
 }

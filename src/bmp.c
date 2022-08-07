@@ -29,157 +29,113 @@ bmp_rowsize(uint16_t bpp, int32_t width)
 int
 bmp_read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_Infohdr *infohdr, char **image)
 {
-	int rc = FAILURE;
+	int ret = FAILURE;
+	FILE *fp = NULL;
 	uint32_t size;
-	size_t reads;
 	fpos_t pos;
 
-	FILE *fp = fopen(file, "r");
-	if (fp == NULL) {
-		return rc;
-	}
+	if ((fp = fopen(file, "r")) == NULL)
+		return ret;
 
-	reads = fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp);
-	if (reads != 1) {
+	if (fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp) != 1)
 		goto out;
-	}
 
-	rc = fgetpos(fp, &pos);
-	if (rc != SUCCESS) {
+	if (fgetpos(fp, &pos) != SUCCESS)
 		goto out;
-	}
 
-	reads = fread(&size, sizeof(uint32_t), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
+	if (fread(&size, sizeof(uint32_t), 1, fp) != 1)
 		goto out;
-	}
 
-	rc = fsetpos(fp, &pos);
-	if (rc != SUCCESS) {
+	if (size != BITMAPINFOHEADER)
 		goto out;
-	}
 
-	if (size != BITMAPINFOHEADER) {
-		rc = FAILURE;
+	if (fsetpos(fp, &pos) != SUCCESS)
 		goto out;
-	}
 
-	reads = fread(infohdr, sizeof(struct bmp_Infohdr), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
+	if (fread(infohdr, sizeof(struct bmp_Infohdr), 1, fp) != 1)
 		goto out;
-	}
 
 	const uint32_t imagesize = infohdr->imagesize;
 
-	*image = calloc(imagesize, sizeof(char));
-	if (*image == NULL) {
-		rc = FAILURE;
+	if ((*image = calloc(imagesize, sizeof(char))) == NULL)
+		goto out;
+
+	if (fread(*image, imagesize * sizeof(char), 1, fp) != 1) {
+		free(*image);
 		goto out;
 	}
 
-	reads = fread(*image, imagesize * sizeof(char), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	assert(rc == SUCCESS);
+	ret = SUCCESS;
 out:
 	fclose(fp);
-	return rc;
+	return ret;
 }
 
 int
 bmp_v4read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_V4hdr *v4hdr, char **image)
 {
-	int rc = FAILURE;
+	int ret = FAILURE;
+	FILE *fp = NULL;
 	uint32_t size;
-	size_t reads;
 	fpos_t pos;
 
-	FILE *fp = fopen(file, "r");
-	if (fp == NULL) {
-		return rc;
-	}
+	if ((fp = fopen(file, "r")) == NULL)
+		return ret;
 
-	reads = fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp);
-	if (reads != 1) {
+	if (fread(filehdr, sizeof(struct bmp_Filehdr), 1, fp) != 1)
 		goto out;
-	}
 
-	rc = fgetpos(fp, &pos);
-	if (rc != SUCCESS) {
+	if (fgetpos(fp, &pos) != SUCCESS)
 		goto out;
-	}
 
-	reads = fread(&size, sizeof(uint32_t), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
+	if (fread(&size, sizeof(uint32_t), 1, fp) != 1)
 		goto out;
-	}
 
-	rc = fsetpos(fp, &pos);
-	if (rc != SUCCESS) {
+	if (size != BITMAPV4HEADER)
 		goto out;
-	}
 
-	if (size != BITMAPV4HEADER) {
-		rc = FAILURE;
+	if (fsetpos(fp, &pos) != SUCCESS)
 		goto out;
-	}
 
-	reads = fread(v4hdr, sizeof(struct bmp_V4hdr), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
+	if (fread(v4hdr, sizeof(struct bmp_V4hdr), 1, fp) != 1)
 		goto out;
-	}
 
 	const uint32_t imagesize = v4hdr->imagesize;
 
-	*image = calloc(imagesize, sizeof(char));
-	if (*image == NULL) {
-		rc = FAILURE;
+	if ((*image = calloc(imagesize, sizeof(char))) == NULL)
+		goto out;
+
+	if (fread(*image, imagesize * sizeof(char), 1, fp) != 1) {
+		free(*image);
 		goto out;
 	}
 
-	reads = fread(*image, imagesize * sizeof(char), 1, fp);
-	if (reads != 1) {
-		rc = FAILURE;
-		goto out;
-	}
-
-	assert(rc == SUCCESS);
+	ret = SUCCESS;
 out:
 	fclose(fp);
-	return rc;
+	return ret;
 }
 
 int
 bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const char *file)
 {
-	int rc = FAILURE;
-	size_t writes;
-	const size_t offset = sizeof(struct bmp_Filehdr) + sizeof(struct bmp_V4hdr);
+	int ret = FAILURE;
+	FILE *fp = NULL;
 
-	if (buf == NULL || file == NULL) {
-		return rc;
-	}
+	if (buf == NULL || file == NULL)
+		return ret;
 
-	if (width > INT32_MAX || height > INT32_MAX) {
-		return rc;
-	}
+	if (width > INT32_MAX || height > INT32_MAX)
+		return ret;
 
 	const size_t imagesize = (width * height) * sizeof(struct bmp_Pixel32);
-	if (imagesize > UINT32_MAX) {
-		return rc;
-	}
+	if (imagesize > UINT32_MAX)
+		return ret;
 
+	const size_t offset = sizeof(struct bmp_Filehdr) + sizeof(struct bmp_V4hdr);
 	const size_t filesize = offset + imagesize;
-	if (filesize > UINT32_MAX) {
-		return rc;
-	}
+	if (filesize > UINT32_MAX)
+		return ret;
 
 	struct bmp_Filehdr filehdr = {
 		.filetype = FILETYPE,
@@ -212,28 +168,20 @@ bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const ch
 		.bgamma = 0,
 	};
 
-	FILE *fp = fopen(file, "wb");
-	if (fp == NULL) {
-		return rc;
-	}
+	if ((fp = fopen(file, "wb")) == NULL)
+		return ret;
 
-	writes = fwrite(&filehdr, sizeof(struct bmp_Filehdr), 1, fp);
-	if (writes != 1) {
+	if (fwrite(&filehdr, sizeof(struct bmp_Filehdr), 1, fp) != 1)
 		goto out;
-	}
 
-	writes = fwrite(&v4hdr, sizeof(struct bmp_V4hdr), 1, fp);
-	if (writes != 1) {
+	if (fwrite(&v4hdr, sizeof(struct bmp_V4hdr), 1, fp) != 1)
 		goto out;
-	}
 
-	writes = fwrite(buf, imagesize, 1, fp);
-	if (writes != 1) {
+	if (fwrite(buf, imagesize, 1, fp) != 1)
 		goto out;
-	}
 
-	rc = SUCCESS;
+	ret = SUCCESS;
 out:
 	fclose(fp);
-	return rc;
+	return ret;
 }
