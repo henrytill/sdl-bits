@@ -59,6 +59,7 @@ freeimage(char **image, size_t height)
 	free(image);
 }
 
+/* https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap */
 static void
 renderchar(FT_GlyphSlot slot, char **target, size_t offset)
 {
