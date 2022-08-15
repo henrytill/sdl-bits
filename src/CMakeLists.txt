@@ -1,5 +1,5 @@
 # Library: bmp
-add_library(bmp bmp.c)
+add_library(bmp OBJECT bmp.c)
 target_compile_options_default(bmp)
 if(WIN32)
   target_compile_definitions(bmp PRIVATE _CRT_SECURE_NO_WARNINGS)
