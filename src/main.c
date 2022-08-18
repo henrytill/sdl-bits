@@ -161,11 +161,9 @@ calcdelta(uint64_t begin, uint64_t end)
 static void
 delay(float frametime, uint64_t begin)
 {
-	if (calcdelta(begin, now()) >= frametime)
-		return;
+	if (calcdelta(begin, now()) >= frametime) return;
 	const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0f);
-	if (delay > 0)
-		SDL_Delay(delay);
+	if (delay > 0) SDL_Delay(delay);
 	while (calcdelta(begin, now()) < frametime) continue;
 }
 
@@ -199,19 +197,12 @@ finishwin(struct Window *win)
 static int
 getrect(struct Window *win, SDL_Rect *rect)
 {
-	int w = 0;
-	int h = 0;
-
 	if (win == NULL || win->r == NULL)
 		return FAILURE;
-	if (SDL_GetRendererOutputSize(win->r, &w, &h) != SUCCESS) {
+	if (SDL_GetRendererOutputSize(win->r, &rect->w, &rect->h) != SUCCESS) {
 		logsdlerr("SDL_GetRendererOutputSize failed");
 		return FAILURE;
 	}
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = w;
-	rect->h = h;
 	return SUCCESS;
 }
 
@@ -236,17 +227,16 @@ main(int argc, char *argv[])
 {
 	int ret = EXIT_FAILURE;
 	enum Loopstat loopstat = RUN;
-	struct Window win = {.w = NULL, .r = NULL};
-	SDL_Rect winrect;
+	struct Window win = {NULL, NULL};
+	SDL_Rect winrect = {0, 0, 0, 0};
 	SDL_Surface *s = NULL;
 	SDL_Texture *t = NULL;
 	SDL_Event ev;
 	const char *const wintitle = "Hello, world!";
 	const char *const testbmp = "test.bmp";
 	char *bmpfile;
-	uint64_t begin = 0;
-	uint64_t end = 0;
-	float delta = 0.0f;
+	uint64_t begin, end;
+	float delta;
 
 	(void)argc;
 	(void)argv;
