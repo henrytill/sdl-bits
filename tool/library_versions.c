@@ -55,17 +55,6 @@ sdl(void)
 	SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", lded.major, lded.minor, lded.patch);
 }
 
-static void
-sdl_ttf(void)
-{
-	SDL_version cced;
-
-	SDL_TTF_VERSION(&cced);
-	const SDL_version *lded = TTF_Linked_Version();
-	SDL_LogInfo(UNHANDLED, "Compiled against SDL_ttf %u.%u.%u ...\n", cced.major, cced.minor, cced.patch);
-	SDL_LogInfo(UNHANDLED, "... and linking against SDL_ttf %u.%u.%u.\n", lded->major, lded->minor, lded->patch);
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -77,6 +66,5 @@ main(int argc, char *argv[])
 	freetype();
 	lua();
 	sdl();
-	sdl_ttf();
 	return EXIT_SUCCESS;
 }

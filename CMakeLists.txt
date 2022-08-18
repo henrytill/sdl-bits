@@ -35,13 +35,6 @@ check_symbol_exists(ceil math.h HAVE_CEIL)
 # Dependency: SDL
 find_package(SDL2 CONFIG REQUIRED)
 
-# Dependency: SDL_ttf
-if(VCPKG_FOUND)
-  find_package(sdl2-ttf CONFIG REQUIRED)
-elseif(PKG_CONFIG_FOUND)
-  pkg_check_modules(SDL2_ttf REQUIRED SDL2_ttf)
-endif()
-
 # Dependency: Freetype
 if(VCPKG_FOUND)
   find_package(freetype CONFIG REQUIRED)
@@ -72,19 +65,6 @@ macro(target_link_SDL2 target)
     target_link_libraries(${target} PRIVATE SDL2::SDL2main SDL2::SDL2-static)
   endif()
 endmacro(target_link_SDL2)
-
-macro(target_link_SDL2_ttf target)
-  if(VCPKG_FOUND)
-    target_link_libraries(${target} PRIVATE SDL2::SDL2_ttf)
-  elseif(PKG_CONFIG_FOUND AND SDL2_ttf_FOUND)
-    target_include_directories(${target} PRIVATE ${SDL2_ttf_INCLUDE_DIRS})
-    if(BUILD_SHARED_LIBS)
-      target_link_libraries(${target} PRIVATE ${SDL2_ttf_LIBRARIES})
-    else()
-      target_link_libraries(${target} PRIVATE ${SDL2_ttf_STATIC_LIBRARIES})
-    endif()
-  endif()
-endmacro(target_link_SDL2_ttf)
 
 macro(target_link_freetype target)
   if(VCPKG_FOUND)
