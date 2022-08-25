@@ -26,8 +26,5 @@ int main(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
-  if (bmp_v4write(BUF, WIDTH, HEIGHT, BMPFILE) != SUCCESS)
-    return EXIT_FAILURE;
-
-  return EXIT_SUCCESS;
+  return bmp_v4write(BUF, WIDTH, HEIGHT, BMPFILE) == SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
 }

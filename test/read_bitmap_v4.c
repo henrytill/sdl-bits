@@ -16,9 +16,7 @@ int main(int argc, char *argv[]) {
 
   if (bmp_v4read(BMP_FILE, &filehdr, &v4hdr, &image) != 0)
     goto out;
-
   struct bmp_Pixel32 *pixel = (struct bmp_Pixel32 *)image;
-
   if (pixel->b != 255)
     goto out;
   if (pixel->g != 0)
@@ -27,7 +25,6 @@ int main(int argc, char *argv[]) {
     goto out;
   if (pixel->a != 127)
     goto out;
-
   ret = EXIT_SUCCESS;
 out:
   free(image);

@@ -27,14 +27,12 @@ static void freeimage(char **image, size_t height);
 
 /* pos = 0 is MSB */
 static char getbit(unsigned char c, size_t pos) {
-  if (pos >= CHAR_BIT)
-    return 0;
+  if (pos >= CHAR_BIT) return 0;
   return (c >> (CHAR_BIT + ~pos)) & 1; /* Also: c & (1 << (CHAR_BIT + ~pos)); */
 }
 
 static char **allocimage(size_t height, size_t width) {
   char **ret = NULL;
-
   if ((ret = calloc(height, sizeof(char *))) == NULL)
     return ret;
   for (size_t i = 0; i < height; ++i)
@@ -46,8 +44,7 @@ static char **allocimage(size_t height, size_t width) {
 }
 
 static void freeimage(char **image, size_t height) {
-  if (image == NULL)
-    return;
+  if (image == NULL) return;
   for (size_t i = 0; i < height; ++i)
     free(image[i]);
   free(image);
@@ -104,27 +101,22 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < CODESZ; ++i)
     code[i] = (char)(i + '!');
-
   if ((image = allocimage(height, width)) == NULL) {
     fprintf(stderr, "allocimage failed.");
     return EXIT_FAILURE;
   }
-
   if ((rc = FT_Init_FreeType(&ftlib)) != SUCCESS) {
     fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
     goto out0;
   }
-
   if ((rc = FT_New_Face(ftlib, FONTFILE, 0, &face)) != SUCCESS) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
     goto out1;
   }
-
   if ((rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT)) != SUCCESS) {
     fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     goto out1;
   }
-
   for (size_t i = 0; i < CODESZ; ++i) {
     if ((rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME)) != SUCCESS) {
       fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
@@ -145,19 +137,14 @@ int main(int argc, char *argv[]) {
     }
     renderchar(slot, image, i);
   }
-
   drawimage(image, width, height);
-
   if ((buf = calloc(width * height, sizeof(struct bmp_Pixel32))) == NULL)
     goto out2;
-
   for (size_t y = height, i = 0; y-- > 0;)
     for (size_t x = 0; x < width; ++x, ++i)
       buf[i] = image[y][x] ? BLACK : WHITE;
-
   if (bmp_v4write(buf, width, height, BMPFILE) != SUCCESS)
     goto out3;
-
   ret = EXIT_SUCCESS;
 out3:
   free(buf);

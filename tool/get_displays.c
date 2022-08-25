@@ -33,10 +33,8 @@ int main(int argc, char *argv[]) {
 
   if (SDL_Init(SDL_INIT_VIDEO) != SUCCESS)
     return ret;
-
   if (enumdisp() != SUCCESS)
     goto out;
-
   ret = EXIT_SUCCESS;
 out:
   SDL_Quit();

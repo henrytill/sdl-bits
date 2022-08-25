@@ -127,7 +127,6 @@ static int loadcfg(const char *f, struct Config *cfg) {
   }
   cfg->width = (int)lua_tonumber(state, -2);
   cfg->height = (int)lua_tonumber(state, -1);
-
   ret = SUCCESS;
 out:
   lua_close(state);
@@ -173,8 +172,7 @@ static void finishwin(struct Window *win) {
 }
 
 static int getrect(struct Window *win, SDL_Rect *rect) {
-  if (win == NULL || win->r == NULL)
-    return FAILURE;
+  if (win == NULL || win->r == NULL) return FAILURE;
   if (SDL_GetRendererOutputSize(win->r, &rect->w, &rect->h) != SUCCESS) {
     logsdlerr("SDL_GetRendererOutputSize failed");
     return FAILURE;
@@ -212,32 +210,24 @@ int main(int argc, char *argv[]) {
   (void)argv;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-
   parseargs(argc, argv, &dargs);
-
   loadcfg(dargs.cfgfile, &dcfg);
 
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != SUCCESS) {
     logsdlerr("SDL_Init failed");
     return EXIT_FAILURE;
   }
-
   pfreq = SDL_GetPerformanceFrequency();
-
   if (initwin(&dcfg, wintitle, &win) != SUCCESS)
     goto out0;
-
   if (getrect(&win, &winrect) != SUCCESS)
     goto out1;
-
   if ((bmpfile = allocpath(dcfg.assetdir, testbmp)) == NULL)
     goto out1;
-
   if ((s = SDL_LoadBMP(bmpfile)) == NULL) {
     logsdlerr("SDL_LoadBMP failed");
     goto out2;
   }
-
   if ((t = SDL_CreateTextureFromSurface(win.r, s)) == NULL) {
     logsdlerr("SDL_CreateTextureFromSurface failed");
     goto out3;

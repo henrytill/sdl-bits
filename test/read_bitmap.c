@@ -16,16 +16,13 @@ int main(int argc, char *argv[]) {
 
   if (bmp_read(BMP_FILE, &filehdr, &infohdr, &image) != 0)
     goto out;
-
   struct bmp_Pixel24 *pixel = (struct bmp_Pixel24 *)image;
-
   if (pixel->b != 0)
     goto out;
   if (pixel->g != 0)
     goto out;
   if (pixel->r != 255)
     goto out;
-
   ret = EXIT_SUCCESS;
 out:
   free(image);
