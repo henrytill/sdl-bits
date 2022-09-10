@@ -23,6 +23,10 @@ enum {
   ERR,
 };
 
+enum {
+  CENTERED = SDL_WINDOWPOS_CENTERED,
+};
+
 enum Loopstat {
   STOP = 0,
   RUN = 1,
@@ -71,8 +75,8 @@ static struct Args dargs = {.cfgfile = "config.lua"};
 
 static struct Config dcfg = {
   .wtype = WINDOWED,
-  .x = SDL_WINDOWPOS_CENTERED,
-  .y = SDL_WINDOWPOS_CENTERED,
+  .x = CENTERED,
+  .y = CENTERED,
   .width = 1280,
   .height = 720,
   .framerate = 60,
