@@ -1,3 +1,4 @@
+import logging
 import os
 import tarfile
 import urllib.request
@@ -12,6 +13,11 @@ UCS_FONTS = {
     'output_dir': 'ucs-fonts'
 }
 
+logging.basicConfig(stream=sys.stdout)
+logger = logging.getLogger('generate')
+logger.setLevel(logging.INFO)
+
+
 def fetch(url, file):
     with urllib.request.urlopen(url) as src:
         with open(file, 'wb') as dst:
@@ -25,7 +31,7 @@ def expand(source, output_dir):
 
 def ucs_fonts():
     if not os.path.isfile(UCS_FONTS['tarball']):
-        print('Downloading ' + UCS_FONTS['url'])
+        logger.info('Downloading %s', UCS_FONTS['url'])
         fetch(UCS_FONTS['url'], UCS_FONTS['tarball'])
     if not os.path.isdir(UCS_FONTS['output_dir']):
         expand(UCS_FONTS['tarball'], UCS_FONTS['output_dir'])
@@ -33,9 +39,10 @@ def ucs_fonts():
 
 def main():
     argv = sys.argv
-    print('Running ' + argv[0] + ' with target: ' + argv[1])
+    logger.debug('Target: %s', argv[1])
     if argv[1] == UCS_FONTS['target']:
         ucs_fonts()
+
 
 if __name__ == "__main__":
     main()
