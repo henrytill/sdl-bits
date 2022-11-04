@@ -33,13 +33,16 @@ static char getbit(unsigned char c, size_t pos) {
 
 static char **allocimage(size_t height, size_t width) {
   char **ret = NULL;
-  if ((ret = calloc(height, sizeof(char *))) == NULL)
+  ret = calloc(height, sizeof(*ret));
+  if (ret == NULL)
     return ret;
-  for (size_t i = 0; i < height; ++i)
-    if ((ret[i] = calloc(width, sizeof(char))) == NULL) {
+  for (size_t i = 0; i < height; ++i) {
+    ret[i] = calloc(width, sizeof(**ret));
+    if (ret[i] == NULL) {
       freeimage(ret, i);
       return NULL;
     }
+  }
   return ret;
 }
 
@@ -101,29 +104,41 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < CODESZ; ++i)
     code[i] = (char)(i + '!');
-  if ((image = allocimage(height, width)) == NULL) {
+
+  image = allocimage(height, width);
+  if (image == NULL) {
     fprintf(stderr, "allocimage failed.");
     return EXIT_FAILURE;
   }
-  if ((rc = FT_Init_FreeType(&ftlib)) != SUCCESS) {
+
+  rc = FT_Init_FreeType(&ftlib);
+  if (rc != SUCCESS) {
     fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
     goto out0;
   }
-  if ((rc = FT_New_Face(ftlib, FONTFILE, 0, &face)) != SUCCESS) {
+
+  rc = FT_New_Face(ftlib, FONTFILE, 0, &face);
+  if (rc != SUCCESS) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
     goto out1;
   }
-  if ((rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT)) != SUCCESS) {
+
+  rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
+  if (rc != SUCCESS) {
     fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     goto out1;
   }
+
   for (size_t i = 0; i < CODESZ; ++i) {
-    if ((rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME)) != SUCCESS) {
+    rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+    if (rc != SUCCESS) {
       fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
       goto out1;
     }
     slot = face->glyph;
-    if ((rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO)) != SUCCESS) {
+
+    rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
+    if (rc != SUCCESS) {
       fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
       goto out1;
     }
@@ -135,16 +150,24 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
       goto out1;
     }
+
     renderchar(slot, image, i);
   }
+
   drawimage(image, width, height);
-  if ((buf = calloc(width * height, sizeof(struct bmp_Pixel32))) == NULL)
+
+  buf = calloc(width * height, sizeof(struct bmp_Pixel32));
+  if (buf == NULL)
     goto out2;
+
   for (size_t y = height, i = 0; y-- > 0;)
     for (size_t x = 0; x < width; ++x, ++i)
       buf[i] = image[y][x] ? BLACK : WHITE;
-  if (bmp_v4write(buf, width, height, BMPFILE) != SUCCESS)
+
+  rc = bmp_v4write(buf, width, height, BMPFILE);
+  if (rc != SUCCESS)
     goto out3;
+
   ret = EXIT_SUCCESS;
 out3:
   free(buf);

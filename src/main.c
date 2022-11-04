@@ -51,8 +51,8 @@ struct Config {
 };
 
 struct Window {
-  SDL_Window *w;
-  SDL_Renderer *r;
+  SDL_Window *window;
+  SDL_Renderer *renderer;
 };
 
 static const float SECOND = 1000.0f;
@@ -157,27 +157,31 @@ static void delay(float frametime, uint64_t begin) {
 
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
   SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
-  if ((win->w = SDL_CreateWindow(title, cfg->x, cfg->y, cfg->width, cfg->height, wflags[cfg->wtype])) == NULL) {
+  win->window = SDL_CreateWindow(title, cfg->x, cfg->y, cfg->width, cfg->height, wflags[cfg->wtype]);
+  if (win->window == NULL) {
     logsdlerr("SDL_CreateWindow failed");
     return FAILURE;
   }
-  if ((win->r = SDL_CreateRenderer(win->w, -1, SDL_RENDERER_ACCELERATED)) == NULL) {
+  win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
+  if (win->renderer == NULL) {
     logsdlerr("SDL_CreateRenderer failed");
     return FAILURE;
   }
-  SDL_SetRenderDrawColor(win->r, 0x00, 0x00, 0x00, 0xFF);
+  SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
   return SUCCESS;
 }
 
 static void finishwin(struct Window *win) {
   if (win == NULL) return;
-  if (win->r != NULL) SDL_DestroyRenderer(win->r);
-  if (win->w != NULL) SDL_DestroyWindow(win->w);
+  if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
+  if (win->window != NULL) SDL_DestroyWindow(win->window);
 }
 
 static int getrect(struct Window *win, SDL_Rect *rect) {
-  if (win == NULL || win->r == NULL) return FAILURE;
-  if (SDL_GetRendererOutputSize(win->r, &rect->w, &rect->h) != SUCCESS) {
+  if (win == NULL || win->renderer == NULL)
+    return FAILURE;
+  const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
+  if (rc != SUCCESS) {
     logsdlerr("SDL_GetRendererOutputSize failed");
     return FAILURE;
   }
@@ -198,11 +202,12 @@ static void update(float delta) {
 
 int main(int argc, char *argv[]) {
   int ret = EXIT_FAILURE;
+  int rc;
   enum Loopstat loopstat = RUN;
   struct Window win = {NULL, NULL};
   SDL_Rect winrect = {0, 0, 0, 0};
-  SDL_Surface *s = NULL;
-  SDL_Texture *t = NULL;
+  SDL_Surface *surface = NULL;
+  SDL_Texture *texture = NULL;
   SDL_Event ev;
   const char *const wintitle = "Hello, world!";
   const char *const testbmp = "test.bmp";
@@ -217,27 +222,39 @@ int main(int argc, char *argv[]) {
   parseargs(argc, argv, &dargs);
   loadcfg(dargs.cfgfile, &dcfg);
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != SUCCESS) {
+  rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+  if (rc != SUCCESS) {
     logsdlerr("SDL_Init failed");
     return EXIT_FAILURE;
   }
+
   pfreq = SDL_GetPerformanceFrequency();
-  if (initwin(&dcfg, wintitle, &win) != SUCCESS)
+
+  rc = initwin(&dcfg, wintitle, &win);
+  if (rc != SUCCESS)
     goto out0;
-  if (getrect(&win, &winrect) != SUCCESS)
+
+  rc = getrect(&win, &winrect);
+  if (rc != SUCCESS)
     goto out1;
-  if ((bmpfile = allocpath(dcfg.assetdir, testbmp)) == NULL)
+
+  bmpfile = allocpath(dcfg.assetdir, testbmp);
+  if (bmpfile == NULL)
     goto out1;
-  if ((s = SDL_LoadBMP(bmpfile)) == NULL) {
+
+  surface = SDL_LoadBMP(bmpfile);
+  if (surface == NULL) {
     logsdlerr("SDL_LoadBMP failed");
     goto out2;
   }
-  if ((t = SDL_CreateTextureFromSurface(win.r, s)) == NULL) {
+
+  texture = SDL_CreateTextureFromSurface(win.renderer, surface);
+  if (texture == NULL) {
     logsdlerr("SDL_CreateTextureFromSurface failed");
     goto out3;
   }
-  SDL_FreeSurface(s);
-  s = NULL;
+  SDL_FreeSurface(surface);
+  surface = NULL;
 
   delta = calcframetime(dcfg.framerate);
   begin = now();
@@ -254,15 +271,17 @@ int main(int argc, char *argv[]) {
 
     update(delta);
 
-    if (SDL_RenderClear(win.r) != SUCCESS) {
+    rc = SDL_RenderClear(win.renderer);
+    if (rc != SUCCESS) {
       logsdlerr("SDL_RenderClear failed");
       goto out4;
     }
-    if (SDL_RenderCopy(win.r, t, NULL, &winrect) != SUCCESS) {
+    rc = SDL_RenderCopy(win.renderer, texture, NULL, &winrect);
+    if (rc != SUCCESS) {
       logsdlerr("SDL_RenderCopy failed");
       goto out4;
     }
-    SDL_RenderPresent(win.r);
+    SDL_RenderPresent(win.renderer);
 
     delay(delta, begin);
     end = now();
@@ -272,9 +291,9 @@ int main(int argc, char *argv[]) {
 
   ret = EXIT_SUCCESS;
 out4:
-  SDL_DestroyTexture(t);
+  SDL_DestroyTexture(texture);
 out3:
-  SDL_FreeSurface(s);
+  SDL_FreeSurface(surface);
 out2:
   free(bmpfile);
 out1:

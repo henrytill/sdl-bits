@@ -16,8 +16,10 @@ static void freetype(void) {
   FT_Int major;
   FT_Int minor;
   FT_Int patch;
+  int rc;
 
-  if (FT_Init_FreeType(&ftlib) != 0) {
+  rc = FT_Init_FreeType(&ftlib);
+  if (rc != 0) {
     SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
     return;
   }
