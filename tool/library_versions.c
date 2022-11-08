@@ -11,7 +11,8 @@ enum {
   UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
 };
 
-static void freetype(void) {
+static void freetype(void)
+{
   FT_Library ftlib = NULL;
   FT_Int major;
   FT_Int minor;
@@ -28,7 +29,8 @@ static void freetype(void) {
   FT_Done_FreeType(ftlib);
 }
 
-static void lua(void) {
+static void lua(void)
+{
   lua_State *state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(UNHANDLED, "Failed to initialize Lua");
@@ -40,7 +42,8 @@ static void lua(void) {
   lua_close(state);
 }
 
-static void sdl(void) {
+static void sdl(void)
+{
   SDL_version cced;
   SDL_version lded;
 
@@ -50,7 +53,8 @@ static void sdl(void) {
   SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", lded.major, lded.minor, lded.patch);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   (void)argc;
   (void)argv;
 

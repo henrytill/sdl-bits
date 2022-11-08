@@ -5,7 +5,8 @@
 
 static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int ret = EXIT_FAILURE;
   char *image = NULL;
   struct bmp_Filehdr filehdr;

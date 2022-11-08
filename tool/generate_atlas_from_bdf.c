@@ -26,12 +26,14 @@ static char **allocimage(size_t height, size_t width);
 static void freeimage(char **image, size_t height);
 
 /* pos = 0 is MSB */
-static char getbit(unsigned char c, size_t pos) {
+static char getbit(unsigned char c, size_t pos)
+{
   if (pos >= CHAR_BIT) return 0;
   return (c >> (CHAR_BIT + ~pos)) & 1; /* Also: c & (1 << (CHAR_BIT + ~pos)); */
 }
 
-static char **allocimage(size_t height, size_t width) {
+static char **allocimage(size_t height, size_t width)
+{
   char **ret = NULL;
   ret = calloc(height, sizeof(*ret));
   if (ret == NULL)
@@ -46,7 +48,8 @@ static char **allocimage(size_t height, size_t width) {
   return ret;
 }
 
-static void freeimage(char **image, size_t height) {
+static void freeimage(char **image, size_t height)
+{
   if (image == NULL) return;
   for (size_t i = 0; i < height; ++i)
     free(image[i]);
@@ -54,7 +57,8 @@ static void freeimage(char **image, size_t height) {
 }
 
 /* https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap */
-static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
+static void renderchar(FT_GlyphSlot slot, char **target, size_t offset)
+{
   unsigned char *buffer = slot->bitmap.buffer;
   size_t rows = slot->bitmap.rows;
   size_t width = slot->bitmap.width;
@@ -71,7 +75,8 @@ static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
 }
 
 #ifdef DRAW_IMAGE
-static void drawimage(char **image, size_t width, size_t height) {
+static void drawimage(char **image, size_t width, size_t height)
+{
   for (size_t y = 0; y < height; ++y) {
     printf("%2zd|", y);
     for (size_t x = 0; x < width; ++x)
@@ -80,14 +85,16 @@ static void drawimage(char **image, size_t width, size_t height) {
   }
 }
 #else
-static inline void drawimage(char **image, size_t width, size_t height) {
+static inline void drawimage(char **image, size_t width, size_t height)
+{
   (void)image;
   (void)width;
   (void)height;
 }
 #endif
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int ret = EXIT_FAILURE;
   int rc;
   char **image = NULL;

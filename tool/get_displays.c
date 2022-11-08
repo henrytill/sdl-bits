@@ -5,7 +5,8 @@ enum {
   FAILURE = 1,
 };
 
-static int enumdisp(void) {
+static int enumdisp(void)
+{
   SDL_DisplayMode mode;
   int rc, ndisp;
 
@@ -27,7 +28,8 @@ static int enumdisp(void) {
   return SUCCESS;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int ret = EXIT_FAILURE;
   int rc;
 

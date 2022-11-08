@@ -83,7 +83,8 @@ static struct Config dcfg = {
   .assetdir = "./assets",
 };
 
-static void logsdlerr(char *msg) {
+static void logsdlerr(char *msg)
+{
   const char *err = SDL_GetError();
   if (strlen(err) != 0)
     SDL_LogError(ERR, "%s (%s)", msg, err);
@@ -91,7 +92,8 @@ static void logsdlerr(char *msg) {
     SDL_LogError(ERR, "%s", msg);
 }
 
-static void parseargs(int argc, char *argv[], struct Args *args) {
+static void parseargs(int argc, char *argv[], struct Args *args)
+{
   for (int i = 0; i < argc;) {
     char *arg = argv[i++];
     if (strcmp(arg, "-c") == 0)
@@ -99,14 +101,16 @@ static void parseargs(int argc, char *argv[], struct Args *args) {
   }
 }
 
-static char *allocpath(const char *a, const char *b) {
+static char *allocpath(const char *a, const char *b)
+{
   size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
   char *ret = calloc(++n, sizeof(char)); /* incr for terminator */
   if (ret != NULL) snprintf(ret, n, "%s/%s", a, b);
   return ret;
 }
 
-static int loadcfg(const char *f, struct Config *cfg) {
+static int loadcfg(const char *f, struct Config *cfg)
+{
   int ret = FAILURE;
 
   lua_State *state = luaL_newstate();
@@ -137,25 +141,29 @@ out:
   return ret;
 }
 
-static float calcframetime(int fps) {
+static float calcframetime(int fps)
+{
   assert(fps > 0);
   return SECOND / (float)fps;
 }
 
-static float calcdelta(uint64_t begin, uint64_t end) {
+static float calcdelta(uint64_t begin, uint64_t end)
+{
   assert(pfreq > 0);
   const float delta_ticks = (float)(end - begin);
   return (delta_ticks * SECOND) / (float)pfreq;
 }
 
-static void delay(float frametime, uint64_t begin) {
+static void delay(float frametime, uint64_t begin)
+{
   if (calcdelta(begin, now()) >= frametime) return;
   const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0f);
   if (delay > 0) SDL_Delay(delay);
   while (calcdelta(begin, now()) < frametime) continue;
 }
 
-static int initwin(struct Config *cfg, const char *title, struct Window *win) {
+static int initwin(struct Config *cfg, const char *title, struct Window *win)
+{
   SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
   win->window = SDL_CreateWindow(title, cfg->x, cfg->y, cfg->width, cfg->height, wflags[cfg->wtype]);
   if (win->window == NULL) {
@@ -171,13 +179,15 @@ static int initwin(struct Config *cfg, const char *title, struct Window *win) {
   return SUCCESS;
 }
 
-static void finishwin(struct Window *win) {
+static void finishwin(struct Window *win)
+{
   if (win == NULL) return;
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
 }
 
-static int getrect(struct Window *win, SDL_Rect *rect) {
+static int getrect(struct Window *win, SDL_Rect *rect)
+{
   if (win == NULL || win->renderer == NULL)
     return FAILURE;
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
@@ -188,7 +198,8 @@ static int getrect(struct Window *win, SDL_Rect *rect) {
   return SUCCESS;
 }
 
-static void keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat) {
+static void keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat)
+{
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
     *loopstat = STOP;
@@ -196,11 +207,13 @@ static void keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat) {
   }
 }
 
-static void update(float delta) {
+static void update(float delta)
+{
   (void)delta;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   int ret = EXIT_FAILURE;
   int rc;
   enum Loopstat loopstat = RUN;

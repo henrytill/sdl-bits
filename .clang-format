@@ -1,5 +1,6 @@
 AlignArrayOfStructures: Right
 AlignConsecutiveMacros: true
+AlignOperands: true
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -10,6 +11,9 @@ AllowShortFunctionsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
 BasedOnStyle: LLVM
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+BreakBeforeBraces: Linux
 ColumnLimit: 0
 ContinuationIndentWidth: 2
 DerivePointerAlignment: false
