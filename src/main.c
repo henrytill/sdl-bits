@@ -120,7 +120,8 @@ static int loadcfg(const char *f, struct Config *cfg)
   }
   luaL_openlibs(state);
   if (luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
-    SDL_LogError(ERR, "%s: failed to load %s, %s", __func__, f, lua_tostring(state, -1));
+    SDL_LogError(ERR, "%s: failed to load %s, %s", __func__,
+                 f, lua_tostring(state, -1));
     goto out;
   }
   lua_getglobal(state, "width");
@@ -165,7 +166,10 @@ static void delay(float frametime, uint64_t begin)
 static int initwin(struct Config *cfg, const char *title, struct Window *win)
 {
   SDL_LogInfo(APP, "Window type: %s\n", wdesc[cfg->wtype]);
-  win->window = SDL_CreateWindow(title, cfg->x, cfg->y, cfg->width, cfg->height, wflags[cfg->wtype]);
+  win->window = SDL_CreateWindow(title,
+                                 cfg->x, cfg->y,
+                                 cfg->width, cfg->height,
+                                 wflags[cfg->wtype]);
   if (win->window == NULL) {
     logsdlerr("SDL_CreateWindow failed");
     return FAILURE;
@@ -272,7 +276,7 @@ int main(int argc, char *argv[])
   delta = calcframetime(dcfg.framerate);
   begin = now();
   while (loopstat == RUN) {
-    while (SDL_PollEvent(&ev) != 0)
+    while (SDL_PollEvent(&ev) != 0) {
       switch (ev.type) {
       case SDL_QUIT:
         loopstat = STOP;
@@ -281,6 +285,7 @@ int main(int argc, char *argv[])
         keydown(&ev.key, &loopstat);
         break;
       }
+    }
 
     update(delta);
 
