@@ -13,7 +13,6 @@ AllowShortLoopsOnASingleLine: true
 BasedOnStyle: LLVM
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
-BreakBeforeBraces: Linux
 ColumnLimit: 0
 ContinuationIndentWidth: 2
 DerivePointerAlignment: false

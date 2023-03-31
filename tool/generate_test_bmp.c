@@ -22,8 +22,7 @@ static const struct bmp_Pixel32 BUF[] = {
 
 static const char *const BMPFILE = "./test.bmp";
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
