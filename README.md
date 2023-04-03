@@ -1,5 +1,5 @@
 # sdl-bits
 
-[![builds.sr.ht status](https://builds.sr.ht/~henrytill/sdl-bits/commits/master.svg)](https://builds.sr.ht/~henrytill/sdl-bits/commits/master?)
+[![CMake](https://github.com/henrytill/sdl-bits/actions/workflows/cmake.yml/badge.svg)](https://github.com/henrytill/sdl-bits/actions/workflows/cmake.yml)
 
 Some experiments with [Simple DirectMedia Layer (SDL)](https://www.libsdl.org).
