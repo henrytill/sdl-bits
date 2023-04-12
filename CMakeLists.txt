@@ -21,8 +21,11 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
 set(VCPKG_FOUND ${VCPKG_TOOLCHAIN} CACHE INTERNAL "")
 
 if((NOT VCPKG_FOUND) AND (UNIX OR MINGW))
+  message(STATUS "Using default package manager and pkg-config")
   find_package(PkgConfig REQUIRED)
-elseif(NOT VCPKG_FOUND)
+elseif(VCPKG_FOUND)
+  message(STATUS "Using vcpkg")
+else()
   message(FATAL_ERROR "Missing vcpkg toolchain file argument")
 endif()
 
