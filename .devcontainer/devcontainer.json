@@ -13,13 +13,26 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "gcc -v"
+  "postCreateCommand": "bash ./.devcontainer/post-create.sh",
 
   // Configure tool-specific properties.
-  // "customizations": {},
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "cmake.configureSettings": {
+          "CMAKE_TOOLCHAIN_FILE": "/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        }
+      },
+	    "extensions": [
+		    "ms-vscode.cpptools-extension-pack"
+	    ]
+    } 
+  },
 
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
   // "remoteUser": "root"
 
-  "containerEnv": { "IN_DEV_CONTAINER": "1" }
+  "containerEnv": {
+    "IN_DEV_CONTAINER": "1"
+  }
 }

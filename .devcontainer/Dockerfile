@@ -15,4 +15,11 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 
 # [Optional] Uncomment this section to install additional packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends libsdl2-dev libfreetype-dev libdrm-dev libgbm-dev
+    && apt-get -y install --no-install-recommends \
+        libdrm-dev libgbm-dev \
+        libx11-dev libxft-dev libxext-dev \
+        libwayland-dev libxkbcommon-dev libegl1-mesa-dev \
+        libibus-1.0-dev \
+        libasound2-dev libpulse-dev
+
+
