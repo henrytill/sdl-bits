@@ -20,7 +20,7 @@ const uint32_t BI_BITFIELDS = 0x0003;
 const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 size_t bmp_rowsize(uint16_t bpp, int32_t width) {
-  double pixelbits = (double)bpp * width;
+  const double pixelbits = (double)bpp * width;
   return (size_t)(ceil(pixelbits / DWORDBITS)) * DWORDBYTES;
 }
 
