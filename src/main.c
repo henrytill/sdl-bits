@@ -11,6 +11,11 @@
 #include "lua.h"
 #include "lualib.h"
 
+/* https://github.com/libsdl-org/SDL/commit/c265fb74b045fcaf6310f116c212d27c3e1104e9 */
+#ifndef SDL_HINT_VIDEO_DRIVER
+#define SDL_HINT_VIDEO_DRIVER SDL_HINT_VIDEODRIVER
+#endif
+
 #define now SDL_GetPerformanceCounter
 
 enum {
@@ -228,7 +233,7 @@ int main(int argc, char *argv[]) {
   parseargs(argc, argv, &dargs);
   loadcfg(dargs.cfgfile, &dcfg);
 
-  rc = SDL_SetHint(SDL_HINT_VIDEODRIVER, VIDEODRIVER);
+  rc = SDL_SetHint(SDL_HINT_VIDEO_DRIVER, VIDEODRIVER);
   if (rc != SDL_TRUE) {
     logsdlerr("SDL_SetHint failed");
     return EXIT_FAILURE;
