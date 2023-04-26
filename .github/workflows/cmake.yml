@@ -40,16 +40,16 @@ jobs:
       name: Build SDL2
       run: |
         pushd $HOME/deps
-        curl -LO https://github.com/libsdl-org/SDL/releases/download/release-2.0.20/SDL2-2.0.20.tar.gz
-        tar xvzf SDL2-2.0.20.tar.gz
-        cd SDL2-2.0.20
+        curl -LO https://github.com/libsdl-org/SDL/releases/download/release-2.26.4/SDL2-2.26.4.tar.gz
+        tar xvzf SDL2-2.26.4.tar.gz
+        cd SDL2-2.26.4
         ./configure
         make
         popd
 
     - name: Install SDL2
       run: |
-        pushd $HOME/deps/SDL2-2.0.20
+        pushd $HOME/deps/SDL2-2.26.4
         sudo make install
         popd
 
