@@ -37,7 +37,7 @@ struct Args {
 };
 
 struct Config {
-  enum {
+  enum WType {
     WINDOWED = 0,
     FULLSCREEN = 1,
     BORDERLESS = 2,
