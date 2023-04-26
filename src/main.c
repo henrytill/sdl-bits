@@ -57,6 +57,8 @@ struct Window {
 
 static const float SECOND = 1000.0f;
 
+static const char *const VIDEODRIVER = "wayland,x11";
+
 static const uint32_t wflags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
   [FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
@@ -225,6 +227,12 @@ int main(int argc, char *argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
   parseargs(argc, argv, &dargs);
   loadcfg(dargs.cfgfile, &dcfg);
+
+  rc = SDL_SetHint(SDL_HINT_VIDEODRIVER, VIDEODRIVER);
+  if (rc != SDL_TRUE) {
+    logsdlerr("SDL_SetHint failed");
+    return EXIT_FAILURE;
+  }
 
   rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != SUCCESS) {
