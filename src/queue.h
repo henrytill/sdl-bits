@@ -17,13 +17,13 @@ enum {
 
 /* A synchronous bounded queue */
 struct Queue {
-  void **buffer;     // circular buffer to hold data
-  uint32_t capacity; // maximum size of the buffer
-  size_t front;      // index of the front element in the buffer
-  size_t rear;       // index of the rear element in the buffer
-  SDL_sem *empty;    // semaphore to track empty slots in the buffer
-  SDL_sem *full;     // semaphore to track filled slots in the buffer
-  SDL_mutex *lock;   // mutex lock to protect buffer access
+  void **buffer;     /* buffer to hold data */
+  uint32_t capacity; /* maximum size of the buffer */
+  size_t front;      /* index of the front element in the buffer */
+  size_t rear;       /* index of the rear element in the buffer */
+  SDL_sem *empty;    /* semaphore to track empty slots in the buffer */
+  SDL_sem *full;     /* semaphore to track filled slots in the buffer */
+  SDL_mutex *lock;   /* mutex lock to protect buffer access */
 };
 
 /*

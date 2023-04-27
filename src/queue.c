@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include <SDL.h>
 
 #include "queue.h"
@@ -81,7 +79,7 @@ int queue_put(struct Queue *q, void *in) {
   return 0;
 }
 
-int queue_get(struct Queue *q, __attribute__((unused)) void **out) {
+int queue_get(struct Queue *q, void **out) {
   int rc;
 
   rc = SDL_SemWait(q->full);
