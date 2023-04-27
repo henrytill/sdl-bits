@@ -2,7 +2,7 @@
 
 #include "queue.h"
 
-static const char *const errormsg[] = {
+static const char *const ERRORMSG[] = {
   [-QUEUE_FAILURE_MALLOC] = "malloc failed",
   [-QUEUE_FAILURE_SEM_CREATE] = "SDL_CreateSemaphore failed",
   [-QUEUE_FAILURE_SEM_POST] = "SDL_SemPost failed",
@@ -17,16 +17,16 @@ const char *queue_error(int rc) {
   if (rc > QUEUE_FAILURE_MALLOC || rc < QUEUE_FAILURE_MIN) {
     return NULL;
   }
-  const char *const err = errormsg[-rc];
-  if (err == NULL) {
+  const char *const msg = ERRORMSG[-rc];
+  if (msg == NULL) {
     return NULL;
   }
-  const size_t len = strlen(err);
+  const size_t len = strlen(msg);
   char *ret = malloc(len + 1);
   if (ret == NULL) {
     return NULL;
   }
-  strcpy(ret, err);
+  strcpy(ret, msg);
   return ret;
 }
 
