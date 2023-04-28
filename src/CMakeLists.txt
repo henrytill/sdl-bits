@@ -10,10 +10,10 @@ if(UNIX)
   target_link_libraries(bmp PRIVATE m)
 endif()
 
-add_library(queue OBJECT queue.c)
-target_compile_options_default(queue)
-target_link_SDL2(queue)
-target_include_directories(queue INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(msgq OBJECT msgq.c)
+target_compile_options_default(msgq)
+target_link_SDL2(msgq)
+target_include_directories(msgq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Executable: main
 add_executable(main main.c)

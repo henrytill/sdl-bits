@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 
-#include <queue.h>
+#include "msgq.h"
 
 #define forever for (;;)
 
@@ -11,52 +11,39 @@ enum {
   ERR,
 };
 
-struct Message {
-  enum Tag {
-    NONE = 0,
-    SOME = 1,
-  } tag;
-  intptr_t value;
-};
+static const int COUNT_MAX = 1000;
+static const uint32_t Q_CAPACITY = 10;
 
-static const char *const tagdesc[] = {
-  [NONE] = "NONE",
-  [SOME] = "SOME",
-};
-
-static const int MAX = 200;
-
-static struct Queue q;
+static struct MessageQueue q;
 
 static int produce(void *data) {
   int rc;
+  struct Message msg;
+  enum Tag tag;
+  const char *tagstr = NULL;
 
   if (data == NULL) {
     SDL_LogError(ERR, "produce failed: data is NULL\n");
     return 1;
   }
-  struct Queue *queue = (struct Queue *)data;
+  struct MessageQueue *queue = (struct MessageQueue *)data;
 
-  for (intptr_t value = 0; value <= MAX;) {
-    const enum Tag tag = (value < MAX) ? SOME : NONE;
+  for (intptr_t value = 0; value <= COUNT_MAX;) {
+    tag = (value < COUNT_MAX) ? SOME : NONE;
 
-    struct Message *msg = malloc(sizeof(*msg));
-    if (msg == NULL) {
-      SDL_LogError(ERR, "produce {%s, %ld} failed: malloc failed\n", tagdesc[tag], value);
-      return 1;
-    }
-    msg->tag = tag;
-    msg->value = value;
+    msg.tag = tag;
+    msg.value = value;
+    tagstr = msgq_tagstr(&msg);
 
-    rc = queue_put(queue, (void *)msg);
+    rc = msgq_put(queue, (void *)&msg);
     if (rc == 1) {
-      SDL_LogDebug(APP, "produce {%s, %ld} blocked: retrying\n", tagdesc[tag], value);
+      SDL_LogDebug(APP, "produce {%s, %ld} blocked: retrying\n", tagstr, value);
       continue;
     } else if (rc < 0) {
-      SDL_LogError(ERR, "produce {%s, %ld} failed: %s\n", tagdesc[tag], value, queue_error(rc));
+      SDL_LogError(ERR, "produce {%s, %ld} failed: %s\n", tagstr, value, msgq_errorstr(rc));
       return 1;
     } else {
-      SDL_LogInfo(APP, "produced {%s, %ld}\n", tagdesc[tag], value);
+      SDL_LogInfo(APP, "produced {%s, %ld}\n", tagstr, value);
       value += 1;
     }
   }
@@ -64,26 +51,20 @@ static int produce(void *data) {
   return 0;
 }
 
-static int consume(struct Queue *q) {
+static int consume(struct MessageQueue *queue) {
   int ret = 1;
   int rc;
-  struct Message *msg = NULL;
+  struct Message msg;
 
-  rc = queue_get(q, (void *)&msg);
+  rc = msgq_get(queue, (void *)&msg);
   if (rc < 0) {
-    SDL_LogError(ERR, "consume failed: %s\n", queue_error(rc));
+    SDL_LogError(ERR, "consume failed: %s\n", msgq_errorstr(rc));
     return -1;
   }
-  if (msg == NULL) {
-    SDL_LogError(ERR, "consume failed: msg is NULL\n");
-    return -1;
-  }
-  if (msg->tag == NONE) {
+  if (msg.tag == NONE) {
     ret = 0;
   }
-
-  SDL_LogInfo(APP, "consumed {%s, %ld}\n", tagdesc[msg->tag], msg->value);
-  free(msg);
+  SDL_LogInfo(APP, "consumed {%s, %ld}\n", msgq_tagstr(&msg), msg.value);
   return ret;
 }
 
@@ -103,9 +84,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  rc = queue_init(&q, 4);
+  rc = msgq_init(&q, Q_CAPACITY);
   if (rc != 0) {
-    SDL_LogError(ERR, "queue_init failed: %s\n", queue_error(rc));
+    SDL_LogError(ERR, "msgq_init failed: %s\n", msgq_errorstr(rc));
     ret = EXIT_FAILURE;
     goto out0;
   }
@@ -131,7 +112,7 @@ int main(int argc, char *argv[]) {
   SDL_WaitThread(producer, NULL);
   SDL_LogInfo(APP, "goodbye...\n");
 out1:
-  queue_finish(&q);
+  msgq_finish(&q);
 out0:
   SDL_Quit();
   return ret;

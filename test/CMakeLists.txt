@@ -2,7 +2,7 @@
 add_executable(produce_consume produce_consume.c)
 target_compile_options_default(produce_consume)
 target_link_SDL2(produce_consume)
-target_link_libraries(produce_consume PRIVATE queue)
+target_link_libraries(produce_consume PRIVATE msgq)
 add_test(NAME produce_consume
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND produce_consume)
