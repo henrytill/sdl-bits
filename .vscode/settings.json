@@ -1,5 +1,8 @@
 {
   "cmake.configureOnOpen": false,
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "./third-party/vcpkg/scripts/buildsystems/vcpkg.cmake"
+  },
   "files.associations": {
     "queue.h": "c",
     "stdio.h": "c"

@@ -19,11 +19,6 @@
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
-      "settings": {
-        "cmake.configureSettings": {
-          "CMAKE_TOOLCHAIN_FILE": "./third-party/vcpkg/scripts/buildsystems/vcpkg.cmake"
-        }
-      },
       "extensions": [
         "ms-vscode.cpptools-extension-pack",
         "esbenp.prettier-vscode"
