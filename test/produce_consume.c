@@ -110,10 +110,12 @@ int main(int argc, char *argv[]) {
 
   ret = EXIT_SUCCESS;
   SDL_WaitThread(producer, NULL);
-  SDL_LogInfo(APP, "goodbye...\n");
+  SDL_LogInfo(APP, "SDL_WaitThread");
 out1:
   msgq_finish(&q);
+  SDL_LogInfo(APP, "msgq_finish");
 out0:
   SDL_Quit();
+  printf("SDL_Quit\n");
   return ret;
 }
