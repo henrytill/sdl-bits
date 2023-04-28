@@ -30,10 +30,10 @@ static int produce(void *data) {
 
   for (intptr_t value = 0; value <= COUNT_MAX;) {
     tag = (value < COUNT_MAX) ? SOME : NONE;
+    tagstr = msgq_tagstr(tag);
 
     msg.tag = tag;
     msg.value = value;
-    tagstr = msgq_tagstr(&msg);
 
     rc = msgq_put(queue, (void *)&msg);
     if (rc == 1) {
@@ -64,7 +64,7 @@ static int consume(struct MessageQueue *queue) {
   if (msg.tag == NONE) {
     ret = 0;
   }
-  SDL_LogInfo(APP, "consumed {%s, %ld}\n", msgq_tagstr(&msg), msg.value);
+  SDL_LogInfo(APP, "consumed {%s, %ld}\n", msgq_tagstr(msg.tag), msg.value);
   return ret;
 }
 

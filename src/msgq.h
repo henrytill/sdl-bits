@@ -34,11 +34,11 @@ struct MessageQueue {
 };
 
 /*
- * Returns the tag string associated with a message.
+ * Returns the tag string associated with a message tag.
  *
- * Returns NULL if the message has no associated tag string.
+ * Returns NULL if the message tag has no associated tag string.
  */
-const char *msgq_tagstr(struct Message *msg);
+const char *msgq_tagstr(int tag);
 
 /*
  * Returns the error message associated with a return code.

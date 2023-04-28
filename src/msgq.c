@@ -18,11 +18,11 @@ static const char *const errorstr[] = {
   [-MSGQ_FAILURE_MUTEX_UNLOCK] = "SDL_UnlockMutex failed",
 };
 
-const char *msgq_tagstr(struct Message *msg) {
-  if (msg->tag > SOME || msg->tag < NONE) {
+const char *msgq_tagstr(int tag) {
+  if (tag > SOME || tag < NONE) {
     return NULL;
   }
-  return tagstr[msg->tag];
+  return tagstr[tag];
 }
 
 const char *msgq_errorstr(int rc) {
