@@ -14,11 +14,14 @@ enum {
   MSGQ_FAILURE_MUTEX_UNLOCK = -8,
 };
 
+enum MessageTag {
+  NONE = 1 << 0,
+  SOME = 1 << 1,
+  QUIT = 1 << 2,
+};
+
 struct Message {
-  enum Tag {
-    NONE = 0,
-    SOME = 1,
-  } tag;
+  enum MessageTag tag;
   intptr_t value;
 };
 

@@ -19,7 +19,7 @@ static struct MessageQueue q;
 static int produce(void *data) {
   int rc;
   struct Message msg;
-  enum Tag tag;
+  enum MessageTag tag;
   const char *tagstr = NULL;
 
   if (data == NULL) {

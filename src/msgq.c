@@ -3,15 +3,16 @@
 #include "msgq.h"
 
 static const char *const tagstr[] = {
-  [NONE] = "NONE",
-  [SOME] = "SOME",
+  [NONE >> 1] = "NONE",
+  [SOME >> 1] = "SOME",
+  [QUIT >> 1] = "QUIT",
 };
 
 const char *msgq_tagstr(int tag) {
-  if (tag > SOME || tag < NONE) {
+  if (tag > QUIT || tag < NONE) {
     return NULL;
   }
-  return tagstr[tag];
+  return tagstr[tag >> 1];
 }
 
 static const char *const errorstr[] = {
