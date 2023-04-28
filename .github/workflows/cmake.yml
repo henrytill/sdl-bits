@@ -22,14 +22,22 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install SDL2
+      - name: Install dependencies
         run: |
-          sudo apt install libsdl2-dev
+          sudo apt install -yyq --no-install-recommends \
+            build-essential cmake \
+            libdrm-dev libgbm-dev \
+            libx11-dev libxft-dev libxext-dev \
+            libwayland-dev libxkbcommon-dev libegl1-mesa-dev \
+            libibus-1.0-dev \
+            libasound2-dev libpulse-dev
+          ./third-party/vcpkg/bootstrap-vcpkg.sh
+          ./third-party/vcpkg/vcpkg install sdl2 freetype
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_SHARED_LIBS=ON
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/third-party/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         # Build your program with the given configuration
