@@ -23,7 +23,7 @@ static int produce(void *data) {
   const char *tagstr = NULL;
 
   if (data == NULL) {
-    SDL_LogError(ERR, "produce failed: data is NULL\n");
+    SDL_LogError(ERR, "produce failed: data is NULL");
     return 1;
   }
   struct MessageQueue *queue = (struct MessageQueue *)data;
@@ -37,13 +37,13 @@ static int produce(void *data) {
 
     rc = msgq_put(queue, (void *)&msg);
     if (rc == 1) {
-      SDL_LogDebug(APP, "produce {%s, %ld} blocked: retrying\n", tagstr, value);
+      SDL_LogDebug(APP, "produce {%s, %ld} blocked: retrying", tagstr, value);
       continue;
     } else if (rc < 0) {
-      SDL_LogError(ERR, "produce {%s, %ld} failed: %s\n", tagstr, value, msgq_errorstr(rc));
+      SDL_LogError(ERR, "produce {%s, %ld} failed: %s", tagstr, value, msgq_errorstr(rc));
       return 1;
     } else {
-      SDL_LogInfo(APP, "produced {%s, %ld}\n", tagstr, value);
+      SDL_LogInfo(APP, "produced {%s, %ld}", tagstr, value);
       value += 1;
     }
   }
@@ -58,13 +58,13 @@ static int consume(struct MessageQueue *queue) {
 
   rc = msgq_get(queue, (void *)&msg);
   if (rc < 0) {
-    SDL_LogError(ERR, "consume failed: %s\n", msgq_errorstr(rc));
+    SDL_LogError(ERR, "consume failed: %s", msgq_errorstr(rc));
     return -1;
   }
   if (msg.tag == NONE) {
     ret = 0;
   }
-  SDL_LogInfo(APP, "consumed {%s, %ld}\n", msgq_tagstr(msg.tag), msg.value);
+  SDL_LogInfo(APP, "consumed {%s, %ld}", msgq_tagstr(msg.tag), msg.value);
   return ret;
 }
 
@@ -80,20 +80,20 @@ int main(int argc, char *argv[]) {
 
   rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc != 0) {
-    SDL_LogError(ERR, "SDL_Init failed\n");
+    SDL_LogError(ERR, "SDL_Init failed");
     return EXIT_FAILURE;
   }
 
   rc = msgq_init(&q, Q_CAPACITY);
   if (rc != 0) {
-    SDL_LogError(ERR, "msgq_init failed: %s\n", msgq_errorstr(rc));
+    SDL_LogError(ERR, "msgq_init failed: %s", msgq_errorstr(rc));
     ret = EXIT_FAILURE;
     goto out0;
   }
 
   producer = SDL_CreateThread(produce, "producer", &q);
   if (producer == NULL) {
-    SDL_LogError(ERR, "SDL_CreateThread failed: %s\n", SDL_GetError());
+    SDL_LogError(ERR, "SDL_CreateThread failed: %s", SDL_GetError());
     ret = EXIT_FAILURE;
     goto out1;
   }

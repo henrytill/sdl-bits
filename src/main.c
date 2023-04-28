@@ -164,7 +164,7 @@ static void delay(float frametime, uint64_t begin) {
 }
 
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
-  SDL_LogInfo(APP, "Window type: %s\n", WDESC[cfg->wtype]);
+  SDL_LogInfo(APP, "Window type: %s", WDESC[cfg->wtype]);
   win->window = SDL_CreateWindow(title,
                                  cfg->x, cfg->y,
                                  cfg->width, cfg->height,

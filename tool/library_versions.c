@@ -24,7 +24,7 @@ static void freetype(void) {
     return;
   }
   FT_Library_Version(ftlib, &major, &minor, &patch);
-  SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u\n", major, minor, patch);
+  SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u", major, minor, patch);
   FT_Done_FreeType(ftlib);
 }
 
@@ -35,8 +35,8 @@ static void lua(void) {
     return;
   }
   const lua_Number lded = lua_version(state);
-  SDL_LogInfo(UNHANDLED, "Compiled against Lua %s ...\n", LUA_RELEASE);
-  SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f\n", lded);
+  SDL_LogInfo(UNHANDLED, "Compiled against Lua %s ...", LUA_RELEASE);
+  SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f", lded);
   lua_close(state);
 }
 
@@ -46,8 +46,8 @@ static void sdl(void) {
 
   SDL_VERSION(&cced);
   SDL_GetVersion(&lded);
-  SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...\n", cced.major, cced.minor, cced.patch);
-  SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.\n", lded.major, lded.minor, lded.patch);
+  SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...", cced.major, cced.minor, cced.patch);
+  SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.", lded.major, lded.minor, lded.patch);
 }
 
 int main(int argc, char *argv[]) {
