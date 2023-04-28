@@ -64,13 +64,13 @@ static const float SECOND = 1000.0f;
 
 static const char *const VIDEODRIVER = "wayland,x11";
 
-static const uint32_t WFLAGS[] = {
+static const uint32_t wtypeflags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
   [FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
   [BORDERLESS] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
 };
 
-static const char *const WDESC[] = {
+static const char *const wtypestr[] = {
   [WINDOWED] = "Windowed",
   [FULLSCREEN] = "Fullscreen",
   [BORDERLESS] = "Borderless Fullscreen",
@@ -164,11 +164,11 @@ static void delay(float frametime, uint64_t begin) {
 }
 
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
-  SDL_LogInfo(APP, "Window type: %s", WDESC[cfg->wtype]);
+  SDL_LogInfo(APP, "Window type: %s", wtypestr[cfg->wtype]);
   win->window = SDL_CreateWindow(title,
                                  cfg->x, cfg->y,
                                  cfg->width, cfg->height,
-                                 WFLAGS[cfg->wtype]);
+                                 wtypeflags[cfg->wtype]);
   if (win->window == NULL) {
     logsdlerr("SDL_CreateWindow failed");
     return FAILURE;
