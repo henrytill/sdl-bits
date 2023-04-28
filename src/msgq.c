@@ -7,6 +7,13 @@ static const char *const tagstr[] = {
   [SOME] = "SOME",
 };
 
+const char *msgq_tagstr(int tag) {
+  if (tag > SOME || tag < NONE) {
+    return NULL;
+  }
+  return tagstr[tag];
+}
+
 static const char *const errorstr[] = {
   [-MSGQ_FAILURE_MALLOC] = "malloc failed",
   [-MSGQ_FAILURE_SEM_CREATE] = "SDL_CreateSemaphore failed",
@@ -17,13 +24,6 @@ static const char *const errorstr[] = {
   [-MSGQ_FAILURE_MUTEX_LOCK] = "SDL_LockMutex failed",
   [-MSGQ_FAILURE_MUTEX_UNLOCK] = "SDL_UnlockMutex failed",
 };
-
-const char *msgq_tagstr(int tag) {
-  if (tag > SOME || tag < NONE) {
-    return NULL;
-  }
-  return tagstr[tag];
-}
 
 const char *msgq_errorstr(int rc) {
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
