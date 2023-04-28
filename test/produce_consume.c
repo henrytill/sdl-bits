@@ -11,8 +11,8 @@ enum {
   ERR,
 };
 
-static const int COUNT_MAX = 1000;
-static const uint32_t Q_CAPACITY = 10;
+static const int COUNT_MAX = 100;
+static const uint32_t Q_CAPACITY = 4;
 
 static struct MessageQueue q;
 
