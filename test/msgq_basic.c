@@ -1,3 +1,15 @@
+/**
+ * Test basic message queue functionality.
+ *
+ * The producer thread produces messages with values from 0 to COUNT_MAX.
+ * The consumer consumes messages on the main thread until it receives a
+ * message with tag NONE.
+ *
+ * @see msgq_init()
+ * @see msgq_put()
+ * @see msgq_get()
+ * @see msgq_destroy()
+ */
 #include <stdio.h>
 
 #include <SDL.h>
@@ -6,16 +18,31 @@
 
 #define forever for (;;)
 
-enum {
+/** Log categories to use with SDL logging functions. */
+enum LogCategory {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,
 };
 
+/** Maximum value to produce. */
 static const int COUNT_MAX = 100;
+
+/** Capacity of the MessageQueue. */
 static const uint32_t Q_CAPACITY = 4;
 
+/** MessageQueue for testing. */
 static struct MessageQueue q;
 
+/**
+ * Produce messages with values from 0 to COUNT_MAX. The last message has
+ * tag NONE.
+ *
+ * This function is meant to be run in its own thread by passing it to SDL_CreateThread().
+ *
+ * @param data Pointer to a MessageQueue.
+ * @return 0 on success, 1 on failure.
+ * @see consume()
+ */
 static int produce(void *data) {
   int rc;
   struct Message msg;
@@ -51,6 +78,15 @@ static int produce(void *data) {
   return 0;
 }
 
+/**
+ * Consume messages until a message with tag NONE is received.
+ *
+ * This function is meant to be run on the main thread.
+ *
+ * @param queue Pointer to a MessageQueue.
+ * @return 0 on success, 1 on failure.
+ * @see produce()
+ */
 static int consume(struct MessageQueue *queue) {
   int ret = 1;
   int rc;
@@ -68,6 +104,9 @@ static int consume(struct MessageQueue *queue) {
   return ret;
 }
 
+/**
+ * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
+ */
 int main(int argc, char *argv[]) {
   int ret = EXIT_FAILURE;
   int rc;
@@ -87,14 +126,12 @@ int main(int argc, char *argv[]) {
   rc = msgq_init(&q, Q_CAPACITY);
   if (rc != 0) {
     SDL_LogError(ERR, "msgq_init failed: %s", msgq_errorstr(rc));
-    ret = EXIT_FAILURE;
     goto out0;
   }
 
   producer = SDL_CreateThread(produce, "producer", &q);
   if (producer == NULL) {
     SDL_LogError(ERR, "SDL_CreateThread failed: %s", SDL_GetError());
-    ret = EXIT_FAILURE;
     goto out1;
   }
 
@@ -103,7 +140,6 @@ int main(int argc, char *argv[]) {
     if (rc == 0) {
       break;
     } else if (rc < 0) {
-      ret = EXIT_FAILURE;
       goto out1;
     }
   }

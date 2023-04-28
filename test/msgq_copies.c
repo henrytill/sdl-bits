@@ -139,19 +139,16 @@ int main(int argc, char *argv[]) {
   rc = msgq_init(&q, Q_CAPACITY);
   if (rc != 0) {
     SDL_LogError(ERR, "msgq_init failed: %s", msgq_errorstr(rc));
-    ret = EXIT_FAILURE;
     goto out0;
   }
 
   producer = SDL_CreateThread(produce, "producer", (void *)&q);
   if (producer == NULL) {
     SDL_LogError(ERR, "SDL_CreateThread failed");
-    ret = EXIT_FAILURE;
     goto out1;
   }
 
   if (consume(&q) != 0) {
-    ret = EXIT_FAILURE;
     goto out1;
   }
 

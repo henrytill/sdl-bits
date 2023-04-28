@@ -1,3 +1,11 @@
+/**
+ * Test for bmp_read() function.
+ *
+ * This test reads a 24-bit bitmap file and checks that the first pixel is
+ * black.
+ *
+ * @see bmp_read()
+ */
 #include <stddef.h>
 #include <stdlib.h>
 
