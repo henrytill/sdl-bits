@@ -62,7 +62,7 @@ struct Window {
 
 static const float SECOND = 1000.0f;
 
-static const char *const VIDEODRIVER = "wayland,x11";
+static const char *const VIDEODRIVER = "x11,wayland";
 
 static const uint32_t wtypeflags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
