@@ -7,6 +7,14 @@ add_test(NAME produce_consume
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND produce_consume)
 
+# msgq_copies
+add_executable(msgq_copies msgq_copies.c)
+target_compile_options_default(msgq_copies)
+target_link_SDL2(msgq_copies)
+target_link_libraries(msgq_copies PRIVATE msgq)
+add_test(NAME msgq_copies
+         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+         COMMAND msgq_copies)
 
 # read_bitmap
 add_executable(read_bitmap read_bitmap.c)
