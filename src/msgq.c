@@ -33,7 +33,7 @@ const char *msgq_errorstr(int rc) {
 }
 
 int msgq_init(struct MessageQueue *q, uint32_t capacity) {
-  q->buffer = malloc((size_t)capacity * sizeof(q->buffer));
+  q->buffer = malloc((size_t)capacity * sizeof(*q->buffer));
   if (q->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
   }
