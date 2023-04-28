@@ -1,15 +1,16 @@
 # Highest version compatible with Steam Runtime container
 cmake_minimum_required(VERSION 3.13)
 include(CheckSymbolExists)
-enable_testing()
 
 project(sdl-bits C)
+include(CTest)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(BuildType)
+include(Coverage)
 
 # https://stackoverflow.com/a/58711983
 string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -93,7 +94,9 @@ add_subdirectory(assets)
 add_subdirectory(src)
 
 # Directory: test
-add_subdirectory(test)
+if (BUILD_TESTING)
+  add_subdirectory(test)
+endif()
 
 # Directory: tool
 add_subdirectory(tool)
