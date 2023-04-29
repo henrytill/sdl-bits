@@ -1,0 +1,11 @@
+/.cache/
+/.devcontainer/
+/.github/
+/.vscode/
+/build/
+.dir-locals.el
+.dockerignore
+Dockerfile
+docker-build
+docker-run
+pulseaudio.client.conf

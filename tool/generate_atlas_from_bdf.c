@@ -56,8 +56,8 @@ static void freeimage(char **image, size_t height) {
 /* https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap */
 static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
   unsigned char *buffer = slot->bitmap.buffer;
-  size_t rows = slot->bitmap.rows;
-  size_t width = slot->bitmap.width;
+  size_t rows = (size_t)slot->bitmap.rows;
+  size_t width = (size_t)slot->bitmap.width;
   size_t pitch = (size_t)abs(slot->bitmap.pitch);
   char bit;
 

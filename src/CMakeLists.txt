@@ -7,7 +7,7 @@ endif()
 target_include_directories(bmp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(UNIX)
-  target_link_libraries(bmp PRIVATE m)
+  target_link_libraries(bmp m)
 endif()
 
 add_library(msgq OBJECT msgq.c)

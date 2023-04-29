@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+docker run -it \
+    --env DISPLAY=$DISPLAY \
+    --env PULSE_SERVER=unix:/tmp/pulseaudio.socket \
+    --env PULSE_COOKIE=/tmp/pulseaudio.cookie \
+    --volume $HOME/.Xauthority:/home/build/.Xauthority \
+    --volume $(pwd)/pulseaudio.client.conf:/etc/pulse/client.conf \
+    --volume /etc/machine-id:/etc/machine-id \
+    --volume /tmp/.X11-unix:/tmp/.X11-unix \
+    --volume $XDG_RUNTIME_DIR/pulse/native:/tmp/pulseaudio.socket \
+    --user $(id -u):$(id -g) \
+    --hostname $HOSTNAME \
+    --workdir /home/build/sdl-bits \
+    sdl-bits
+
