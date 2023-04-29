@@ -14,19 +14,27 @@
 
 #include "msgq.h"
 
-#define logmsg(msg)                                     \
+#define ATEXIT(func)                                 \
+  do {                                               \
+    if (atexit(func) != 0) {                         \
+      fprintf(stderr, "atexit(%s) failed\n", #func); \
+      exit(EXIT_FAILURE);                            \
+    }                                                \
+  } while (0)
+
+#define LOGMSG(msg)                                     \
   do {                                                  \
     SDL_LogInfo(APP, "%s: %s{%s, %ld}", __func__, #msg, \
                 msgq_tagstr(msg.tag), msg.value);       \
   } while (0)
 
-#define checkmsg(msg, extag, exvalue)                                   \
+#define CHECKMSG(msg, extag, exvalue)                                   \
   do {                                                                  \
     if (msg.tag != extag || msg.value != exvalue) {                     \
       SDL_LogError(ERR, "%s: %s{%s, %ld} != {%s, %ld}", __func__, #msg, \
                    msgq_tagstr(msg.tag), msg.value,                     \
                    msgq_tagstr(extag), exvalue);                        \
-      return 1;                                                         \
+      exit(EXIT_FAILURE);                                               \
     }                                                                   \
   } while (0);
 
@@ -40,10 +48,35 @@ enum LogCategory {
 static const uint32_t DELAY = 2000U;
 
 /** Capacity of the MessageQueue. */
-static const uint32_t Q_CAPACITY = 1U;
+static const uint32_t QCAP = 1U;
 
 /** MessageQueue for testing. */
 static struct MessageQueue q;
+
+/**
+ * Calls msgq_finish() on q.
+ *
+ * @see msgq_finish()
+ */
+static void qfinish(void) {
+  msgq_finish(&q);
+}
+
+/** Logs a msgq error message and exits. */
+static void qfail(int err, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_errorstr(err));
+  exit(EXIT_FAILURE);
+}
+
+/** Logs a SDL error message and exits. */
+static void sdlfail(const char *msg) {
+  const char *err = SDL_GetError();
+  if (strlen(err) != 0)
+    SDL_LogError(ERR, "%s (%s)", msg, err);
+  else
+    SDL_LogError(ERR, "%s", msg);
+  exit(EXIT_FAILURE);
+}
 
 /**
  * Produce messages.
@@ -62,22 +95,28 @@ static int produce(void *data) {
   m.value = 42;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &m);
+    if (rc < 0)
+      qfail(rc, "msgq_put failed");
   }
-  logmsg(m);
+  LOGMSG(m);
 
   m.tag = SOME;
   m.value = 0;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &m);
+    if (rc < 0)
+      qfail(rc, "msgq_put failed");
   }
-  logmsg(m);
+  LOGMSG(m);
 
   m.tag = SOME;
   m.value = 1;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &m);
+    if (rc < 0)
+      qfail(rc, "msgq_put failed");
   }
-  logmsg(m);
+  LOGMSG(m);
 
   return 0;
 }
@@ -100,19 +139,19 @@ static int consume(struct MessageQueue *queue) {
   SDL_Delay(DELAY);
 
   msgq_get(queue, (void *)&a);
-  logmsg(a);
-  checkmsg(a, SOME, 42l);
+  LOGMSG(a);
+  CHECKMSG(a, SOME, 42l);
 
   msgq_get(queue, (void *)&b);
-  logmsg(b);
-  checkmsg(a, SOME, 42l);
-  checkmsg(b, SOME, 0l);
+  LOGMSG(b);
+  CHECKMSG(a, SOME, 42l);
+  CHECKMSG(b, SOME, 0l);
 
   msgq_get(queue, (void *)&c);
-  logmsg(c);
-  checkmsg(a, SOME, 42l);
-  checkmsg(b, SOME, 0l);
-  checkmsg(c, SOME, 1l);
+  LOGMSG(c);
+  CHECKMSG(a, SOME, 42l);
+  CHECKMSG(b, SOME, 0l);
+  CHECKMSG(c, SOME, 1l);
 
   return 0;
 }
@@ -121,7 +160,6 @@ static int consume(struct MessageQueue *queue) {
  * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
  */
 int main(int argc, char *argv[]) {
-  int ret = EXIT_FAILURE;
   int rc;
   SDL_Thread *producer;
 
@@ -131,35 +169,24 @@ int main(int argc, char *argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
   rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
-  if (rc != 0) {
-    SDL_LogError(ERR, "SDL_Init failed");
-    return EXIT_FAILURE;
-  }
+  if (rc != 0)
+    sdlfail("SDL_Init failed");
 
-  rc = msgq_init(&q, Q_CAPACITY);
-  if (rc != 0) {
-    SDL_LogError(ERR, "msgq_init failed: %s", msgq_errorstr(rc));
-    goto out0;
-  }
+  ATEXIT(SDL_Quit);
+
+  rc = msgq_init(&q, QCAP);
+  if (rc != 0)
+    qfail(rc, "msgq_init failed");
+
+  ATEXIT(qfinish);
 
   producer = SDL_CreateThread(produce, "producer", (void *)&q);
-  if (producer == NULL) {
-    SDL_LogError(ERR, "SDL_CreateThread failed");
-    goto out1;
-  }
+  if (producer == NULL)
+    sdlfail("SDL_CreateThread failed");
 
-  if (consume(&q) != 0) {
-    goto out1;
-  }
+  if (consume(&q) != 0)
+    return EXIT_FAILURE;
 
-  ret = EXIT_SUCCESS;
   SDL_WaitThread(producer, NULL);
-  SDL_LogInfo(APP, "SDL_WaitThread");
-out1:
-  msgq_finish(&q);
-  SDL_LogInfo(APP, "msgq_finish");
-out0:
-  SDL_Quit();
-  printf("SDL_Quit\n");
-  return ret;
+  return EXIT_SUCCESS;
 }
