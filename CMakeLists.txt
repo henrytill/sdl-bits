@@ -1,12 +1,15 @@
 # Highest version compatible with Steam Runtime container
 cmake_minimum_required(VERSION 3.13)
-include(CheckSymbolExists)
 
 project(sdl-bits C)
-include(CTest)
-
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
+
+include(CheckSymbolExists)
+
+# https://gitlab.kitware.com/cmake/cmake/-/issues/21730
+set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
+include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(BuildType)
