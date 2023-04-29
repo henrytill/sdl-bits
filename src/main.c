@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <math.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,6 +7,7 @@
 #include <string.h>
 
 #include <SDL.h>
+#include <SDL_audio.h>
 
 #include "lauxlib.h"
 #include "lua.h"
@@ -50,6 +52,14 @@ struct Config {
   char *assetdir;
 };
 
+struct AudioState {
+  const int samplerate;
+  const uint16_t buffsize;
+  const double volume;
+  const double frequency;
+  uint64_t offset;
+};
+
 struct Window {
   SDL_Window *window;
   SDL_Renderer *renderer;
@@ -81,6 +91,14 @@ static struct Config dcfg = {
   .height = 720,
   .framerate = 60,
   .assetdir = "./assets",
+};
+
+static struct AudioState as = {
+  .samplerate = 48000,
+  .buffsize = 2048,
+  .volume = 0.25,
+  .frequency = 440.0,
+  .offset = 0,
 };
 
 static void logsdlerr(char *msg) {
@@ -136,6 +154,25 @@ static int loadcfg(const char *f, struct Config *cfg) {
 out:
   lua_close(state);
   return ret;
+}
+
+void calcsine(void *userdata, uint8_t *stream, int len) {
+  struct AudioState *as = (struct AudioState *)userdata;
+  float *fstream = (float *)stream;
+
+  assert((len / 8) == as->buffsize);
+
+  const double samplerate = (double)as->samplerate;
+  const uint64_t buffsize = (uint64_t)as->buffsize;
+
+  for (uint64_t i = 0; i < buffsize; ++i) {
+    const double time = (double)((as->offset * buffsize) + i) / samplerate;
+    const double x = 2.0 * M_PI * time * as->frequency;
+    fstream[2 * i + 0] = (float)(as->volume * sin(x));
+    fstream[2 * i + 1] = (float)(as->volume * sin(x));
+  }
+
+  as->offset += 1;
 }
 
 static float calcframetime(int fps) {
@@ -209,6 +246,8 @@ int main(int argc, char *argv[]) {
   int rc;
   enum Loopstat loopstat = RUN;
   struct Window win = {NULL, NULL};
+  SDL_AudioSpec want, have;
+  SDL_AudioDeviceID devid;
   SDL_Rect winrect = {0, 0, 0, 0};
   SDL_Surface *surface = NULL;
   SDL_Texture *texture = NULL;
@@ -234,31 +273,46 @@ int main(int argc, char *argv[]) {
 
   pfreq = SDL_GetPerformanceFrequency();
 
+  want.freq = as.samplerate;
+  want.format = AUDIO_F32;
+  want.channels = 2;
+  want.samples = as.buffsize;
+  want.callback = calcsine;
+  want.userdata = (void *)&as;
+
+  devid = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+  if (devid < 2) {
+    logsdlerr("SDL_OpenAudio failed");
+    goto out0;
+  }
+
   rc = initwin(&dcfg, wintitle, &win);
   if (rc != SUCCESS)
-    goto out0;
+    goto out1;
 
   rc = getrect(&win, &winrect);
   if (rc != SUCCESS)
-    goto out1;
+    goto out2;
 
   bmpfile = allocpath(dcfg.assetdir, testbmp);
   if (bmpfile == NULL)
-    goto out1;
+    goto out2;
 
   surface = SDL_LoadBMP(bmpfile);
   if (surface == NULL) {
     logsdlerr("SDL_LoadBMP failed");
-    goto out2;
+    goto out3;
   }
 
   texture = SDL_CreateTextureFromSurface(win.renderer, surface);
   if (texture == NULL) {
     logsdlerr("SDL_CreateTextureFromSurface failed");
-    goto out3;
+    goto out4;
   }
   SDL_FreeSurface(surface);
   surface = NULL;
+
+  SDL_PauseAudioDevice(devid, 0);
 
   delta = calcframetime(dcfg.framerate);
   begin = now();
@@ -279,12 +333,12 @@ int main(int argc, char *argv[]) {
     rc = SDL_RenderClear(win.renderer);
     if (rc != SUCCESS) {
       logsdlerr("SDL_RenderClear failed");
-      goto out4;
+      goto out5;
     }
     rc = SDL_RenderCopy(win.renderer, texture, NULL, &winrect);
     if (rc != SUCCESS) {
       logsdlerr("SDL_RenderCopy failed");
-      goto out4;
+      goto out5;
     }
     SDL_RenderPresent(win.renderer);
 
@@ -294,15 +348,19 @@ int main(int argc, char *argv[]) {
     begin = end;
   }
 
+  SDL_PauseAudioDevice(devid, 1);
+
   ret = EXIT_SUCCESS;
-out4:
+out5:
   SDL_DestroyTexture(texture);
-out3:
+out4:
   SDL_FreeSurface(surface);
-out2:
+out3:
   free(bmpfile);
-out1:
+out2:
   finishwin(&win);
+out1:
+  SDL_CloseAudioDevice(devid);
 out0:
   SDL_Quit();
   return ret;
