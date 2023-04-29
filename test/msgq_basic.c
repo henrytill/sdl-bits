@@ -16,12 +16,12 @@
 
 #include "msgq.h"
 
-#define ATEXIT(func)                             \
-  do {                                           \
-    if (atexit(func) != 0) {                     \
-      fprintf(stderr, "atexit(#func) failed\n"); \
-      exit(EXIT_FAILURE);                        \
-    }                                            \
+#define ATEXIT(func)                                 \
+  do {                                               \
+    if (atexit(func) != 0) {                         \
+      fprintf(stderr, "atexit(%s) failed\n", #func); \
+      exit(EXIT_FAILURE);                            \
+    }                                                \
   } while (0)
 
 /** Log categories to use with SDL logging functions. */
