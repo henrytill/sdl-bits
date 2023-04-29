@@ -1,0 +1,25 @@
+services:
+  main:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+      - PULSE_SERVER=unix:/tmp/pulseaudio.socket
+      - PULSE_COOKIE=/tmp/pulseaudio.cookie
+    volumes:
+      - ${HOME}/.Xauthority:/home/build/.Xauthority:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XDG_RUNTIME_DIR}/pulse/native:/tmp/pulseaudio.socket
+      - ./pulseaudio.client.conf:/etc/pulse/client.conf:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    user: 1000:1000
+    working_dir: /home/build/sdl-bits
+    command: ./build/src/main
+
+  test:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    working_dir: /home/build/sdl-bits/build
+    command: ctest
