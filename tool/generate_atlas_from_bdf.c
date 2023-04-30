@@ -16,11 +16,11 @@ enum {
   CODESZ = 94, /* ('~' - '!') + 1 */
 };
 
-static const char *const FONTFILE = "./ucs-fonts/10x20.bdf";
-static const char *const BMPFILE = "./10x20.bmp";
+static const char *const fontfile = "./ucs-fonts/10x20.bdf";
+static const char *const bmpfile = "./10x20.bmp";
 
-static const struct bmp_Pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
-static const struct bmp_Pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
+static const struct bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
+static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
 
 static char **allocimage(size_t height, size_t width);
 static void freeimage(char **image, size_t height);
@@ -88,6 +88,11 @@ static inline void drawimage(char **image, size_t width, size_t height) {
 #endif
 
 int main(int argc, char *argv[]) {
+  extern const char *const fontfile;
+  extern const char *const bmpfile;
+  extern const struct bmp_Pixel32 white;
+  extern const struct bmp_Pixel32 black;
+
   int ret = EXIT_FAILURE;
   int rc;
   char **image = NULL;
@@ -117,7 +122,7 @@ int main(int argc, char *argv[]) {
     goto out0;
   }
 
-  rc = FT_New_Face(ftlib, FONTFILE, 0, &face);
+  rc = FT_New_Face(ftlib, fontfile, 0, &face);
   if (rc != SUCCESS) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
     goto out1;
@@ -162,9 +167,9 @@ int main(int argc, char *argv[]) {
 
   for (size_t y = height, i = 0; y-- > 0;)
     for (size_t x = 0; x < width; ++x, ++i)
-      buf[i] = image[y][x] ? BLACK : WHITE;
+      buf[i] = image[y][x] ? black : white;
 
-  rc = bmp_v4write(buf, width, height, BMPFILE);
+  rc = bmp_v4write(buf, width, height, bmpfile);
   if (rc != SUCCESS)
     goto out3;
 
