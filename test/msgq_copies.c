@@ -54,7 +54,7 @@ static const uint32_t qcap = 1U;
 static struct MessageQueue q;
 
 /**
- * Calls msgq_finish() on q.
+ * Call msgq_finish() on q.
  *
  * @see msgq_finish()
  */
@@ -63,13 +63,13 @@ static void qfinish(void) {
   msgq_finish(&q);
 }
 
-/** Logs a msgq error message and exits. */
+/** Log a msgq error message and exits. */
 static void qfail(int err, const char *msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_errorstr(err));
   exit(EXIT_FAILURE);
 }
 
-/** Logs a SDL error message and exits. */
+/** Log a SDL error message and exits. */
 static void sdlfail(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0)

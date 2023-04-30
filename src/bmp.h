@@ -92,12 +92,45 @@ struct bmp_Pixel32 {
 
 #pragma pack(pop)
 
+/**
+ * Calculate the number of bytes per row.
+ *
+ * @param bpp Bits per pixel.
+ * @param width Image width.
+ * @return Number of bytes per row.
+ */
 size_t bmp_rowsize(uint16_t bpp, int32_t width);
 
+/**
+ * Read a BMP file.
+ *
+ * @param file Path to the BMP file.
+ * @param filehdr The file header structure to be filled.
+ * @param infohdr The info header structure to be filled.
+ * @param image The image data to be filled.
+ * @return 0 on success, -1 on error.
+ */
 int bmp_read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_Infohdr *infohdr, char **image);
 
+/**
+ * Reads a BMP file with a V4 header.
+ *
+ * @param file Path to the BMP file.
+ * @param filehdr The file header structure to be filled.
+ * @param v4hdr The V4 header structure to be filled.
+ * @param image The image data to be filled.
+ * @return 0 on success, -1 on error.
+ */
 int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_V4hdr *v4hdr, char **image);
 
+/**
+ * Write a BMP file with a V4 header.
+ *
+ * @param buf The image data.
+ * @param width Image width in pixels.
+ * @param height Image height in pixels.
+ * @param file Path to the BMP file
+ */
 int bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const char *file);
 
 #endif /* SDL_BITS_BMP_H */
