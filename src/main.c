@@ -29,9 +29,9 @@ enum {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
-enum Loopstat {
-  STOP = 0,
-  RUN = 1,
+enum Toggle {
+  OFF = 0,
+  ON = 1,
 };
 
 struct Args {
@@ -58,6 +58,13 @@ struct AudioState {
   const double volume;
   const double frequency;
   uint64_t offset;
+};
+
+struct State {
+  SDL_AudioDeviceID audiodev;
+  struct AudioState audio;
+  enum Toggle loopstat;
+  enum Toggle pauseaudio;
 };
 
 struct Window {
@@ -93,12 +100,17 @@ static struct Config dcfg = {
   .assetdir = "./assets",
 };
 
-static struct AudioState as = {
-  .samplerate = 48000,
-  .buffsize = 2048,
-  .volume = 0.25,
-  .frequency = 440.0,
-  .offset = 0,
+static struct State state = {
+  .audiodev = 0,
+  .audio = {
+    .samplerate = 48000,
+    .buffsize = 2048,
+    .volume = 0.25,
+    .frequency = 440.0,
+    .offset = 0,
+  },
+  .loopstat = ON,
+  .pauseaudio = ON,
 };
 
 static void logsdlerr(char *msg) {
@@ -238,10 +250,18 @@ static int getrect(struct Window *win, SDL_Rect *rect) {
   return SUCCESS;
 }
 
-static void keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat) {
+static void keydown(SDL_KeyboardEvent *key, struct State *state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
-    *loopstat = STOP;
+    state->loopstat = OFF;
+    break;
+  case SDLK_F1:
+    state->pauseaudio = (state->pauseaudio == ON) ? OFF : ON;
+    SDL_LogInfo(APP, "PauseAudioDevice(%d)", state->pauseaudio);
+    SDL_PauseAudioDevice(state->audiodev, state->pauseaudio);
+    if (state->pauseaudio == ON) {
+      state->audio.offset = 0;
+    }
     break;
   }
 }
@@ -254,14 +274,12 @@ int main(int argc, char *argv[]) {
   extern uint64_t pfreq;
   extern struct Args dargs;
   extern struct Config dcfg;
-  extern struct AudioState as;
+  extern struct State state;
 
   int ret = EXIT_FAILURE;
   int rc;
-  enum Loopstat loopstat = RUN;
   struct Window win = {NULL, NULL};
   SDL_AudioSpec want, have;
-  SDL_AudioDeviceID devid;
   SDL_Rect winrect = {0, 0, 0, 0};
   SDL_Surface *surface = NULL;
   SDL_Texture *texture = NULL;
@@ -287,15 +305,14 @@ int main(int argc, char *argv[]) {
 
   pfreq = SDL_GetPerformanceFrequency();
 
-  want.freq = as.samplerate;
+  want.freq = state.audio.samplerate;
   want.format = AUDIO_F32;
   want.channels = 2;
-  want.samples = as.buffsize;
+  want.samples = state.audio.buffsize;
   want.callback = calcsine;
-  want.userdata = (void *)&as;
-
-  devid = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-  if (devid < 2) {
+  want.userdata = (void *)&state.audio;
+  state.audiodev = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+  if (state.audiodev < 2) {
     logsdlerr("SDL_OpenAudio failed");
     goto out0;
   }
@@ -331,20 +348,18 @@ int main(int argc, char *argv[]) {
   surface = NULL;
   bmpfile = NULL;
 
-  SDL_PauseAudioDevice(devid, 0);
-
   const double frametime = calcframetime(dcfg.framerate);
 
   delta = frametime;
   begin = now();
-  while (loopstat == RUN) {
+  while (state.loopstat == ON) {
     while (SDL_PollEvent(&ev) != 0) {
       switch (ev.type) {
       case SDL_QUIT:
-        loopstat = STOP;
+        state.loopstat = OFF;
         break;
       case SDL_KEYDOWN:
-        keydown(&ev.key, &loopstat);
+        keydown(&ev.key, &state);
         break;
       }
     }
@@ -369,15 +384,13 @@ int main(int argc, char *argv[]) {
     begin = end;
   }
 
-  SDL_PauseAudioDevice(devid, 1);
-
   ret = EXIT_SUCCESS;
 out3:
   SDL_DestroyTexture(texture);
 out2:
   finishwin(&win);
 out1:
-  SDL_CloseAudioDevice(devid);
+  SDL_CloseAudioDevice(state.audiodev);
 out0:
   SDL_Quit();
   return ret;
