@@ -237,6 +237,7 @@ static double calcdelta(uint64_t begin, uint64_t end) {
   extern const double second;
   extern uint64_t pfreq;
   assert(pfreq > 0);
+  assert(begin <= end);
   const double delta_ticks = (double)(end - begin);
   return (delta_ticks * second) / (double)pfreq;
 }

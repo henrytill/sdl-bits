@@ -10,7 +10,7 @@ extern const uint32_t LCS_WINDOWS_COLOR_SPACE;
 
 #pragma pack(push, 1)
 
-enum Headersz {
+enum HeaderSize {
   BITMAPCOREHEADER = 12,
   OS22XBITMAPHEADER = 64,
   BITMAPINFOHEADER = 40,

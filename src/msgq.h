@@ -1,7 +1,7 @@
 #ifndef SDL_BITS_MSGQ_H
 #define SDL_BITS_MSGQ_H
 
-#include <stdlib.h>
+#include <stdint.h>
 
 enum {
   MSGQ_FAILURE_MALLOC = -1,

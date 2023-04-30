@@ -10,6 +10,7 @@
  * @see msgq_get()
  * @see msgq_destroy()
  */
+#include <stdint.h>
 #include <stdio.h>
 
 #include <SDL.h>

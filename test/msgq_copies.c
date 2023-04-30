@@ -8,6 +8,7 @@
  * @see msgq_put()
  * @see msgq_get()
  */
+#include <stdint.h>
 #include <stdio.h>
 
 #include <SDL.h>
