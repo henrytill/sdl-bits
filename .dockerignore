@@ -3,9 +3,7 @@
 /.github/
 /.vscode/
 /build/
+/misc/
 .dir-locals.el
 .dockerignore
 Dockerfile
-docker-build
-docker-run
-pulseaudio.client.conf
