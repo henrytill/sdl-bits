@@ -319,7 +319,9 @@ int main(int argc, char *argv[]) {
 
   SDL_PauseAudioDevice(devid, 0);
 
-  delta = calcframetime(dcfg.framerate);
+  const float frametime = calcframetime(dcfg.framerate);
+
+  delta = frametime;
   begin = now();
   while (loopstat == RUN) {
     while (SDL_PollEvent(&ev) != 0) {
@@ -347,7 +349,7 @@ int main(int argc, char *argv[]) {
     }
     SDL_RenderPresent(win.renderer);
 
-    delay(delta, begin);
+    delay(frametime, begin);
     end = now();
     delta = calcdelta(begin, end);
     begin = end;
