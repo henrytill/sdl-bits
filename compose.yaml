@@ -14,6 +14,9 @@ services:
       - ./pulseaudio.client.conf:/etc/pulse/client.conf:ro
       - /etc/machine-id:/etc/machine-id:ro
     user: 1000:1000
+    cap_add:
+      - SYS_NICE
+      - SYS_RESOURCE
     working_dir: /home/build/sdl-bits
     command: ./build/src/main
 
