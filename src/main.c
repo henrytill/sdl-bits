@@ -160,8 +160,7 @@ void calcsine(void *userdata, uint8_t *stream, int len) {
   struct AudioState *as = (struct AudioState *)userdata;
   float *fstream = (float *)stream;
 
-  assert((len / 8) == as->buffsize);
-
+  assert((len / (4 * 2)) == as->buffsize);
   const double samplerate = (double)as->samplerate;
   const uint64_t buffsize = (uint64_t)as->buffsize;
 
@@ -171,7 +170,6 @@ void calcsine(void *userdata, uint8_t *stream, int len) {
     fstream[2 * i + 0] = (float)(as->volume * sin(x));
     fstream[2 * i + 1] = (float)(as->volume * sin(x));
   }
-
   as->offset += 1;
 }
 
