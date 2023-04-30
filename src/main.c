@@ -301,16 +301,21 @@ int main(int argc, char *argv[]) {
   surface = SDL_LoadBMP(bmpfile);
   if (surface == NULL) {
     logsdlerr("SDL_LoadBMP failed");
-    goto out3;
+    free(bmpfile);
+    goto out2;
   }
 
   texture = SDL_CreateTextureFromSurface(win.renderer, surface);
   if (texture == NULL) {
     logsdlerr("SDL_CreateTextureFromSurface failed");
-    goto out4;
+    SDL_FreeSurface(surface);
+    free(bmpfile);
+    goto out2;
   }
   SDL_FreeSurface(surface);
+  free(bmpfile);
   surface = NULL;
+  bmpfile = NULL;
 
   SDL_PauseAudioDevice(devid, 0);
 
@@ -333,12 +338,12 @@ int main(int argc, char *argv[]) {
     rc = SDL_RenderClear(win.renderer);
     if (rc != SUCCESS) {
       logsdlerr("SDL_RenderClear failed");
-      goto out5;
+      goto out3;
     }
     rc = SDL_RenderCopy(win.renderer, texture, NULL, &winrect);
     if (rc != SUCCESS) {
       logsdlerr("SDL_RenderCopy failed");
-      goto out5;
+      goto out3;
     }
     SDL_RenderPresent(win.renderer);
 
@@ -351,12 +356,8 @@ int main(int argc, char *argv[]) {
   SDL_PauseAudioDevice(devid, 1);
 
   ret = EXIT_SUCCESS;
-out5:
-  SDL_DestroyTexture(texture);
-out4:
-  SDL_FreeSurface(surface);
 out3:
-  free(bmpfile);
+  SDL_DestroyTexture(texture);
 out2:
   finishwin(&win);
 out1:
