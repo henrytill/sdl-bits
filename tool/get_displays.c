@@ -2,7 +2,7 @@
 
 enum {
   SUCCESS = 0,
-  FAILURE = 1,
+  FAILURE = -1,
 };
 
 static int enumdisp(void) {
