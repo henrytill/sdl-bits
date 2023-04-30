@@ -140,16 +140,22 @@ static int loadcfg(const char *f, struct Config *cfg) {
   }
   lua_getglobal(state, "width");
   lua_getglobal(state, "height");
-  if (!lua_isnumber(state, -2)) {
+  lua_getglobal(state, "framerate");
+  if (!lua_isnumber(state, -3)) {
     SDL_LogError(ERR, "%s: width is not a number", __func__);
     goto out;
   }
-  if (!lua_isnumber(state, -1)) {
+  if (!lua_isnumber(state, -2)) {
     SDL_LogError(ERR, "%s: height is not a number", __func__);
     goto out;
   }
-  cfg->width = (int)lua_tonumber(state, -2);
-  cfg->height = (int)lua_tonumber(state, -1);
+  if (!lua_isnumber(state, -1)) {
+    SDL_LogError(ERR, "%s: framerate is not a number", __func__);
+    goto out;
+  }
+  cfg->width = (int)lua_tonumber(state, -3);
+  cfg->height = (int)lua_tonumber(state, -2);
+  cfg->framerate = (int)lua_tonumber(state, -1);
   ret = SUCCESS;
 out:
   lua_close(state);
