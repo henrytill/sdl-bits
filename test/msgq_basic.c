@@ -1,7 +1,7 @@
 /**
  * Test basic message queue functionality.
  *
- * The producer thread produces messages with values from 0 to COUNT.
+ * The producer thread produces messages with values from 0 to count.
  * The consumer consumes messages on the main thread until it receives a
  * message with tag NONE.
  *
@@ -31,10 +31,10 @@ enum LogCategory {
 };
 
 /** Maximum value to produce. */
-static const int COUNT = 100;
+static const int count = 100;
 
 /** Capacity of the MessageQueue. */
-static const uint32_t QCAP = 4;
+static const uint32_t qcap = 4;
 
 /** MessageQueue for testing. */
 static struct MessageQueue q;
@@ -45,6 +45,7 @@ static struct MessageQueue q;
  * @see msgq_finish()
  */
 static void qfinish(void) {
+  extern struct MessageQueue q;
   msgq_finish(&q);
 }
 
@@ -71,7 +72,7 @@ static void sdlfail(const char *msg) {
 }
 
 /**
- * Produce messages with values from 0 to COUNT. The last message has
+ * Produce messages with values from 0 to count. The last message has
  * tag NONE.
  *
  * This function is meant to be run in its own thread by passing it to SDL_CreateThread().
@@ -81,6 +82,7 @@ static void sdlfail(const char *msg) {
  * @see consume()
  */
 static int produce(void *data) {
+  extern const int count;
   int rc;
   struct Message msg;
   enum MessageTag tag;
@@ -91,8 +93,8 @@ static int produce(void *data) {
 
   struct MessageQueue *queue = (struct MessageQueue *)data;
 
-  for (intptr_t value = 0; value <= COUNT;) {
-    tag = (value < COUNT) ? SOME : NONE;
+  for (intptr_t value = 0; value <= count;) {
+    tag = (value < count) ? SOME : NONE;
     tagstr = msgq_tagstr(tag);
 
     msg.tag = tag;
@@ -138,6 +140,9 @@ static int consume(struct MessageQueue *queue) {
  * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
  */
 int main(int argc, char *argv[]) {
+  extern struct MessageQueue q;
+  extern const uint32_t qcap;
+
   int rc;
   SDL_Thread *producer;
 
@@ -152,7 +157,7 @@ int main(int argc, char *argv[]) {
 
   ATEXIT(SDL_Quit);
 
-  rc = msgq_init(&q, QCAP);
+  rc = msgq_init(&q, qcap);
   if (rc < 0)
     qfail(rc, "msgq_init failed");
 

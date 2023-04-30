@@ -45,10 +45,10 @@ enum LogCategory {
 };
 
 /** Delay before consuming messages. */
-static const uint32_t DELAY = 2000U;
+static const uint32_t delay = 2000U;
 
 /** Capacity of the MessageQueue. */
-static const uint32_t QCAP = 1U;
+static const uint32_t qcap = 1U;
 
 /** MessageQueue for testing. */
 static struct MessageQueue q;
@@ -59,6 +59,7 @@ static struct MessageQueue q;
  * @see msgq_finish()
  */
 static void qfinish(void) {
+  extern struct MessageQueue q;
   msgq_finish(&q);
 }
 
@@ -131,12 +132,13 @@ static int produce(void *data) {
  * @see produce()
  */
 static int consume(struct MessageQueue *queue) {
+  extern const uint32_t delay;
   struct Message a;
   struct Message b;
   struct Message c;
 
-  SDL_LogInfo(APP, "%s: pausing for %d...", __func__, DELAY);
-  SDL_Delay(DELAY);
+  SDL_LogInfo(APP, "%s: pausing for %d...", __func__, delay);
+  SDL_Delay(delay);
 
   msgq_get(queue, (void *)&a);
   LOGMSG(a);
@@ -160,6 +162,9 @@ static int consume(struct MessageQueue *queue) {
  * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
  */
 int main(int argc, char *argv[]) {
+  extern struct MessageQueue q;
+  extern const uint32_t qcap;
+
   int rc;
   SDL_Thread *producer;
 
@@ -174,7 +179,7 @@ int main(int argc, char *argv[]) {
 
   ATEXIT(SDL_Quit);
 
-  rc = msgq_init(&q, QCAP);
+  rc = msgq_init(&q, qcap);
   if (rc != 0)
     qfail(rc, "msgq_init failed");
 

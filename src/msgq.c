@@ -9,6 +9,7 @@ static const char *const tagstr[] = {
 };
 
 const char *msgq_tagstr(int tag) {
+  extern const char *const tagstr[];
   if (tag > QUIT || tag < NONE) {
     return NULL;
   }
@@ -27,6 +28,7 @@ static const char *const errorstr[] = {
 };
 
 const char *msgq_errorstr(int rc) {
+  extern const char *const errorstr[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
   }

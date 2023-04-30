@@ -65,7 +65,7 @@ struct Window {
   SDL_Renderer *renderer;
 };
 
-static const double SECOND = 1000.0;
+static const double second = 1000.0;
 
 static const uint32_t wtypeflags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
@@ -180,14 +180,17 @@ void calcsine(void *userdata, uint8_t *stream, int len) {
 }
 
 static double calcframetime(int fps) {
+  extern const double second;
   assert(fps > 0);
-  return SECOND / (double)fps;
+  return second / (double)fps;
 }
 
 static double calcdelta(uint64_t begin, uint64_t end) {
+  extern const double second;
+  extern uint64_t pfreq;
   assert(pfreq > 0);
   const double delta_ticks = (double)(end - begin);
-  return (delta_ticks * SECOND) / (double)pfreq;
+  return (delta_ticks * second) / (double)pfreq;
 }
 
 static void delay(double frametime, uint64_t begin) {
@@ -198,6 +201,8 @@ static void delay(double frametime, uint64_t begin) {
 }
 
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
+  extern const char *const wtypestr[];
+  extern const uint32_t wtypeflags[];
   SDL_LogInfo(APP, "Window type: %s", wtypestr[cfg->wtype]);
   win->window = SDL_CreateWindow(title,
                                  cfg->x, cfg->y,
@@ -246,6 +251,11 @@ static void update(double delta) {
 }
 
 int main(int argc, char *argv[]) {
+  extern uint64_t pfreq;
+  extern struct Args dargs;
+  extern struct Config dcfg;
+  extern struct AudioState as;
+
   int ret = EXIT_FAILURE;
   int rc;
   enum Loopstat loopstat = RUN;
