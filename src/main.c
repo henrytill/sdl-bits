@@ -24,11 +24,6 @@ enum {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
-enum Toggle {
-  OFF = 0,
-  ON = 1,
-};
-
 struct Args {
   char *cfgfile;
 };
@@ -58,8 +53,8 @@ struct AudioState {
 struct State {
   SDL_AudioDeviceID audiodev;
   struct AudioState audio;
-  enum Toggle loopstat;
-  enum Toggle pauseaudio;
+  int loopstat;
+  int pauseaudio;
 };
 
 struct Window {
@@ -104,8 +99,8 @@ static struct State state = {
     .frequency = 440.0,
     .offset = 0,
   },
-  .loopstat = ON,
-  .pauseaudio = ON,
+  .loopstat = 1,
+  .pauseaudio = 1,
 };
 
 static void logsdlerr(char *msg) {
@@ -248,13 +243,13 @@ static int getrect(struct Window *win, SDL_Rect *rect) {
 static void keydown(SDL_KeyboardEvent *key, struct State *state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
-    state->loopstat = OFF;
+    state->loopstat = 0;
     break;
   case SDLK_F1:
-    state->pauseaudio = (state->pauseaudio == ON) ? OFF : ON;
+    state->pauseaudio = (state->pauseaudio == 1) ? 0 : 1;
     SDL_LogInfo(APP, "PauseAudioDevice(%d)", state->pauseaudio);
     SDL_PauseAudioDevice(state->audiodev, state->pauseaudio);
-    if (state->pauseaudio == ON) {
+    if (state->pauseaudio == 1) {
       state->audio.offset = 0;
     }
     break;
@@ -350,11 +345,11 @@ int main(int argc, char *argv[]) {
 
   delta = frametime;
   begin = now();
-  while (state.loopstat == ON) {
+  while (state.loopstat == 1) {
     while (SDL_PollEvent(&ev) != 0) {
       switch (ev.type) {
       case SDL_QUIT:
-        state.loopstat = OFF;
+        state.loopstat = 0;
         break;
       case SDL_KEYDOWN:
         keydown(&ev.key, &state);
