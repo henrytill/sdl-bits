@@ -119,7 +119,7 @@ static void parseargs(int argc, char *argv[], struct Args *args) {
   }
 }
 
-static char *allocpath(const char *a, const char *b) {
+static char *joinpath(const char *a, const char *b) {
   size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
   char *ret = calloc(++n, sizeof(char)); /* incr for terminator */
   if (ret != NULL) snprintf(ret, n, "%s/%s", a, b);
@@ -317,7 +317,7 @@ int main(int argc, char *argv[]) {
 
   /* create texture from testbmp */
   {
-    bmpfile = allocpath(config.assetdir, testbmp);
+    bmpfile = joinpath(config.assetdir, testbmp);
     if (bmpfile == NULL)
       goto out2;
 
