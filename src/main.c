@@ -164,7 +164,7 @@ out:
   return ret;
 }
 
-void calcsine(void *userdata, uint8_t *stream, int len) {
+static void calcsine(void *userdata, uint8_t *stream, int len) {
   struct AudioState *as = (struct AudioState *)userdata;
   float *fstream = (float *)stream;
 
