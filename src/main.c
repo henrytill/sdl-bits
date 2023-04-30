@@ -325,28 +325,31 @@ int main(int argc, char *argv[]) {
   if (rc != SUCCESS)
     goto out2;
 
-  bmpfile = allocpath(dcfg.assetdir, testbmp);
-  if (bmpfile == NULL)
-    goto out2;
+  /* create texture from testbmp */
+  {
+    bmpfile = allocpath(dcfg.assetdir, testbmp);
+    if (bmpfile == NULL)
+      goto out2;
 
-  surface = SDL_LoadBMP(bmpfile);
-  if (surface == NULL) {
-    logsdlerr("SDL_LoadBMP failed");
-    free(bmpfile);
-    goto out2;
-  }
+    surface = SDL_LoadBMP(bmpfile);
+    if (surface == NULL) {
+      logsdlerr("SDL_LoadBMP failed");
+      free(bmpfile);
+      goto out2;
+    }
 
-  texture = SDL_CreateTextureFromSurface(win.renderer, surface);
-  if (texture == NULL) {
-    logsdlerr("SDL_CreateTextureFromSurface failed");
+    texture = SDL_CreateTextureFromSurface(win.renderer, surface);
+    if (texture == NULL) {
+      logsdlerr("SDL_CreateTextureFromSurface failed");
+      SDL_FreeSurface(surface);
+      free(bmpfile);
+      goto out2;
+    }
     SDL_FreeSurface(surface);
     free(bmpfile);
-    goto out2;
+    surface = NULL;
+    bmpfile = NULL;
   }
-  SDL_FreeSurface(surface);
-  free(bmpfile);
-  surface = NULL;
-  bmpfile = NULL;
 
   const double frametime = calcframetime(dcfg.framerate);
 
