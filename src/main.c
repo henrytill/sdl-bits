@@ -65,7 +65,7 @@ struct Window {
   SDL_Renderer *renderer;
 };
 
-static const float SECOND = 1000.0f;
+static const double SECOND = 1000.0;
 
 static const uint32_t wtypeflags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
@@ -175,20 +175,20 @@ void calcsine(void *userdata, uint8_t *stream, int len) {
   as->offset += 1;
 }
 
-static float calcframetime(int fps) {
+static double calcframetime(int fps) {
   assert(fps > 0);
-  return SECOND / (float)fps;
+  return SECOND / (double)fps;
 }
 
-static float calcdelta(uint64_t begin, uint64_t end) {
+static double calcdelta(uint64_t begin, uint64_t end) {
   assert(pfreq > 0);
-  const float delta_ticks = (float)(end - begin);
-  return (delta_ticks * SECOND) / (float)pfreq;
+  const double delta_ticks = (double)(end - begin);
+  return (delta_ticks * SECOND) / (double)pfreq;
 }
 
-static void delay(float frametime, uint64_t begin) {
+static void delay(double frametime, uint64_t begin) {
   if (calcdelta(begin, now()) >= frametime) return;
-  const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0f);
+  const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0);
   if (delay > 0) SDL_Delay(delay);
   while (calcdelta(begin, now()) < frametime) continue;
 }
@@ -237,7 +237,7 @@ static void keydown(SDL_KeyboardEvent *key, enum Loopstat *loopstat) {
   }
 }
 
-static void update(float delta) {
+static void update(double delta) {
   (void)delta;
 }
 
@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
   const char *const testbmp = "test.bmp";
   char *bmpfile;
   uint64_t begin, end;
-  float delta;
+  double delta;
 
   (void)argc;
   (void)argv;
@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 
   SDL_PauseAudioDevice(devid, 0);
 
-  const float frametime = calcframetime(dcfg.framerate);
+  const double frametime = calcframetime(dcfg.framerate);
 
   delta = frametime;
   begin = now();
