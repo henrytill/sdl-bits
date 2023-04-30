@@ -88,9 +88,9 @@ static const char *const wtypestr[] = {
 
 static uint64_t pfreq = 0;
 
-static struct Args dargs = {.cfgfile = "config.lua"};
+static struct Args args = {.cfgfile = "config.lua"};
 
-static struct Config dcfg = {
+static struct Config config = {
   .wtype = WINDOWED,
   .x = CENTERED,
   .y = CENTERED,
@@ -272,8 +272,8 @@ static void update(double delta) {
 
 int main(int argc, char *argv[]) {
   extern uint64_t pfreq;
-  extern struct Args dargs;
-  extern struct Config dcfg;
+  extern struct Args args;
+  extern struct Config config;
   extern struct State state;
 
   int ret = EXIT_FAILURE;
@@ -294,8 +294,8 @@ int main(int argc, char *argv[]) {
   (void)argv;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-  parseargs(argc, argv, &dargs);
-  loadcfg(dargs.cfgfile, &dcfg);
+  parseargs(argc, argv, &args);
+  loadcfg(args.cfgfile, &config);
 
   rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != SUCCESS) {
@@ -317,7 +317,7 @@ int main(int argc, char *argv[]) {
     goto out0;
   }
 
-  rc = initwin(&dcfg, wintitle, &win);
+  rc = initwin(&config, wintitle, &win);
   if (rc != SUCCESS)
     goto out1;
 
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
 
   /* create texture from testbmp */
   {
-    bmpfile = allocpath(dcfg.assetdir, testbmp);
+    bmpfile = allocpath(config.assetdir, testbmp);
     if (bmpfile == NULL)
       goto out2;
 
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
     bmpfile = NULL;
   }
 
-  const double frametime = calcframetime(dcfg.framerate);
+  const double frametime = calcframetime(config.framerate);
 
   delta = frametime;
   begin = now();
