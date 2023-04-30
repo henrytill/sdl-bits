@@ -1,0 +1,58 @@
+name: CMake Windows
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        include:
+          - { sys: mingw64, env: x86_64 }
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.sys}}
+          install: >-
+            mingw-w64-${{matrix.env}}-toolchain
+            mingw-w64-${{matrix.env}}-ninja
+            mingw-w64-${{matrix.env}}-cmake
+            mingw-w64-${{matrix.env}}-SDL2
+            mingw-w64-${{matrix.env}}-freetype
+
+      - name: Check MSYSTEM
+        run: echo $MSYSTEM
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -GNinja
+
+      - name: Build
+        working-directory: ${{github.workspace}}\build
+        run: ninja -j0
+
+      - name: Test
+        working-directory: ${{github.workspace}}\build
+        run: ctest -C ${{env.BUILD_TYPE}}
