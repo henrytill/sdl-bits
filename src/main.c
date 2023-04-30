@@ -16,11 +16,6 @@
 #define now SDL_GetPerformanceCounter
 
 enum {
-  SUCCESS = 0,
-  FAILURE = -1
-};
-
-enum {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,
 };
@@ -137,7 +132,7 @@ static char *allocpath(const char *a, const char *b) {
 }
 
 static int loadcfg(const char *f, struct Config *cfg) {
-  int ret = FAILURE;
+  int ret = -1;
 
   lua_State *state = luaL_newstate();
   if (state == NULL) {
@@ -168,7 +163,7 @@ static int loadcfg(const char *f, struct Config *cfg) {
   cfg->width = (int)lua_tonumber(state, -3);
   cfg->height = (int)lua_tonumber(state, -2);
   cfg->framerate = (int)lua_tonumber(state, -1);
-  ret = SUCCESS;
+  ret = 0;
 out:
   lua_close(state);
   return ret;
@@ -222,15 +217,15 @@ static int initwin(struct Config *cfg, const char *title, struct Window *win) {
                                  wtypeflags[cfg->wtype]);
   if (win->window == NULL) {
     logsdlerr("SDL_CreateWindow failed");
-    return FAILURE;
+    return -1;
   }
   win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
   if (win->renderer == NULL) {
     logsdlerr("SDL_CreateRenderer failed");
-    return FAILURE;
+    return -1;
   }
   SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
-  return SUCCESS;
+  return 0;
 }
 
 static void finishwin(struct Window *win) {
@@ -241,13 +236,13 @@ static void finishwin(struct Window *win) {
 
 static int getrect(struct Window *win, SDL_Rect *rect) {
   if (win == NULL || win->renderer == NULL)
-    return FAILURE;
+    return -1;
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
-  if (rc != SUCCESS) {
+  if (rc != 0) {
     logsdlerr("SDL_GetRendererOutputSize failed");
-    return FAILURE;
+    return -1;
   }
-  return SUCCESS;
+  return 0;
 }
 
 static void keydown(SDL_KeyboardEvent *key, struct State *state) {
@@ -298,7 +293,7 @@ int main(int argc, char *argv[]) {
   loadcfg(args.cfgfile, &config);
 
   rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-  if (rc != SUCCESS) {
+  if (rc != 0) {
     logsdlerr("SDL_Init failed");
     return EXIT_FAILURE;
   }
@@ -318,11 +313,11 @@ int main(int argc, char *argv[]) {
   }
 
   rc = initwin(&config, wintitle, &win);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out1;
 
   rc = getrect(&win, &winrect);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out2;
 
   /* create texture from testbmp */
@@ -370,12 +365,12 @@ int main(int argc, char *argv[]) {
     update(delta);
 
     rc = SDL_RenderClear(win.renderer);
-    if (rc != SUCCESS) {
+    if (rc != 0) {
       logsdlerr("SDL_RenderClear failed");
       goto out3;
     }
     rc = SDL_RenderCopy(win.renderer, texture, NULL, &winrect);
-    if (rc != SUCCESS) {
+    if (rc != 0) {
       logsdlerr("SDL_RenderCopy failed");
       goto out3;
     }

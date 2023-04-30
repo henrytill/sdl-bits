@@ -2,8 +2,6 @@
 
 #include "bmp.h"
 
-enum { SUCCESS = 0 };
-
 enum {
   WIDTH = 4,
   HEIGHT = 2,
@@ -29,5 +27,5 @@ int main(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
-  return (bmp_v4write(buf, WIDTH, HEIGHT, bmpfile) == SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return (bmp_v4write(buf, WIDTH, HEIGHT, bmpfile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

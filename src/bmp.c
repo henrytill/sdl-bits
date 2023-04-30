@@ -5,11 +5,6 @@
 #include "bmp.h"
 
 enum {
-  SUCCESS = 0,
-  FAILURE = -1,
-};
-
-enum {
   DWORDBITS = 32,
   DWORDBYTES = 4,
 };
@@ -25,7 +20,7 @@ size_t bmp_rowsize(uint16_t bpp, int32_t width) {
 
 int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
              struct bmp_Infohdr *infohdr, char **image) {
-  int ret = FAILURE;
+  int ret = -1;
   int rc;
   size_t reads;
   FILE *fp = NULL;
@@ -41,7 +36,7 @@ int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
 
   rc = fgetpos(fp, &pos);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out;
 
   reads = fread(&size, sizeof(size), 1, fp);
@@ -51,7 +46,7 @@ int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
 
   rc = fsetpos(fp, &pos);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out;
 
   reads = fread(infohdr, sizeof(*infohdr), 1, fp);
@@ -69,7 +64,7 @@ int bmp_read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
   }
 
-  ret = SUCCESS;
+  ret = 0;
 out:
   fclose(fp);
   return ret;
@@ -77,7 +72,7 @@ out:
 
 int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
                struct bmp_V4hdr *v4hdr, char **image) {
-  int ret = FAILURE;
+  int ret = -1;
   int rc;
   size_t reads;
   FILE *fp = NULL;
@@ -93,7 +88,7 @@ int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
 
   rc = fgetpos(fp, &pos);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out;
 
   reads = fread(&size, sizeof(size), 1, fp);
@@ -103,7 +98,7 @@ int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
 
   rc = fsetpos(fp, &pos);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out;
 
   reads = fread(v4hdr, sizeof(*v4hdr), 1, fp);
@@ -121,7 +116,7 @@ int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr,
     goto out;
   }
 
-  ret = SUCCESS;
+  ret = 0;
 out:
   fclose(fp);
   return ret;
@@ -130,7 +125,7 @@ out:
 int bmp_v4write(const struct bmp_Pixel32 *buf,
                 size_t width, size_t height,
                 const char *file) {
-  int ret = FAILURE;
+  int ret = -1;
   size_t writes;
   FILE *fp = NULL;
 
@@ -196,7 +191,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buf,
   if (writes != 1)
     goto out;
 
-  ret = SUCCESS;
+  ret = 0;
 out:
   fclose(fp);
   return ret;

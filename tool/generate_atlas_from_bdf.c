@@ -8,8 +8,6 @@
 
 #include "bmp.h"
 
-enum { SUCCESS = 0 };
-
 enum {
   WIDTH = 10,
   HEIGHT = 20,
@@ -117,33 +115,33 @@ int main(int argc, char *argv[]) {
   }
 
   rc = FT_Init_FreeType(&ftlib);
-  if (rc != SUCCESS) {
+  if (rc != 0) {
     fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
     goto out0;
   }
 
   rc = FT_New_Face(ftlib, fontfile, 0, &face);
-  if (rc != SUCCESS) {
+  if (rc != 0) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
     goto out1;
   }
 
   rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
-  if (rc != SUCCESS) {
+  if (rc != 0) {
     fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     goto out1;
   }
 
   for (size_t i = 0; i < CODESZ; ++i) {
     rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
-    if (rc != SUCCESS) {
+    if (rc != 0) {
       fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
       goto out1;
     }
     slot = face->glyph;
 
     rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
-    if (rc != SUCCESS) {
+    if (rc != 0) {
       fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
       goto out1;
     }
@@ -170,7 +168,7 @@ int main(int argc, char *argv[]) {
       buf[i] = image[y][x] ? black : white;
 
   rc = bmp_v4write(buf, width, height, bmpfile);
-  if (rc != SUCCESS)
+  if (rc != 0)
     goto out3;
 
   ret = EXIT_SUCCESS;
