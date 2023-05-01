@@ -42,7 +42,7 @@ struct MessageQueue {
  * @param tag A message tag.
  * @return The tag string associated with the given tag, or NULL if the tag is invalid.
  */
-const char *msgq_tagstr(int tag);
+const char *msgq_tagstr(enum MessageTag tag);
 
 /**
  * Returns the error message associated with a return code.

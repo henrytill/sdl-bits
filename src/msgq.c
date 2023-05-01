@@ -8,7 +8,7 @@ static const char *const tagstr[] = {
   [QUIT >> 1] = "QUIT",
 };
 
-const char *msgq_tagstr(int tag) {
+const char *msgq_tagstr(enum MessageTag tag) {
   extern const char *const tagstr[];
   if (tag > QUIT || tag < NONE) {
     return NULL;
