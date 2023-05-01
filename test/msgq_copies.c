@@ -8,6 +8,7 @@
  * @see msgq_put()
  * @see msgq_get()
  */
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -23,20 +24,22 @@
     }                                                \
   } while (0)
 
-#define LOGMSG(msg)                                     \
-  do {                                                  \
-    SDL_LogInfo(APP, "%s: %s{%s, %ld}", __func__, #msg, \
-                msgq_tagstr(msg.tag), msg.value);       \
+#define LOGMSG(msg)                               \
+  do {                                            \
+    SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",  \
+                __func__, #msg,                   \
+                msgq_tagstr(msg.tag), msg.value); \
   } while (0)
 
-#define CHECKMSG(msg, extag, exvalue)                                   \
-  do {                                                                  \
-    if (msg.tag != extag || msg.value != exvalue) {                     \
-      SDL_LogError(ERR, "%s: %s{%s, %ld} != {%s, %ld}", __func__, #msg, \
-                   msgq_tagstr(msg.tag), msg.value,                     \
-                   msgq_tagstr(extag), exvalue);                        \
-      exit(EXIT_FAILURE);                                               \
-    }                                                                   \
+#define CHECKMSG(msg, extag, exvalue)                            \
+  do {                                                           \
+    if (msg.tag != extag || msg.value != exvalue) {              \
+      SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
+                   __func__, #msg,                               \
+                   msgq_tagstr(msg.tag), msg.value,              \
+                   msgq_tagstr(extag), exvalue);                 \
+      exit(EXIT_FAILURE);                                        \
+    }                                                            \
   } while (0);
 
 /** Log categories to use with SDL logging functions. */

@@ -10,6 +10,7 @@
  * @see msgq_get()
  * @see msgq_destroy()
  */
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -105,10 +106,12 @@ static int produce(void *data) {
     if (rc < 0) {
       qfail(rc, "msgq_put failed");
     } else if (rc == 1) {
-      SDL_LogDebug(APP, "produce {%s, %ld} blocked: retrying", tagstr, value);
+      SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
+                   tagstr, value);
       continue;
     } else {
-      SDL_LogInfo(APP, "Produced {%s, %ld}", tagstr, value);
+      SDL_LogInfo(APP, "Produced {%s, %" PRIdPTR "}",
+                  tagstr, value);
       value += 1;
     }
   }
@@ -132,7 +135,8 @@ static int consume(struct MessageQueue *queue) {
   if (rc < 0)
     qfail(rc, "msgq_get failed");
 
-  SDL_LogInfo(APP, "Consumed {%s, %ld}", msgq_tagstr(msg.tag), msg.value);
+  SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
+              msgq_tagstr(msg.tag), msg.value);
 
   return msg.tag != NONE;
 }
