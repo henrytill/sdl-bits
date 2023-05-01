@@ -48,7 +48,7 @@ jobs:
       - name: Configure CMake
         run: |
           mkdir build
-          cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -GNinja
+          cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -GNinja -DBUILD_SHARED_LIBS=ON
 
       - name: Build
         working-directory: ${{github.workspace}}\build
