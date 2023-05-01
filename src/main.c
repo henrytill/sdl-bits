@@ -6,12 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-#include <SDL_audio.h>
-
-#include "lauxlib.h"
-#include "lua.h"
-#include "lualib.h"
+#include "prelude.h"
 
 #define now SDL_GetPerformanceCounter
 
@@ -153,41 +148,36 @@ static char *joinpath(const char *a, const char *b) {
  * @return 0 on success, -1 on failure
  */
 static int loadcfg(const char *f, struct Config *cfg) {
-  int ret = -1;
-
-  lua_State *state = luaL_newstate();
+  _cleanup_lua_State_ lua_State *state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
-    return ret;
+    return -1;
   }
   luaL_openlibs(state);
   if (luaL_loadfile(state, f) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
     SDL_LogError(ERR, "%s: failed to load %s, %s", __func__,
                  f, lua_tostring(state, -1));
-    goto out;
+    return -1;
   }
   lua_getglobal(state, "width");
   lua_getglobal(state, "height");
   lua_getglobal(state, "framerate");
   if (!lua_isnumber(state, -3)) {
     SDL_LogError(ERR, "%s: width is not a number", __func__);
-    goto out;
+    return -1;
   }
   if (!lua_isnumber(state, -2)) {
     SDL_LogError(ERR, "%s: height is not a number", __func__);
-    goto out;
+    return -1;
   }
   if (!lua_isnumber(state, -1)) {
     SDL_LogError(ERR, "%s: framerate is not a number", __func__);
-    goto out;
+    return -1;
   }
   cfg->width = (int)lua_tonumber(state, -3);
   cfg->height = (int)lua_tonumber(state, -2);
   cfg->framerate = (int)lua_tonumber(state, -1);
-  ret = 0;
-out:
-  lua_close(state);
-  return ret;
+  return 0;
 }
 
 /**
@@ -277,6 +267,7 @@ static int initwin(struct Config *cfg, const char *title, struct Window *win) {
   }
   win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
   if (win->renderer == NULL) {
+    SDL_DestroyWindow(win->window);
     logsdlerr("SDL_CreateRenderer failed");
     return -1;
   }
@@ -294,6 +285,40 @@ static void finishwin(struct Window *win) {
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
 }
+
+/**
+ * Create a window and renderer.
+ *
+ * @param cfg The configuration.
+ * @param title The window title.
+ * @return The window on success, NULL on failure.
+ */
+static struct Window *createwin(struct Config *cfg, const char *title) {
+  struct Window *win = malloc(sizeof(struct Window));
+  if (win == NULL) {
+    SDL_LogError(ERR, "%s: malloc failed", __func__);
+    return NULL;
+  }
+  if (initwin(cfg, title, win) != 0) {
+    free(win);
+    return NULL;
+  }
+  return win;
+}
+
+/**
+ * Destroy a window and renderer.
+ *
+ * @param win The window to destroy.
+ */
+static void destroywin(struct Window *win) {
+  if (win == NULL) return;
+  finishwin(win);
+  free(win);
+}
+
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroywin);
+#define _cleanup_Window_ _cleanup_(destroywinp)
 
 /**
  * Get the window's rectangle.
@@ -345,17 +370,12 @@ int main(int argc, char *argv[]) {
   extern struct Config config;
   extern struct State state;
 
-  int ret = EXIT_FAILURE;
   int rc;
-  struct Window win = {NULL, NULL};
   SDL_AudioSpec want, have;
   SDL_Rect winrect = {0, 0, 0, 0};
-  SDL_Surface *surface = NULL;
-  SDL_Texture *texture = NULL;
   SDL_Event ev;
   const char *const wintitle = "Hello, world!";
   const char *const testbmp = "test.bmp";
-  char *bmpfile;
   uint64_t begin, end;
   double delta;
 
@@ -368,9 +388,11 @@ int main(int argc, char *argv[]) {
 
   rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != 0) {
-    logsdlerr("SDL_Init failed");
+    logsdlerr("init failed");
     return EXIT_FAILURE;
   }
+
+  ATEXIT(SDL_Quit);
 
   pfreq = SDL_GetPerformanceFrequency();
 
@@ -380,45 +402,45 @@ int main(int argc, char *argv[]) {
   want.samples = state.audio.buffsize;
   want.callback = calcsine;
   want.userdata = (void *)&state.audio;
-  state.audiodev = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+
+  _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID devid = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+  state.audiodev = devid;
   if (state.audiodev < 2) {
     logsdlerr("SDL_OpenAudio failed");
-    goto out0;
+    return EXIT_FAILURE;
   }
 
-  rc = initwin(&config, wintitle, &win);
+  _cleanup_Window_ struct Window *win = createwin(&config, wintitle);
+  if (win == NULL)
+    return EXIT_FAILURE;
+
+  rc = getrect(win, &winrect);
   if (rc != 0)
-    goto out1;
+    return EXIT_FAILURE;
 
-  rc = getrect(&win, &winrect);
-  if (rc != 0)
-    goto out2;
+  _cleanup_str_ char *bmpfile = joinpath(config.assetdir, testbmp);
+  if (bmpfile == NULL)
+    return EXIT_FAILURE;
 
-  /* create texture from testbmp */
-  {
-    bmpfile = joinpath(config.assetdir, testbmp);
-    if (bmpfile == NULL)
-      goto out2;
-
-    surface = SDL_LoadBMP(bmpfile);
-    if (surface == NULL) {
-      logsdlerr("SDL_LoadBMP failed");
-      free(bmpfile);
-      goto out2;
-    }
-
-    texture = SDL_CreateTextureFromSurface(win.renderer, surface);
-    if (texture == NULL) {
-      logsdlerr("SDL_CreateTextureFromSurface failed");
-      SDL_FreeSurface(surface);
-      free(bmpfile);
-      goto out2;
-    }
-    SDL_FreeSurface(surface);
-    free(bmpfile);
-    surface = NULL;
-    bmpfile = NULL;
+  _cleanup_SDL_Surface_ SDL_Surface *surface = SDL_LoadBMP(bmpfile);
+  if (surface == NULL) {
+    logsdlerr("SDL_LoadBMP failed");
+    return EXIT_FAILURE;
   }
+
+  _cleanup_SDL_Texture_ SDL_Texture *texture = SDL_CreateTextureFromSurface(win->renderer, surface);
+  if (texture == NULL) {
+    logsdlerr("SDL_CreateTextureFromSurface failed");
+    return EXIT_FAILURE;
+  }
+
+  SDL_FreeSurface(surface);
+  assert(surface != NULL);
+  surface = NULL;
+
+  freestr(bmpfile);
+  assert(bmpfile != NULL);
+  bmpfile = NULL;
 
   const double frametime = calcframetime(config.framerate);
 
@@ -438,17 +460,17 @@ int main(int argc, char *argv[]) {
 
     update(delta);
 
-    rc = SDL_RenderClear(win.renderer);
+    rc = SDL_RenderClear(win->renderer);
     if (rc != 0) {
       logsdlerr("SDL_RenderClear failed");
-      goto out3;
+      return EXIT_FAILURE;
     }
-    rc = SDL_RenderCopy(win.renderer, texture, NULL, &winrect);
+    rc = SDL_RenderCopy(win->renderer, texture, NULL, &winrect);
     if (rc != 0) {
       logsdlerr("SDL_RenderCopy failed");
-      goto out3;
+      return EXIT_FAILURE;
     }
-    SDL_RenderPresent(win.renderer);
+    SDL_RenderPresent(win->renderer);
 
     delay(frametime, begin);
     end = now();
@@ -456,14 +478,5 @@ int main(int argc, char *argv[]) {
     begin = end;
   }
 
-  ret = EXIT_SUCCESS;
-out3:
-  SDL_DestroyTexture(texture);
-out2:
-  finishwin(&win);
-out1:
-  SDL_CloseAudioDevice(state.audiodev);
-out0:
-  SDL_Quit();
-  return ret;
+  return EXIT_SUCCESS;
 }
