@@ -21,6 +21,7 @@ jobs:
       matrix:
         include:
           - { sys: mingw64, env: x86_64 }
+          - { sys: clang64, env: clang-x86_64 }
 
     defaults:
       run:
