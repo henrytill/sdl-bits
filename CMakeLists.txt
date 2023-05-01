@@ -14,6 +14,15 @@ include(CTest)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(BuildType)
 include(Coverage)
+include(FeatureTest)
+
+test_has_attribute_cleanup()
+
+if(HAS_ATTRIBUTE_CLEANUP)
+  message(STATUS "Compiler supports __attribute__((cleanup(f)))")
+else()
+  message(FATAL_ERROR "Compiler does not support __attribute__((cleanup(f)))")
+endif()
 
 # https://stackoverflow.com/a/58711983
 string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
