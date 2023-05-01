@@ -45,14 +45,20 @@ int msgq_init(struct MessageQueue *q, uint32_t capacity) {
   q->rear = 0;
   q->empty = SDL_CreateSemaphore(capacity);
   if (q->empty == NULL) {
+    free(q->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
   q->full = SDL_CreateSemaphore(0);
   if (q->empty == NULL) {
+    SDL_DestroySemaphore(q->empty);
+    free(q->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
   q->lock = SDL_CreateMutex();
   if (q->lock == NULL) {
+    SDL_DestroySemaphore(q->full);
+    SDL_DestroySemaphore(q->empty);
+    free(q->buffer);
     return MSGQ_FAILURE_MUTEX_CREATE;
   }
   return 0;
