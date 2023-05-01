@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-enum {
+enum MessageQueueFailure {
   MSGQ_FAILURE_MALLOC = -1,
   MSGQ_FAILURE_SEM_CREATE = -2,
   MSGQ_FAILURE_SEM_POST = -3,
@@ -27,13 +27,13 @@ struct Message {
 
 /** A synchronous bounded message queue */
 struct MessageQueue {
-  struct Message *buffer; /* buffer to hold messages */
-  uint32_t capacity;      /* maximum size of the buffer */
-  size_t front;           /* index of the front message in the buffer */
-  size_t rear;            /* index of the rear message in the buffer */
-  SDL_sem *empty;         /* semaphore to track empty slots in the buffer */
-  SDL_sem *full;          /* semaphore to track filled slots in the buffer */
-  SDL_mutex *lock;        /* mutex lock to protect buffer access */
+  struct Message *buffer; /* Buffer to hold messages */
+  uint32_t capacity;      /* Maximum size of the buffer */
+  size_t front;           /* Index of the front message in the buffer */
+  size_t rear;            /* Index of the rear message in the buffer */
+  SDL_sem *empty;         /* Semaphore to track empty slots in the buffer */
+  SDL_sem *full;          /* Semaphore to track filled slots in the buffer */
+  SDL_mutex *lock;        /* Mutex lock to protect buffer access */
 };
 
 /**
@@ -66,7 +66,7 @@ int msgq_init(struct MessageQueue *q, uint32_t capacity);
  *
  * @param q A MessageQueue.
  * @param in Message to add to the back of the queue.
- * @returns 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
+ * @return 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
  */
 int msgq_put(struct MessageQueue *q, struct Message *in);
 
@@ -75,7 +75,7 @@ int msgq_put(struct MessageQueue *q, struct Message *in);
  *
  * @param q A MessageQueue.
  * @param out The message at the front of the queue.
- * @returns 0 if a message was removed from the queue, or a negative value on error.
+ * @return 0 if a message was removed from the queue, or a negative value on error.
  */
 int msgq_get(struct MessageQueue *q, struct Message *out);
 

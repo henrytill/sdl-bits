@@ -264,8 +264,8 @@ static void delay(double frametime, uint64_t begin) {
  * @return 0 on success, -1 on failure.
  */
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
-  extern const char *const wtypestr[];
   extern const uint32_t wtypeflags[];
+  extern const char *const wtypestr[];
   SDL_LogInfo(APP, "Window type: %s", wtypestr[cfg->wtype]);
   win->window = SDL_CreateWindow(title,
                                  cfg->x, cfg->y,
