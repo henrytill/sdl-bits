@@ -197,7 +197,7 @@ out:
  * @param stream The stream to write to
  * @param len The length of the stream
  */
-static void calcsine(void *userdata, uint8_t *stream, int len) {
+static void calcsine(void *userdata, uint8_t *stream, __attribute__((unused)) int len) {
   struct AudioState *as = (struct AudioState *)userdata;
   float *fstream = (float *)stream;
 
