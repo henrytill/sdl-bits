@@ -13,10 +13,10 @@
 #define _unused_     __attribute__((unused))
 
 #ifdef DEBUG
-#define DEBUG_PRINT(fmt, ...) printf(fmt, __VA_ARGS__)
+#define debug_printf(fmt, ...) printf(fmt, __VA_ARGS__)
 #else
-#define DEBUG_PRINT(fmt, ...) \
-  do {                        \
+#define debug_printf(fmt, ...) \
+  do {                         \
   } while (0)
 #endif
 
@@ -28,11 +28,11 @@
     }                                                \
   } while (0)
 
-#define DEFINE_TRIVIAL_CLEANUP_FUNC(type, func)   \
-  static inline void func##p(type *p) {           \
-    if (*p) {                                     \
-      func(*p);                                   \
-      DEBUG_PRINT("%s(*%p)\n", #func, (void *)p); \
-    }                                             \
-  }                                               \
+#define DEFINE_TRIVIAL_CLEANUP_FUNC(type, func)    \
+  static inline void func##p(type *p) {            \
+    if (*p) {                                      \
+      func(*p);                                    \
+      debug_printf("%s(*%p)\n", #func, (void *)p); \
+    }                                              \
+  }                                                \
   static_assert(1, "end of DEFINE_TRIVIAL_CLEANUP_FUNC")
