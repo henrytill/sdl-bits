@@ -1,0 +1,5 @@
+add_library(msgq OBJECT msgq.c)
+target_compile_options_default(msgq)
+target_link_libraries(msgq PRIVATE macro)
+target_link_SDL2(msgq)
+target_include_directories(msgq PUBLIC ${SDL_BITS_INCLUDE_DIR}/msgq)

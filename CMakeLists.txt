@@ -101,16 +101,12 @@ macro(target_link_lua target)
   target_link_libraries(${target} PRIVATE lua)
 endmacro(target_link_lua)
 
-# Directory: assets
+set(SDL_BITS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 add_subdirectory(assets)
+add_subdirectory(bin)
+add_subdirectory(lib)
 
-# Directory: src
-add_subdirectory(src)
-
-# Directory: test
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
-
-# Directory: tool
-add_subdirectory(tool)

@@ -16,7 +16,7 @@ services:
       - SYS_NICE
       - SYS_RESOURCE
     working_dir: /home/build/sdl-bits
-    command: ./build/src/main
+    command: ./build/bin/main
 
   test:
     build:

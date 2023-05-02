@@ -1,26 +1,29 @@
-# Executable: generate_atlas_from_bdf
+# generate_atlas_from_bdf
 add_executable(generate_atlas_from_bdf generate_atlas_from_bdf.c)
 target_compile_options_default(generate_atlas_from_bdf)
-target_compile_definitions(generate_atlas_from_bdf PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_link_libraries(generate_atlas_from_bdf PRIVATE bmp)
 target_link_freetype(generate_atlas_from_bdf)
 
-
-# Executable: generate_test_bmp
+# generate_test_bmp
 add_executable(generate_test_bmp generate_test_bmp.c)
 target_compile_options_default(generate_test_bmp)
 target_link_libraries(generate_test_bmp PRIVATE bmp)
 
-
-# Executable: get_displays
+# get_displays
 add_executable(get_displays get_displays.c)
 target_compile_options_default(get_displays)
 target_link_SDL2(get_displays)
 
-
-# Executable: library_versions
+# library_versions
 add_executable(library_versions library_versions.c)
 target_compile_options_default(library_versions)
 target_link_SDL2(library_versions)
 target_link_freetype(library_versions)
 target_link_lua(library_versions)
+
+# main
+add_executable(main main.c)
+target_compile_options_default(main)
+target_link_libraries(main PRIVATE prelude)
+target_link_SDL2(main)
+target_link_lua(main)
