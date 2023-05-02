@@ -33,7 +33,7 @@
     const typeof(*(ptr)) *: ((const type *)container_of(ptr, type, member)), \
     default: ((type *)container_of(ptr, type, member)))
 
-#define apply(obj, method, ...) ({   \
+#define send(obj, method, ...) ({    \
   typeof(obj) _obj = (obj);          \
   _obj->method(_obj, ##__VA_ARGS__); \
 })
