@@ -17,11 +17,18 @@ include(Coverage)
 include(FeatureTest)
 
 test_has_attribute_cleanup()
+test_has_builtin_types_compatible_p()
 
 if(HAS_ATTRIBUTE_CLEANUP)
   message(STATUS "Compiler supports __attribute__((cleanup(f)))")
 else()
   message(FATAL_ERROR "Compiler does not support __attribute__((cleanup(f)))")
+endif()
+
+if(HAS_BUILTIN_TYPES_COMPATIBLE_P)
+  message(STATUS "Compiler supports __builtin_types_compatible_p")
+else()
+  message(FATAL_ERROR "Compiler does not support __builtin_types_compatible_p")
 endif()
 
 check_symbol_exists(alloca alloca.h stdlib.h HAVE_ALLOCA)

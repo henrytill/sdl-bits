@@ -38,11 +38,11 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(lua_State *, lua_close);
 
 /* Let's not use SDL-defined numeric types */
 
-static_assert(sizeof(Uint16) == sizeof(uint16_t), "SDL-defined Uint16 is not uint16_t");
-static_assert(sizeof(Uint32) == sizeof(uint32_t), "SDL-defined Uint32 is not uint32_t");
-static_assert(sizeof(Uint64) == sizeof(uint64_t), "SDL-defined Uint64 is not uint64_t");
-static_assert(sizeof(Sint16) == sizeof(int16_t), "SDL-defined Sint16 is not int16_t");
-static_assert(sizeof(Sint32) == sizeof(int32_t), "SDL-defined Sint32 is not int32_t");
-static_assert(sizeof(Sint64) == sizeof(int64_t), "SDL-defined Sint64 is not int64_t");
-static_assert(sizeof(SDL_AudioFormat) == sizeof(uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
-static_assert(sizeof(SDL_AudioDeviceID) == sizeof(uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
+static_assert(__builtin_types_compatible_p(Uint16, uint16_t), "SDL-defined Uint16 is not uint16_t");
+static_assert(__builtin_types_compatible_p(Uint32, uint32_t), "SDL-defined Uint32 is not uint32_t");
+static_assert(__builtin_types_compatible_p(Uint64, uint64_t), "SDL-defined Uint64 is not uint64_t");
+static_assert(__builtin_types_compatible_p(Sint16, int16_t), "SDL-defined Sint16 is not int16_t");
+static_assert(__builtin_types_compatible_p(Sint32, int32_t), "SDL-defined Sint32 is not int32_t");
+static_assert(__builtin_types_compatible_p(Sint64, int64_t), "SDL-defined Sint64 is not int64_t");
+static_assert(__builtin_types_compatible_p(SDL_AudioFormat, uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
+static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
