@@ -19,7 +19,7 @@
 #define same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 
 #define container_of(ptr, type, member) ({                                         \
-  const typeof_member(type, member) *__mptr = (ptr);                               \
+  void *__mptr = (void *)(ptr);                                                    \
   static_assert(same_type(*(ptr), ((type *)0)->member) || same_type(*(ptr), void), \
                 "pointer type mismatch");                                          \
   ((type *)(__mptr - offsetof(type, member)));                                     \
