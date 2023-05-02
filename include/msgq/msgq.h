@@ -106,7 +106,7 @@ uint32_t msgq_size(struct MessageQueue *q);
  * Does not free the queue itself.  Useful for statically allocated queues.
  *
  * @param q A MessageQueue.
- * @see msgq_init
+ * @see msgq_init()
  */
 void msgq_finish(struct MessageQueue *q);
 
@@ -118,7 +118,7 @@ void msgq_finish(struct MessageQueue *q);
  * Consider using _cleanup_msgq_ for scoped cleanup.
  *
  * @param q A MessageQueue.
- * @see msgq_create
+ * @see msgq_create()
  */
 void msgq_destroy(struct MessageQueue *q);
 

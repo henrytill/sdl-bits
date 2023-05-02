@@ -3,9 +3,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <SDL.h>
-
-#include "lauxlib.h"
-#include "lua.h"
+#include <lauxlib.h>
+#include <lua.h>
 
 #include "macro.h"
 

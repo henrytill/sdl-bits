@@ -15,6 +15,8 @@
 static const char *const BMP_FILE = "./assets/test.bmp";
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
+  extern const char *const BMP_FILE;
+
   int ret = EXIT_FAILURE;
   char *image = NULL;
   struct bmp_Filehdr filehdr;

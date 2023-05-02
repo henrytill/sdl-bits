@@ -8,6 +8,10 @@
 #define static_assert _Static_assert
 #endif
 
+#define _unused_ __attribute__((unused))
+
+#define _cleanup_(f) __attribute__((cleanup(f)))
+
 #ifdef DEBUG
 #define DEBUG_PRINT(fmt, ...) printf(fmt, __VA_ARGS__)
 #else
@@ -16,8 +20,6 @@
   } while (0)
 #endif
 
-#define _unused_ __attribute__((unused))
-
 #define ATEXIT(func)                                 \
   do {                                               \
     if (atexit(func) != 0) {                         \
@@ -25,8 +27,6 @@
       exit(EXIT_FAILURE);                            \
     }                                                \
   } while (0)
-
-#define _cleanup_(f) __attribute__((cleanup(f)))
 
 #define DEFINE_TRIVIAL_CLEANUP_FUNC(type, func)   \
   static inline void func##p(type *p) {           \
