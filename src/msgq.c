@@ -64,6 +64,19 @@ int msgq_init(struct MessageQueue *q, uint32_t capacity) {
   return 0;
 }
 
+struct MessageQueue *msgq_create(uint32_t capacity) {
+  struct MessageQueue *q = malloc(sizeof(*q));
+  if (q == NULL) {
+    return NULL;
+  }
+  int rc = msgq_init(q, capacity);
+  if (rc < 0) {
+    free(q);
+    return NULL;
+  }
+  return q;
+}
+
 int msgq_put(struct MessageQueue *q, struct Message *in) {
   int rc;
 
@@ -125,4 +138,10 @@ void msgq_finish(struct MessageQueue *q) {
   if (q->empty != NULL) SDL_DestroySemaphore(q->empty);
   if (q->full != NULL) SDL_DestroySemaphore(q->full);
   if (q->lock != NULL) SDL_DestroyMutex(q->lock);
+}
+
+void msgq_destroy(struct MessageQueue *q) {
+  if (q == NULL) return;
+  msgq_finish(q);
+  free(q);
 }

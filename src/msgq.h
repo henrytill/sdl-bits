@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "macro.h"
+
 enum MessageQueueFailure {
   MSGQ_FAILURE_MALLOC = -1,
   MSGQ_FAILURE_SEM_CREATE = -2,
@@ -55,11 +57,23 @@ const char *msgq_errorstr(int rc);
 /**
  * Initializes a new bounded queue with the given capacity.
  *
+ * Does not allocate memory for the queue.  Useful for statically allocated queues.
+ *
  * @param q A MessageQueue.
  * @param capacity The maximum number of messages the queue can hold.
  * @return 0 on success, or a negative value on error.
  */
 int msgq_init(struct MessageQueue *q, uint32_t capacity);
+
+/**
+ * Creates a new bounded queue with the given capacity.
+ *
+ * Allocates memory for the queue and initializes it.
+ *
+ * @param capacity The maximum number of messages the queue can hold.
+ * @return A pointer to a new MessageQueue, or NULL on error.
+ */
+struct MessageQueue *msgq_create(uint32_t capacity);
 
 /**
  * Adds an message to the back of the queue.
@@ -90,8 +104,26 @@ uint32_t msgq_size(struct MessageQueue *q);
 /**
  * Frees resources associated with the queue.
  *
+ * Does not free the queue itself.  Useful for statically allocated queues.
+ *
  * @param q A MessageQueue.
+ * @see msgq_init
  */
 void msgq_finish(struct MessageQueue *q);
+
+/**
+ * Frees resources associated with the queue.
+ *
+ * Also frees the queue itself.
+ *
+ * Consider using _cleanup_msgq_ for scoped cleanup.
+ *
+ * @param q A MessageQueue.
+ * @see msgq_create
+ */
+void msgq_destroy(struct MessageQueue *q);
+
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue *, msgq_destroy);
+#define _cleanup_msgq_ _cleanup_(msgq_destroyp)
 
 #endif /* SDL_BITS_MSGQ_H */
