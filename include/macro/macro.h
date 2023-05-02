@@ -14,6 +14,8 @@
 #define _packed_     __attribute__((packed))
 #define _unused_     __attribute__((unused))
 
+#define array_size(array) (sizeof(array) / sizeof((array)[0]))
+
 #define typeof_member(type, member) typeof(((type *)0)->member)
 
 #define same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))

@@ -83,7 +83,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   struct Person *people[] = {alice, bob, &carol->person};
 
-  for (int i = 0; i < 3; i++) {
+  for (size_t i = 0; i < array_size(people); i++) {
     apply(people[i], ops->say_hello);
   }
 
