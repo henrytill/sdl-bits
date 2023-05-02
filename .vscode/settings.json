@@ -1,11 +1,15 @@
 {
   "cmake.configureOnOpen": false,
   "cmake.configureSettings": {
-    "BUILD_SHARED_LIBS": "ON"
+    "BUILD_SHARED_LIBS": "ON",
+    "LUA_BUILD_OBJECTS": "ON"
   },
   "python.formatting.provider": "black",
   "files.associations": {
     "queue.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "prelude.h": "c",
+    "compare": "c",
+    "type_traits": "c"
   }
 }
