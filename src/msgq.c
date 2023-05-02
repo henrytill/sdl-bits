@@ -134,10 +134,25 @@ uint32_t msgq_size(struct MessageQueue *q) {
 
 void msgq_finish(struct MessageQueue *q) {
   if (q == NULL) return;
-  if (q->buffer != NULL) free(q->buffer);
-  if (q->empty != NULL) SDL_DestroySemaphore(q->empty);
-  if (q->full != NULL) SDL_DestroySemaphore(q->full);
-  if (q->lock != NULL) SDL_DestroyMutex(q->lock);
+  q->capacity = 0;
+  q->front = 0;
+  q->rear = 0;
+  if (q->buffer != NULL) {
+    free(q->buffer);
+    q->buffer = NULL;
+  }
+  if (q->empty != NULL) {
+    SDL_DestroySemaphore(q->empty);
+    q->empty = NULL;
+  }
+  if (q->full != NULL) {
+    SDL_DestroySemaphore(q->full);
+    q->full = NULL;
+  };
+  if (q->lock != NULL) {
+    SDL_DestroyMutex(q->lock);
+    q->lock = NULL;
+  };
 }
 
 void msgq_destroy(struct MessageQueue *q) {
