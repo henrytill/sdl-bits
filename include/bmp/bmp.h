@@ -3,11 +3,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "macro.h"
+
 extern const uint16_t FILETYPE;
 extern const uint32_t BI_BITFIELDS;
 extern const uint32_t LCS_WINDOWS_COLOR_SPACE;
-
-#pragma pack(push, 1)
 
 enum HeaderSize {
   BITMAPCOREHEADER = 12,
@@ -25,7 +25,7 @@ struct bmp_Filehdr {
   uint16_t reserved1;
   uint16_t reserved2;
   uint32_t offset;
-};
+} _packed_;
 
 struct bmp_Infohdr {
   uint32_t size;        /* DIB Header size (bytes) */
@@ -39,7 +39,7 @@ struct bmp_Infohdr {
   int32_t vres;         /* Vertical resolution (pixels per meter) */
   uint32_t colors;      /* Used colors */
   uint32_t impcolors;   /* Important colors */
-};
+} _packed_;
 
 struct bmp_Colorspace {
   int32_t rx;
@@ -51,7 +51,7 @@ struct bmp_Colorspace {
   int32_t bx;
   int32_t by;
   int32_t bz;
-};
+} _packed_;
 
 struct bmp_V4hdr {
   uint32_t size;        /* DIB Header Size (bytes) */
@@ -74,22 +74,20 @@ struct bmp_V4hdr {
   uint32_t rgamma;
   uint32_t ggamma;
   uint32_t bgamma;
-};
+} _packed_;
 
 struct bmp_Pixel24 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
-};
+} _packed_;
 
 struct bmp_Pixel32 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
   uint8_t a;
-};
-
-#pragma pack(pop)
+} _packed_;
 
 /**
  * Calculate the number of bytes per row.
