@@ -1,5 +1,4 @@
-#ifndef SDL_BITS_MACRO_H
-#define SDL_BITS_MACRO_H
+#pragma once
 
 #ifndef NDEBUG
 #define DEBUG
@@ -35,5 +34,3 @@
     }                                             \
   }                                               \
   static_assert(1, "end of DEFINE_TRIVIAL_CLEANUP_FUNC")
-
-#endif /* SDL_BITS_MACRO_H */

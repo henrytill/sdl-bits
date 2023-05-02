@@ -1,5 +1,4 @@
-#ifndef SDL_BITS_BMP_H
-#define SDL_BITS_BMP_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -132,5 +131,3 @@ int bmp_v4read(const char *file, struct bmp_Filehdr *filehdr, struct bmp_V4hdr *
  * @param file Path to the BMP file
  */
 int bmp_v4write(const struct bmp_Pixel32 *buf, size_t width, size_t height, const char *file);
-
-#endif /* SDL_BITS_BMP_H */

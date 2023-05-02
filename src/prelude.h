@@ -1,5 +1,4 @@
-#ifndef SDL_BITS_PRELUDE_H
-#define SDL_BITS_PRELUDE_H
+#pragma once
 
 #include <stdint.h>
 
@@ -45,5 +44,3 @@ static_assert(sizeof(Sint32) == sizeof(int32_t), "SDL-defined Sint32 is not int3
 static_assert(sizeof(Sint64) == sizeof(int64_t), "SDL-defined Sint64 is not int64_t");
 static_assert(sizeof(SDL_AudioFormat) == sizeof(uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
 static_assert(sizeof(SDL_AudioDeviceID) == sizeof(uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
-
-#endif /* SDL_BITS_PRELUDE_H */

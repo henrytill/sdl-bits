@@ -1,5 +1,4 @@
-#ifndef SDL_BITS_MSGQ_H
-#define SDL_BITS_MSGQ_H
+#pragma once
 
 #include <stdint.h>
 
@@ -125,5 +124,3 @@ void msgq_destroy(struct MessageQueue *q);
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue *, msgq_destroy);
 #define _cleanup_msgq_ _cleanup_(msgq_destroyp)
-
-#endif /* SDL_BITS_MSGQ_H */
