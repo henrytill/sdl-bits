@@ -40,8 +40,9 @@ struct Config {
 struct AudioState {
   const int samplerate;
   const uint16_t buffsize;
-  const double volume;
   const double frequency;
+  const double maxvolume;
+  double volume;
   uint64_t offset;
 };
 
@@ -49,7 +50,7 @@ struct State {
   SDL_AudioDeviceID audiodev;
   struct AudioState audio;
   int loopstat;
-  int pauseaudio;
+  int tonestat;
 };
 
 struct Window {
@@ -90,12 +91,13 @@ static struct State state = {
   .audio = {
     .samplerate = 48000,
     .buffsize = 2048,
-    .volume = 0.25,
     .frequency = 440.0,
+    .maxvolume = 0.25,
+    .volume = 0.0,
     .offset = 0,
   },
   .loopstat = 1,
-  .pauseaudio = 1,
+  .tonestat = 0,
 };
 
 /**
@@ -350,12 +352,11 @@ static void keydown(SDL_KeyboardEvent *key, struct State *state) {
     state->loopstat = 0;
     break;
   case SDLK_F1:
-    state->pauseaudio = (state->pauseaudio == 1) ? 0 : 1;
-    SDL_LogInfo(APP, "PauseAudioDevice(%d)", state->pauseaudio);
-    SDL_PauseAudioDevice(state->audiodev, state->pauseaudio);
-    if (state->pauseaudio == 1) {
-      state->audio.offset = 0;
-    }
+    state->tonestat = (state->tonestat == 1) ? 0 : 1;
+    SDL_LockAudioDevice(state->audiodev);
+    state->audio.volume = state->tonestat * state->audio.maxvolume;
+    state->audio.offset = 0;
+    SDL_UnlockAudioDevice(state->audiodev);
     break;
   }
 }
@@ -444,6 +445,8 @@ int main(int argc, char *argv[]) {
 
   const double frametime = calcframetime(config.framerate);
 
+  SDL_PauseAudioDevice(state.audiodev, 0);
+
   delta = frametime;
   begin = now();
   while (state.loopstat == 1) {
@@ -477,6 +480,8 @@ int main(int argc, char *argv[]) {
     delta = calcdelta(begin, end);
     begin = end;
   }
+
+  SDL_PauseAudioDevice(state.audiodev, 1);
 
   return EXIT_SUCCESS;
 }
