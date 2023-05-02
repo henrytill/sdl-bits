@@ -1,6 +1,9 @@
 # generate_atlas_from_bdf
 add_executable(generate_atlas_from_bdf generate_atlas_from_bdf.c)
 target_compile_options_default(generate_atlas_from_bdf)
+if(WIN32)
+  target_compile_definitions(generate_atlas_from_bdf PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 target_link_libraries(generate_atlas_from_bdf PRIVATE bmp)
 target_link_libraries(generate_atlas_from_bdf PRIVATE macro)
 target_link_freetype(generate_atlas_from_bdf)
