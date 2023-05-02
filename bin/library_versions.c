@@ -7,6 +7,8 @@
 #include "lauxlib.h"
 #include "lua.h"
 
+#include "macro.h"
+
 enum {
   UNHANDLED = SDL_LOG_CATEGORY_CUSTOM
 };
@@ -50,10 +52,7 @@ static void sdl(void) {
   SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.", lded.major, lded.minor, lded.patch);
 }
 
-int main(int argc, char *argv[]) {
-  (void)argc;
-  (void)argv;
-
+int main(_unused_ int argc, _unused_ char *argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
   freetype();

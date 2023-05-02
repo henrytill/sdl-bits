@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "bmp.h"
+#include "macro.h"
 
 enum {
   WIDTH = 4,
@@ -20,12 +21,9 @@ static const struct bmp_Pixel32 buf[] = {
 
 static const char *const bmpfile = "./test.bmp";
 
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   extern const struct bmp_Pixel32 buf[];
   extern const char *const bmpfile;
-
-  (void)argc;
-  (void)argv;
 
   return (bmp_v4write(buf, WIDTH, HEIGHT, bmpfile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

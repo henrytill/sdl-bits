@@ -137,15 +137,12 @@ static int consume(struct MessageQueue *queue) {
 /**
  * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
  */
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue q;
   extern const uint32_t qcap;
 
   int rc;
   SDL_Thread *producer;
-
-  (void)argc;
-  (void)argv;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 

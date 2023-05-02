@@ -1,5 +1,7 @@
 #include <SDL.h>
 
+#include "macro.h"
+
 static int enumdisp(void) {
   SDL_DisplayMode mode;
   int rc, ndisp;
@@ -22,12 +24,9 @@ static int enumdisp(void) {
   return 0;
 }
 
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   int ret = EXIT_FAILURE;
   int rc;
-
-  (void)argc;
-  (void)argv;
 
   rc = SDL_Init(SDL_INIT_VIDEO);
   if (rc != 0)

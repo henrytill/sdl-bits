@@ -7,6 +7,7 @@
 #include FT_FREETYPE_H
 
 #include "bmp.h"
+#include "macro.h"
 
 enum {
   WIDTH = 10,
@@ -78,14 +79,11 @@ static void drawimage(char **image, size_t width, size_t height) {
   }
 }
 #else
-static inline void drawimage(char **image, size_t width, size_t height) {
-  (void)image;
-  (void)width;
-  (void)height;
+static inline void drawimage(_unused_ char **image, _unused_ size_t width, _unused_ size_t height) {
 }
 #endif
 
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   extern const char *const fontfile;
   extern const char *const bmpfile;
   extern const struct bmp_Pixel32 white;
@@ -101,9 +99,6 @@ int main(int argc, char *argv[]) {
   const size_t height = HEIGHT;
   char code[CODESZ];
   struct bmp_Pixel32 *buf;
-
-  (void)argc;
-  (void)argv;
 
   for (int i = 0; i < CODESZ; ++i)
     code[i] = (char)(i + '!');

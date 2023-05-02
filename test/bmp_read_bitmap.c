@@ -10,17 +10,15 @@
 #include <stdlib.h>
 
 #include "bmp.h"
+#include "macro.h"
 
 static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
 
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   int ret = EXIT_FAILURE;
   char *image = NULL;
   struct bmp_Filehdr filehdr;
   struct bmp_Infohdr infohdr;
-
-  (void)argc;
-  (void)argv;
 
   if (bmp_read(BMP_FILE, &filehdr, &infohdr, &image) != 0)
     goto out;

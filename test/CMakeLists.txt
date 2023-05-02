@@ -2,6 +2,7 @@
 add_executable(bmp_read_bitmap bmp_read_bitmap.c)
 target_compile_options_default(bmp_read_bitmap)
 target_link_libraries(bmp_read_bitmap PRIVATE bmp)
+target_link_libraries(bmp_read_bitmap PRIVATE macro)
 add_test(NAME bmp_read_bitmap
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND bmp_read_bitmap)
@@ -10,6 +11,7 @@ add_test(NAME bmp_read_bitmap
 add_executable(bmp_read_bitmap_v4 bmp_read_bitmap_v4.c)
 target_compile_options_default(bmp_read_bitmap_v4)
 target_link_libraries(bmp_read_bitmap_v4 PRIVATE bmp)
+target_link_libraries(bmp_read_bitmap_v4 PRIVATE macro)
 add_test(NAME bmp_read_bitmap_v4
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND bmp_read_bitmap_v4)

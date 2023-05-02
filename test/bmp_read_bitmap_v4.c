@@ -10,17 +10,15 @@
 #include <stdlib.h>
 
 #include "bmp.h"
+#include "macro.h"
 
 static const char *const BMP_FILE = "./assets/test.bmp";
 
-int main(int argc, char *argv[]) {
+int main(_unused_ int argc, _unused_ char *argv[]) {
   int ret = EXIT_FAILURE;
   char *image = NULL;
   struct bmp_Filehdr filehdr;
   struct bmp_V4hdr v4hdr;
-
-  (void)argc;
-  (void)argv;
 
   if (bmp_v4read(BMP_FILE, &filehdr, &v4hdr, &image) != 0)
     goto out;
