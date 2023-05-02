@@ -19,12 +19,12 @@ struct PersonOperations {
 void person_say_hello(struct Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
-/** Static vtable of the base class. */
+/** Base class vtable. */
 static struct PersonOperations person_ops = {
   .say_hello = person_say_hello,
 };
 
-/** Constructor of the base class. */
+/** Base class constructor. */
 struct Person *person_new(char *name, int age) {
   struct Person *self = emalloc(sizeof(struct Person));
   self->ops = &person_ops;
@@ -33,7 +33,7 @@ struct Person *person_new(char *name, int age) {
   return self;
 }
 
-/** Destructor of the base class. */
+/** Base class destructor. */
 void person_free(struct Person *self) {
   free(self);
 }
@@ -44,19 +44,19 @@ struct Student {
   char *school;
 };
 
-/** Override the method of the base class. */
+/** Derived class override of PersonOperations::say_hello */
 void student_say_hello(struct Person *self) {
   struct Student *student = container_of(self, struct Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
 }
 
-/** Static vtable of the derived class. */
+/** Derived class vtable. */
 static struct PersonOperations student_ops = {
   .say_hello = student_say_hello,
 };
 
-/** Constructor of the derived class. */
+/** Derived class constructor. */
 struct Student *student_new(char *name, int age, char *school) {
   struct Student *self = emalloc(sizeof(struct Student));
   self->person.ops = &student_ops;
@@ -66,7 +66,7 @@ struct Student *student_new(char *name, int age, char *school) {
   return self;
 }
 
-/** Destructor of the derived class. */
+/** Derived class destructor. */
 void student_free(struct Student *self) {
   free(self);
 }
