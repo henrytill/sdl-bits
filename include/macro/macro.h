@@ -8,9 +8,9 @@
 #define static_assert _Static_assert
 #endif
 
-#define _unused_ __attribute__((unused))
-
 #define _cleanup_(f) __attribute__((cleanup(f)))
+#define _packed_     __attribute__((packed))
+#define _unused_     __attribute__((unused))
 
 #ifdef DEBUG
 #define DEBUG_PRINT(fmt, ...) printf(fmt, __VA_ARGS__)
