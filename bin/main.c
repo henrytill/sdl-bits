@@ -8,8 +8,6 @@
 
 #include "prelude.h"
 
-#define now SDL_GetPerformanceCounter
-
 enum {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,

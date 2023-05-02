@@ -10,6 +10,8 @@
 
 #include "macro.h"
 
+#define now SDL_GetPerformanceCounter
+
 /* General cleanup functions */
 
 static inline void freestr(char *str) {
