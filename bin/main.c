@@ -240,8 +240,8 @@ static double calcdelta(uint64_t begin, uint64_t end) {
  */
 static void delay(double frametime, uint64_t begin) {
   if (calcdelta(begin, now()) >= frametime) return;
-  const uint32_t delay = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0);
-  if (delay > 0) SDL_Delay(delay);
+  const uint32_t time = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0);
+  if (time > 0) SDL_Delay(time);
   while (calcdelta(begin, now()) < frametime) continue;
 }
 
