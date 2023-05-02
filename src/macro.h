@@ -16,6 +16,8 @@
   } while (0)
 #endif
 
+#define _unused_ __attribute__((unused))
+
 #define ATEXIT(func)                                 \
   do {                                               \
     if (atexit(func) != 0) {                         \

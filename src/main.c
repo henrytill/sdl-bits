@@ -189,7 +189,7 @@ static int loadcfg(const char *f, struct Config *cfg) {
  * @param stream The stream to write to
  * @param len The length of the stream
  */
-static void calcsine(void *userdata, uint8_t *stream, __attribute__((unused)) int len) {
+static void calcsine(void *userdata, uint8_t *stream, _unused_ int len) {
   struct AudioState *as = (struct AudioState *)userdata;
   float *fstream = (float *)stream;
 
