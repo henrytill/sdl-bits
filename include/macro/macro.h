@@ -20,7 +20,7 @@
   } while (0)
 #endif
 
-#define ATEXIT(func)                                 \
+#define exitwith(func)                               \
   do {                                               \
     if (atexit(func) != 0) {                         \
       fprintf(stderr, "atexit(%s) failed\n", #func); \

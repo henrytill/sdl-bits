@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  ATEXIT(SDL_Quit);
+  exitwith(SDL_Quit);
 
   pfreq = SDL_GetPerformanceFrequency();
 

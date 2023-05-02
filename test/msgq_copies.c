@@ -171,13 +171,13 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
   if (rc != 0)
     sdlfail("SDL_Init failed");
 
-  ATEXIT(SDL_Quit);
+  exitwith(SDL_Quit);
 
   rc = msgq_init(&q, qcap);
   if (rc != 0)
     qfail(rc, "msgq_init failed");
 
-  ATEXIT(qfinish);
+  exitwith(qfinish);
 
   producer = SDL_CreateThread(produce, "producer", (void *)&q);
   if (producer == NULL)
