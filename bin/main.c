@@ -135,8 +135,8 @@ static void parseargs(int argc, char *argv[], struct Args *args) {
  */
 static char *joinpath(const char *a, const char *b) {
   size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
-  char *ret = calloc(++n, sizeof(char)); /* incr for terminator */
-  if (ret != NULL) snprintf(ret, n, "%s/%s", a, b);
+  char *ret = ecalloc(++n, sizeof(char)); /* incr for terminator */
+  snprintf(ret, n, "%s/%s", a, b);
   return ret;
 }
 
@@ -294,11 +294,7 @@ static void finishwin(struct Window *win) {
  * @return The window on success, NULL on failure.
  */
 static struct Window *createwin(struct Config *cfg, const char *title) {
-  struct Window *win = malloc(sizeof(struct Window));
-  if (win == NULL) {
-    SDL_LogError(ERR, "%s: malloc failed", __func__);
-    return NULL;
-  }
+  struct Window *win = emalloc(sizeof(struct Window));
   if (initwin(cfg, title, win) != 0) {
     free(win);
     return NULL;

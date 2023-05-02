@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <SDL.h>
 #include <SDL_audio.h>
@@ -46,3 +48,36 @@ static_assert(__builtin_types_compatible_p(Sint32, int32_t), "SDL-defined Sint32
 static_assert(__builtin_types_compatible_p(Sint64, int64_t), "SDL-defined Sint64 is not int64_t");
 static_assert(__builtin_types_compatible_p(SDL_AudioFormat, uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
 static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
+
+/* Utility functions */
+
+/**
+ * Allocate or die.
+ *
+ * @param size The size in bytes to allocate.
+ * @return A pointer to the allocated memory.
+ */
+static inline void *emalloc(size_t size) {
+  void *p = malloc(size);
+  if (p == NULL) {
+    fprintf(stderr, "Failed to allocate.\n");
+    exit(EXIT_FAILURE);
+  }
+  return p;
+}
+
+/**
+ * Allocate and zero or die.
+ *
+ * @param nmemb The number of elements to allocate.
+ * @param size The size in bytes of each element.
+ * @return A pointer to the allocated memory.
+ */
+static inline void *ecalloc(size_t nmemb, size_t size) {
+  void *p = calloc(nmemb, size);
+  if (p == NULL) {
+    fprintf(stderr, "Failed to allocate.\n");
+    exit(EXIT_FAILURE);
+  }
+  return p;
+}
