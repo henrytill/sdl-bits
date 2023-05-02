@@ -12,16 +12,13 @@
 #include "bmp.h"
 #include "prelude.h"
 
-static const char *const BMP_FILE = "./assets/sample_24bit.bmp";
-
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern const char *const BMP_FILE;
-
   struct bmp_Filehdr filehdr;
   struct bmp_Infohdr infohdr;
+  const char *const bmpfile = "./assets/sample_24bit.bmp";
 
   _cleanup_str_ char *image = NULL;
-  if (bmp_read(BMP_FILE, &filehdr, &infohdr, &image) != 0)
+  if (bmp_read(bmpfile, &filehdr, &infohdr, &image) != 0)
     return EXIT_FAILURE;
 
   struct bmp_Pixel24 *pixel = (struct bmp_Pixel24 *)image;
