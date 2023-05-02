@@ -15,18 +15,15 @@
 #ifdef DEBUG
 #define debug_printf(fmt, ...) printf(fmt, __VA_ARGS__)
 #else
-#define debug_printf(fmt, ...) \
-  do {                         \
-  } while (0)
+#define debug_printf(fmt, ...) ({})
 #endif
 
-#define exitwith(func)                               \
-  do {                                               \
-    if (atexit(func) != 0) {                         \
-      fprintf(stderr, "atexit(%s) failed\n", #func); \
-      exit(EXIT_FAILURE);                            \
-    }                                                \
-  } while (0)
+#define exitwith(func) ({                          \
+  if (atexit(func) != 0) {                         \
+    fprintf(stderr, "atexit(%s) failed\n", #func); \
+    exit(EXIT_FAILURE);                            \
+  }                                                \
+})
 
 #define DEFINE_TRIVIAL_CLEANUP_FUNC(type, func)    \
   static inline void func##p(type *p) {            \

@@ -417,29 +417,24 @@ int main(int argc, char *argv[]) {
   if (rc != 0)
     return EXIT_FAILURE;
 
-  _cleanup_str_ char *bmpfile = joinpath(config.assetdir, testbmp);
-  if (bmpfile == NULL)
-    return EXIT_FAILURE;
+  _cleanup_SDL_Texture_ SDL_Texture *texture = ({
+    _cleanup_str_ char *bmpfile = joinpath(config.assetdir, testbmp);
+    if (bmpfile == NULL)
+      return EXIT_FAILURE;
 
-  _cleanup_SDL_Surface_ SDL_Surface *surface = SDL_LoadBMP(bmpfile);
-  if (surface == NULL) {
-    logsdlerr("SDL_LoadBMP failed");
-    return EXIT_FAILURE;
-  }
+    _cleanup_SDL_Surface_ SDL_Surface *surface = SDL_LoadBMP(bmpfile);
+    if (surface == NULL) {
+      logsdlerr("SDL_LoadBMP failed");
+      return EXIT_FAILURE;
+    }
 
-  _cleanup_SDL_Texture_ SDL_Texture *texture = SDL_CreateTextureFromSurface(win->renderer, surface);
-  if (texture == NULL) {
-    logsdlerr("SDL_CreateTextureFromSurface failed");
-    return EXIT_FAILURE;
-  }
-
-  SDL_FreeSurface(surface);
-  assert(surface != NULL);
-  surface = NULL;
-
-  freestr(bmpfile);
-  assert(bmpfile != NULL);
-  bmpfile = NULL;
+    SDL_Texture *tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
+    if (tmp == NULL) {
+      logsdlerr("SDL_CreateTextureFromSurface failed");
+      return EXIT_FAILURE;
+    }
+    tmp;
+  });
 
   const double frametime = calcframetime(config.framerate);
 

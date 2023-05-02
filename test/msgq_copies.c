@@ -17,23 +17,21 @@
 #include "macro.h"
 #include "msgq.h"
 
-#define LOGMSG(msg)                               \
-  do {                                            \
-    SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",  \
-                __func__, #msg,                   \
-                msgq_tagstr(msg.tag), msg.value); \
-  } while (0)
+#define LOGMSG(msg) ({                          \
+  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",  \
+              __func__, #msg,                   \
+              msgq_tagstr(msg.tag), msg.value); \
+})
 
-#define CHECKMSG(msg, extag, exvalue)                            \
-  do {                                                           \
-    if (msg.tag != extag || msg.value != exvalue) {              \
-      SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
-                   __func__, #msg,                               \
-                   msgq_tagstr(msg.tag), msg.value,              \
-                   msgq_tagstr(extag), exvalue);                 \
-      exit(EXIT_FAILURE);                                        \
-    }                                                            \
-  } while (0);
+#define CHECKMSG(msg, extag, exvalue) ({                       \
+  if (msg.tag != extag || msg.value != exvalue) {              \
+    SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
+                 __func__, #msg,                               \
+                 msgq_tagstr(msg.tag), msg.value,              \
+                 msgq_tagstr(extag), exvalue);                 \
+    exit(EXIT_FAILURE);                                        \
+  }                                                            \
+});
 
 /** Log categories to use with SDL logging functions. */
 enum LogCategory {
