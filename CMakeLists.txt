@@ -24,6 +24,8 @@ else()
   message(FATAL_ERROR "Compiler does not support __attribute__((cleanup(f)))")
 endif()
 
+check_symbol_exists(alloca alloca.h stdlib.h HAVE_ALLOCA)
+
 # https://stackoverflow.com/a/58711983
 string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
