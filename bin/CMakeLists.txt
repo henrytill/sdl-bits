@@ -1,7 +1,7 @@
 # demo_oop
 add_executable(demo_oop demo_oop.c)
 target_compile_options_default(demo_oop)
-target_link_libraries(demo_oop PRIVATE prelude)
+target_link_libraries(demo_oop PRIVATE macro)
 
 # generate_atlas_from_bdf
 add_executable(generate_atlas_from_bdf generate_atlas_from_bdf.c)
