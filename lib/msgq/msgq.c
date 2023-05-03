@@ -36,7 +36,7 @@ const char *msgq_error(int rc) {
 }
 
 int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
-  queue->buffer = malloc((size_t)capacity * sizeof(*queue->buffer));
+  queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
   }
@@ -65,7 +65,7 @@ int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
 }
 
 struct MessageQueue *msgq_create(uint32_t capacity) {
-  struct MessageQueue *queue = malloc(sizeof(*queue));
+  struct MessageQueue *queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
