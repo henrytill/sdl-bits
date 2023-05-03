@@ -272,8 +272,7 @@ static int initWindow(struct Config *config, const char *title, struct Window *w
     logSDLError("SDL_CreateRenderer failed");
     return -1;
   }
-  SDL_SetRenderDrawColor(window->renderer, 0x00, 0x00, 0x00, 0xFF);
-  return 0;
+  return SDL_SetRenderDrawColor(window->renderer, 0x00, 0x00, 0x00, 0xFF);
 }
 
 ///
