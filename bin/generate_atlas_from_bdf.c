@@ -12,7 +12,7 @@
 enum {
   WIDTH = 10,
   HEIGHT = 20,
-  CODESZ = 94, /* ('~' - '!') + 1 */
+  CODESZ = 94, // ('~' - '!') + 1
 };
 
 static const char *const fontfile = "./ucs-fonts/10x20.bdf";
@@ -24,10 +24,10 @@ static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
 static char **allocimage(size_t height, size_t width);
 static void freeimage(char **image, size_t height);
 
-/* pos = 0 is MSB */
+// pos = 0 is MSB
 static char getbit(unsigned char c, size_t pos) {
   if (pos >= CHAR_BIT) return 0;
-  return (c >> (CHAR_BIT + ~pos)) & 1; /* Also: c & (1 << (CHAR_BIT + ~pos)); */
+  return (c >> (CHAR_BIT + ~pos)) & 1; // Also: c & (1 << (CHAR_BIT + ~pos));
 }
 
 static char **allocimage(size_t height, size_t width) {
@@ -52,7 +52,7 @@ static void freeimage(char **image, size_t height) {
   free(image);
 }
 
-/* https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap */
+// https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
 static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
   unsigned char *buffer = slot->bitmap.buffer;
   size_t rows = (size_t)slot->bitmap.rows;

@@ -1,13 +1,13 @@
-/**
- * Test that values are copied into and out of the message queue.
- *
- * The producer thread produces messages with values 42, 0, and 1.
- * The consumer consumes messages on the main thread after a delay and checks
- * their values.
- *
- * @see msgq_put()
- * @see msgq_get()
- */
+///
+/// Test that values are copied into and out of the message queue.
+///
+/// The producer thread produces messages with values 42, 0, and 1.
+/// The consumer consumes messages on the main thread after a delay and checks
+/// their values.
+///
+/// @see msgq_put()
+/// @see msgq_get()
+///
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -33,38 +33,38 @@
   }                                                            \
 });
 
-/** Log categories to use with SDL logging functions. */
+/// Log categories to use with SDL logging functions.
 enum LogCategory {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,
 };
 
-/** Delay before consuming messages. */
+/// Delay before consuming messages.
 static const uint32_t delay = 2000U;
 
-/** Capacity of the MessageQueue. */
+/// Capacity of the MessageQueue.
 static const uint32_t qcap = 1U;
 
-/** MessageQueue for testing. */
+/// MessageQueue for testing.
 static struct MessageQueue q;
 
-/**
- * Call msgq_finish() on q.
- *
- * @see msgq_finish()
- */
+///
+/// Call msgq_finish() on q.
+///
+/// @see msgq_finish()
+///
 static void qfinish(void) {
   extern struct MessageQueue q;
   msgq_finish(&q);
 }
 
-/** Log a msgq error message and exits. */
+/// Log a msgq error message and exits.
 static void qfail(int err, const char *msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_errorstr(err));
   exit(EXIT_FAILURE);
 }
 
-/** Log a SDL error message and exits. */
+/// Log a SDL error message and exits.
 static void sdlfail(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0)
@@ -74,15 +74,15 @@ static void sdlfail(const char *msg) {
   exit(EXIT_FAILURE);
 }
 
-/**
- * Produce messages.
- *
- * This function is meant to be run in its own thread by passing it to SDL_CreateThread().
- *
- * @param data Pointer to a MessageQueue.
- * @return 0 on success, 1 on failure.
- * @see consume()
- */
+///
+/// Produce messages.
+///
+/// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
+///
+/// @param data Pointer to a MessageQueue.
+/// @return 0 on success, 1 on failure.
+/// @see consume()
+///
 static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
   struct Message m;
@@ -117,15 +117,15 @@ static int produce(void *data) {
   return 0;
 }
 
-/**
- * Consume messages produced by produce() after a delay and check their values.
- *
- * This function is meant to be run in the main thread.
- *
- * @param queue Pointer to a MessageQueue.
- * @return 0 on success, 1 on failure.
- * @see produce()
- */
+///
+/// Consume messages produced by produce() after a delay and check their values.
+///
+/// This function is meant to be run in the main thread.
+///
+/// @param queue Pointer to a MessageQueue.
+/// @return 0 on success, 1 on failure.
+/// @see produce()
+///
 static int consume(struct MessageQueue *queue) {
   extern const uint32_t delay;
   struct Message a;
@@ -153,9 +153,9 @@ static int consume(struct MessageQueue *queue) {
   return 0;
 }
 
-/**
- * Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
- */
+///
+/// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
+///
 int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue q;
   extern const uint32_t qcap;

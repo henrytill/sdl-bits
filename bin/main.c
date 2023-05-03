@@ -98,11 +98,11 @@ static struct State state = {
   .tonestat = 0,
 };
 
-/**
- * Log a msg and the contents of SDL_GetError().
- *
- * @param msg The message to log
- */
+///
+/// Log a msg and the contents of SDL_GetError().
+///
+/// @param msg The message to log
+///
 static void logsdlerr(char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0)
@@ -111,13 +111,13 @@ static void logsdlerr(char *msg) {
     SDL_LogError(ERR, "%s", msg);
 }
 
-/**
- * Parse command line arguments and populate an Args struct with the results.
- *
- * @param argc The number of arguments
- * @param argv The arguments
- * @param args The Args struct to populate
- */
+///
+/// Parse command line arguments and populate an Args struct with the results.
+///
+/// @param argc The number of arguments
+/// @param argv The arguments
+/// @param args The Args struct to populate
+///
 static void parseargs(int argc, char *argv[], struct Args *args) {
   for (int i = 0; i < argc;) {
     char *arg = argv[i++];
@@ -126,27 +126,27 @@ static void parseargs(int argc, char *argv[], struct Args *args) {
   }
 }
 
-/**
- * Join two paths together.  User is responsible for freeing the returned path.
- *
- * @param a The first path
- * @param b The second path
- * @return A new path, or NULL on failure
- */
+///
+/// Join two paths together.  User is responsible for freeing the returned path.
+///
+/// @param a The first path
+/// @param b The second path
+/// @return A new path, or NULL on failure
+///
 static char *joinpath(const char *a, const char *b) {
   size_t n = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
-  char *ret = ecalloc(++n, sizeof(char)); /* incr for terminator */
+  char *ret = ecalloc(++n, sizeof(char)); // incr for terminator
   snprintf(ret, n, "%s/%s", a, b);
   return ret;
 }
 
-/**
- * Load and parse a config file and populate a Config struct with the results.
- *
- * @param f The config file to load
- * @param cfg The Config struct to populate
- * @return 0 on success, -1 on failure
- */
+///
+/// Load and parse a config file and populate a Config struct with the results.
+///
+/// @param f The config file to load
+/// @param cfg The Config struct to populate
+/// @return 0 on success, -1 on failure
+///
 static int loadcfg(const char *f, struct Config *cfg) {
   _cleanup_lua_State_ lua_State *state = luaL_newstate();
   if (state == NULL) {
@@ -180,13 +180,13 @@ static int loadcfg(const char *f, struct Config *cfg) {
   return 0;
 }
 
-/**
- * Calculate a sine wave and write it to the stream.
- *
- * @param userdata The userdata passed to SDL_OpenAudioDevice
- * @param stream The stream to write to
- * @param len The length of the stream
- */
+///
+/// Calculate a sine wave and write it to the stream.
+///
+/// @param userdata The userdata passed to SDL_OpenAudioDevice
+/// @param stream The stream to write to
+/// @param len The length of the stream
+///
 static void calcsine(void *userdata, uint8_t *stream, _unused_ int len) {
   struct AudioState *as = (struct AudioState *)userdata;
   float *fstream = (float *)stream;
@@ -204,25 +204,25 @@ static void calcsine(void *userdata, uint8_t *stream, _unused_ int len) {
   as->offset += 1;
 }
 
-/**
- * Calculate the time in milliseconds for a frame.
- *
- * @param fps The framerate
- * @return The time in milliseconds for a frame
- */
+///
+/// Calculate the time in milliseconds for a frame.
+///
+/// @param fps The framerate
+/// @return The time in milliseconds for a frame
+///
 static double calcframetime(int fps) {
   extern const double second;
   assert(fps > 0);
   return second / (double)fps;
 }
 
-/**
- * Calculate the time in milliseconds between two timestamps.
- *
- * @param begin An initial timestamp in ticks
- * @param end A final timestamp in ticks
- * @return The time in milliseconds between the two timestamps
- */
+///
+/// Calculate the time in milliseconds between two timestamps.
+///
+/// @param begin An initial timestamp in ticks
+/// @param end A final timestamp in ticks
+/// @return The time in milliseconds between the two timestamps
+///
 static double calcdelta(uint64_t begin, uint64_t end) {
   extern const double second;
   extern uint64_t pfreq;
@@ -232,12 +232,12 @@ static double calcdelta(uint64_t begin, uint64_t end) {
   return (delta_ticks * second) / (double)pfreq;
 }
 
-/**
- * Wait until the current frame end before returning.
- *
- * @param frametime The desired time in milliseconds for a frame
- * @param begin The timestamp in ticks when the frame started
- */
+///
+/// Wait until the current frame end before returning.
+///
+/// @param frametime The desired time in milliseconds for a frame
+/// @param begin The timestamp in ticks when the frame started
+///
 static void delay(double frametime, uint64_t begin) {
   if (calcdelta(begin, now()) >= frametime) return;
   const uint32_t time = (uint32_t)(frametime - calcdelta(begin, now()) - 1.0);
@@ -245,14 +245,14 @@ static void delay(double frametime, uint64_t begin) {
   while (calcdelta(begin, now()) < frametime) continue;
 }
 
-/**
- * Create a window and renderer.
- *
- * @param cfg The configuration.
- * @param title The window title.
- * @param win The window to initialize.
- * @return 0 on success, -1 on failure.
- */
+///
+/// Create a window and renderer.
+///
+/// @param cfg The configuration.
+/// @param title The window title.
+/// @param win The window to initialize.
+/// @return 0 on success, -1 on failure.
+///
 static int initwin(struct Config *cfg, const char *title, struct Window *win) {
   extern const uint32_t wtypeflags[];
   extern const char *const wtypestr[];
@@ -275,24 +275,24 @@ static int initwin(struct Config *cfg, const char *title, struct Window *win) {
   return 0;
 }
 
-/**
- * Destroy a window and renderer.
- *
- * @param win The window to destroy.
- */
+///
+/// Destroy a window and renderer.
+///
+/// @param win The window to destroy.
+///
 static void finishwin(struct Window *win) {
   if (win == NULL) return;
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
 }
 
-/**
- * Create a window and renderer.
- *
- * @param cfg The configuration.
- * @param title The window title.
- * @return The window on success, NULL on failure.
- */
+///
+/// Create a window and renderer.
+///
+/// @param cfg The configuration.
+/// @param title The window title.
+/// @return The window on success, NULL on failure.
+///
 static struct Window *createwin(struct Config *cfg, const char *title) {
   struct Window *win = emalloc(sizeof(struct Window));
   if (initwin(cfg, title, win) != 0) {
@@ -302,11 +302,11 @@ static struct Window *createwin(struct Config *cfg, const char *title) {
   return win;
 }
 
-/**
- * Destroy a window and renderer.
- *
- * @param win The window to destroy.
- */
+///
+/// Destroy a window and renderer.
+///
+/// @param win The window to destroy.
+///
 static void destroywin(struct Window *win) {
   if (win == NULL) return;
   finishwin(win);
@@ -316,13 +316,13 @@ static void destroywin(struct Window *win) {
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroywin);
 #define _cleanup_Window_ _cleanup_(destroywinp)
 
-/**
- * Get the window's rectangle.
- *
- * @param win The window.
- * @param rect The rectangle to initialize.
- * @return 0 on success, -1 on failure.
- */
+///
+/// Get the window's rectangle.
+///
+/// @param win The window.
+/// @param rect The rectangle to initialize.
+/// @return 0 on success, -1 on failure.
+///
 static int getrect(struct Window *win, SDL_Rect *rect) {
   if (win == NULL || win->renderer == NULL)
     return -1;
@@ -334,12 +334,12 @@ static int getrect(struct Window *win, SDL_Rect *rect) {
   return 0;
 }
 
-/**
- * Handle keydown events.
- *
- * @param key The keydown event.
- * @param state The state.
- */
+///
+/// Handle keydown events.
+///
+/// @param key The keydown event.
+/// @param state The state.
+///
 static void keydown(SDL_KeyboardEvent *key, struct State *state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
