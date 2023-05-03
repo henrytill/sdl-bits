@@ -7,7 +7,7 @@ struct PersonOperations;
 
 /** Base class. */
 struct Person {
-  struct PersonOperations *ops;
+  const struct PersonOperations *ops;
   char *name;
   int age;
 };
@@ -21,7 +21,7 @@ void person_say_hello(struct Person *self) {
 }
 
 /** Base class vtable. */
-static struct PersonOperations person_ops = {
+static const struct PersonOperations person_ops = {
   .say_hello = person_say_hello,
 };
 
@@ -53,7 +53,7 @@ void student_say_hello(struct Person *self) {
 }
 
 /** Derived class vtable. */
-static struct PersonOperations student_ops = {
+static const struct PersonOperations student_ops = {
   .say_hello = student_say_hello,
 };
 
