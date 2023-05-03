@@ -19,6 +19,7 @@ struct PersonOperations {
 void person_say_hello(struct Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
+
 /** Base class vtable. */
 static struct PersonOperations person_ops = {
   .say_hello = person_say_hello,
