@@ -49,7 +49,7 @@ int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
     return MSGQ_FAILURE_SEM_CREATE;
   }
   queue->full = SDL_CreateSemaphore(0);
-  if (queue->empty == NULL) {
+  if (queue->full == NULL) {
     SDL_DestroySemaphore(queue->empty);
     free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
