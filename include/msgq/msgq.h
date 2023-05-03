@@ -122,5 +122,5 @@ void msgq_finish(struct MessageQueue *queue);
 ///
 void msgq_destroy(struct MessageQueue *queue);
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue *, msgq_destroy);
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue *, msgq_destroy)
 #define _cleanup_msgq_ _cleanup_(msgq_destroyp)

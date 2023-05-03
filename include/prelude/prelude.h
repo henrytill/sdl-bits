@@ -21,21 +21,21 @@ static inline void freestr(char *str) {
     free(str);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(char *, freestr);
+DEFINE_TRIVIAL_CLEANUP_FUNC(char *, freestr)
 #define _cleanup_str_ __attribute__((cleanup(freestrp)))
 
 // SDL cleanup functions
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Surface *, SDL_FreeSurface);
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Texture *, SDL_DestroyTexture);
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_AudioDeviceID, SDL_CloseAudioDevice);
+DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Surface *, SDL_FreeSurface)
+DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Texture *, SDL_DestroyTexture)
+DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_AudioDeviceID, SDL_CloseAudioDevice)
 #define _cleanup_SDL_Surface_       _cleanup_(SDL_FreeSurfacep)
 #define _cleanup_SDL_Texture_       _cleanup_(SDL_DestroyTexturep)
 #define _cleanup_SDL_AudioDeviceID_ _cleanup_(SDL_CloseAudioDevicep)
 
 // Lua cleanup functions
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(lua_State *, lua_close);
+DEFINE_TRIVIAL_CLEANUP_FUNC(lua_State *, lua_close)
 #define _cleanup_lua_State_ _cleanup_(lua_closep)
 
 // Let's not use SDL-defined numeric types

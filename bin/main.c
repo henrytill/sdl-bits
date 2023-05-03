@@ -313,7 +313,7 @@ static void destroyWindow(struct Window *window) {
   free(window);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow);
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow)
 #define _cleanup_Window_ _cleanup_(destroyWindowp)
 
 ///

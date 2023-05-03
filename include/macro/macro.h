@@ -57,5 +57,4 @@
       func(*p);                                    \
       debug_printf("%s(*%p)\n", #func, (void *)p); \
     }                                              \
-  }                                                \
-  static_assert(1, "end of DEFINE_TRIVIAL_CLEANUP_FUNC")
+  }

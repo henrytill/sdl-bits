@@ -14,7 +14,7 @@ const uint16_t FILETYPE = 0x4D42;
 const uint32_t BI_BITFIELDS = 0x0003;
 const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose);
+DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose)
 #define _cleanup_FILE_ _cleanup_(fclosep)
 
 size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
