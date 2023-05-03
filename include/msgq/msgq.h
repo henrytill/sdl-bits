@@ -43,7 +43,7 @@ struct MessageQueue {
 /// @param tag A message tag.
 /// @return The tag string associated with the given tag, or NULL if the tag is invalid.
 ///
-const char *msgq_tagstr(enum MessageTag tag);
+const char *msgq_tag(enum MessageTag tag);
 
 ///
 /// Returns the error message associated with a return code.
@@ -51,18 +51,18 @@ const char *msgq_tagstr(enum MessageTag tag);
 /// @param rc A return code.
 /// @return The error message associated with the given return code, or NULL if the return code is invalid.
 ///
-const char *msgq_errorstr(int rc);
+const char *msgq_error(int rc);
 
 ///
 /// Initializes a new bounded queue with the given capacity.
 ///
 /// Does not allocate memory for the queue.  Useful for statically allocated queues.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @param capacity The maximum number of messages the queue can hold.
 /// @return 0 on success, or a negative value on error.
 ///
-int msgq_init(struct MessageQueue *q, uint32_t capacity);
+int msgq_init(struct MessageQueue *queue, uint32_t capacity);
 
 ///
 /// Creates a new bounded queue with the given capacity.
@@ -77,38 +77,38 @@ struct MessageQueue *msgq_create(uint32_t capacity);
 ///
 /// Adds an message to the back of the queue.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @param in Message to add to the back of the queue.
 /// @return 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
 ///
-int msgq_put(struct MessageQueue *q, struct Message *in);
+int msgq_put(struct MessageQueue *queue, struct Message *in);
 
 ///
 /// Removes and returns the message at the front of the queue, blocking if the queue is empty.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @param out The message at the front of the queue.
 /// @return 0 if a message was removed from the queue, or a negative value on error.
 ///
-int msgq_get(struct MessageQueue *q, struct Message *out);
+int msgq_get(struct MessageQueue *queue, struct Message *out);
 
 ///
 /// Returns the number of messages in the queue.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @return The number of messages in the queue.
 ///
-uint32_t msgq_size(struct MessageQueue *q);
+uint32_t msgq_size(struct MessageQueue *queue);
 
 ///
 /// Frees resources associated with the queue.
 ///
 /// Does not free the queue itself.  Useful for statically allocated queues.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @see msgq_init()
 ///
-void msgq_finish(struct MessageQueue *q);
+void msgq_finish(struct MessageQueue *queue);
 
 ///
 /// Frees resources associated with the queue.
@@ -117,10 +117,10 @@ void msgq_finish(struct MessageQueue *q);
 ///
 /// Consider using _cleanup_msgq_ for scoped cleanup.
 ///
-/// @param q A MessageQueue.
+/// @param queue A MessageQueue.
 /// @see msgq_create()
 ///
-void msgq_destroy(struct MessageQueue *q);
+void msgq_destroy(struct MessageQueue *queue);
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue *, msgq_destroy);
 #define _cleanup_msgq_ _cleanup_(msgq_destroyp)

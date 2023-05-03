@@ -12,25 +12,25 @@
 enum {
   WIDTH = 10,
   HEIGHT = 20,
-  CODESZ = 94, // ('~' - '!') + 1
+  CODE_SIZE = 94, // ('~' - '!') + 1
 };
 
-static const char *const fontfile = "./ucs-fonts/10x20.bdf";
-static const char *const bmpfile = "./10x20.bmp";
+static const char *const fontFile = "./ucs-fonts/10x20.bdf";
+static const char *const bmpFile = "./10x20.bmp";
 
 static const struct bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
 
-static char **allocimage(size_t height, size_t width);
-static void freeimage(char **image, size_t height);
+static char **allocImage(size_t height, size_t width);
+static void freeImage(char **image, size_t height);
 
 // pos = 0 is MSB
-static char getbit(unsigned char c, size_t pos) {
+static char getBit(unsigned char c, size_t pos) {
   if (pos >= CHAR_BIT) return 0;
   return (c >> (CHAR_BIT + ~pos)) & 1; // Also: c & (1 << (CHAR_BIT + ~pos));
 }
 
-static char **allocimage(size_t height, size_t width) {
+static char **allocImage(size_t height, size_t width) {
   char **ret = NULL;
   ret = calloc(height, sizeof(*ret));
   if (ret == NULL)
@@ -38,14 +38,14 @@ static char **allocimage(size_t height, size_t width) {
   for (size_t i = 0; i < height; ++i) {
     ret[i] = calloc(width, sizeof(**ret));
     if (ret[i] == NULL) {
-      freeimage(ret, i);
+      freeImage(ret, i);
       return NULL;
     }
   }
   return ret;
 }
 
-static void freeimage(char **image, size_t height) {
+static void freeImage(char **image, size_t height) {
   if (image == NULL) return;
   for (size_t i = 0; i < height; ++i)
     free(image[i]);
@@ -53,7 +53,7 @@ static void freeimage(char **image, size_t height) {
 }
 
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
-static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
+static void renderChar(FT_GlyphSlot slot, char **target, size_t offset) {
   unsigned char *buffer = slot->bitmap.buffer;
   size_t rows = (size_t)slot->bitmap.rows;
   size_t width = (size_t)slot->bitmap.width;
@@ -63,14 +63,14 @@ static void renderchar(FT_GlyphSlot slot, char **target, size_t offset) {
   for (size_t y = 0, p = 0; y < rows; ++y, p += pitch)
     for (size_t i = 0; i < pitch; ++i)
       for (size_t j = 0, x; j < CHAR_BIT; ++j) {
-        bit = getbit(buffer[p + i], j);
+        bit = getBit(buffer[p + i], j);
         x = j + (i * CHAR_BIT);
         if (x < width) target[y][x + (offset * width)] = bit;
       }
 }
 
 #ifdef DRAW_IMAGE
-static void drawimage(char **image, size_t width, size_t height) {
+static void drawImage(char **image, size_t width, size_t height) {
   for (size_t y = 0; y < height; ++y) {
     printf("%2zd|", y);
     for (size_t x = 0; x < width; ++x)
@@ -79,43 +79,43 @@ static void drawimage(char **image, size_t width, size_t height) {
   }
 }
 #else
-static inline void drawimage(_unused_ char **image, _unused_ size_t width, _unused_ size_t height) {
+static inline void drawImage(_unused_ char **image, _unused_ size_t width, _unused_ size_t height) {
 }
 #endif
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern const char *const fontfile;
-  extern const char *const bmpfile;
+  extern const char *const fontFile;
+  extern const char *const bmpFile;
   extern const struct bmp_Pixel32 white;
   extern const struct bmp_Pixel32 black;
 
   int ret = EXIT_FAILURE;
   int rc;
   char **image = NULL;
-  FT_Library ftlib = NULL;
+  FT_Library lib = NULL;
   FT_Face face = NULL;
   FT_GlyphSlot slot = NULL;
-  const size_t width = WIDTH * CODESZ;
+  const size_t width = WIDTH * CODE_SIZE;
   const size_t height = HEIGHT;
-  char code[CODESZ];
-  struct bmp_Pixel32 *buf;
+  char code[CODE_SIZE];
+  struct bmp_Pixel32 *buffer;
 
-  for (int i = 0; i < CODESZ; ++i)
+  for (int i = 0; i < CODE_SIZE; ++i)
     code[i] = (char)(i + '!');
 
-  image = allocimage(height, width);
+  image = allocImage(height, width);
   if (image == NULL) {
-    fprintf(stderr, "allocimage failed.");
+    fprintf(stderr, "allocImage failed.");
     return EXIT_FAILURE;
   }
 
-  rc = FT_Init_FreeType(&ftlib);
+  rc = FT_Init_FreeType(&lib);
   if (rc != 0) {
     fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
     goto out0;
   }
 
-  rc = FT_New_Face(ftlib, fontfile, 0, &face);
+  rc = FT_New_Face(lib, fontFile, 0, &face);
   if (rc != 0) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
     goto out1;
@@ -127,7 +127,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
     goto out1;
   }
 
-  for (size_t i = 0; i < CODESZ; ++i) {
+  for (size_t i = 0; i < CODE_SIZE; ++i) {
     rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
     if (rc != 0) {
       fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
@@ -149,31 +149,31 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
       goto out1;
     }
 
-    renderchar(slot, image, i);
+    renderChar(slot, image, i);
   }
 
-  drawimage(image, width, height);
+  drawImage(image, width, height);
 
-  buf = calloc(width * height, sizeof(struct bmp_Pixel32));
-  if (buf == NULL)
+  buffer = calloc(width * height, sizeof(struct bmp_Pixel32));
+  if (buffer == NULL)
     goto out2;
 
   for (size_t y = height, i = 0; y-- > 0;)
     for (size_t x = 0; x < width; ++x, ++i)
-      buf[i] = image[y][x] ? black : white;
+      buffer[i] = image[y][x] ? black : white;
 
-  rc = bmp_v4write(buf, width, height, bmpfile);
+  rc = bmp_v4write(buffer, width, height, bmpFile);
   if (rc != 0)
     goto out3;
 
   ret = EXIT_SUCCESS;
 out3:
-  free(buf);
+  free(buffer);
 out2:
   FT_Done_Face(face);
 out1:
-  FT_Done_FreeType(ftlib);
+  FT_Done_FreeType(lib);
 out0:
-  freeimage(image, height);
+  freeImage(image, height);
   return ret;
 }

@@ -12,20 +12,20 @@
 #include "prelude.h"
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  struct bmp_Filehdr filehdr;
-  struct bmp_Infohdr infohdr;
-  const char *const bmpfile = "./assets/sample_24bit.bmp";
+  struct bmp_FileHeader fileHeader;
+  struct bmp_InfoHeader infoHeader;
+  const char *const bmpFile = "./assets/sample_24bit.bmp";
 
   _cleanup_str_ char *image = NULL;
-  if (bmp_read(bmpfile, &filehdr, &infohdr, &image) != 0)
+  if (bmp_read(bmpFile, &fileHeader, &infoHeader, &image) != 0)
     return EXIT_FAILURE;
 
   struct bmp_Pixel24 *pixel = (struct bmp_Pixel24 *)image;
-  if (pixel->b != 0)
+  if (pixel->blue != 0)
     return EXIT_FAILURE;
-  if (pixel->g != 0)
+  if (pixel->green != 0)
     return EXIT_FAILURE;
-  if (pixel->r != 255)
+  if (pixel->red != 255)
     return EXIT_FAILURE;
 
   return EXIT_SUCCESS;

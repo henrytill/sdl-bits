@@ -29,19 +29,19 @@ enum LogCategory {
 static const int count = 100;
 
 /// Capacity of the MessageQueue.
-static const uint32_t qcap = 4;
+static const uint32_t queueCapacity = 4;
 
 /// MessageQueue for testing.
-static struct MessageQueue q;
+static struct MessageQueue queue;
 
 ///
-/// Call msgq_finish() on q.
+/// Call msgq_finish() on queue.
 ///
 /// @see msgq_finish()
 ///
-static void qfinish(void) {
-  extern struct MessageQueue q;
-  msgq_finish(&q);
+static void finishQueue(void) {
+  extern struct MessageQueue queue;
+  msgq_finish(&queue);
 }
 
 /// Log an error message and exits.
@@ -51,13 +51,13 @@ static void fail(const char *msg) {
 }
 
 /// Log a msgq error message and exits.
-static void qfail(int err, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_errorstr(err));
+static void msgq_fail(int err, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exits.
-static void sdlfail(const char *msg) {
+static void sdl_fail(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0)
     SDL_LogError(ERR, "%s (%s)", msg, err);
@@ -79,9 +79,9 @@ static void sdlfail(const char *msg) {
 static int produce(void *data) {
   extern const int count;
   int rc;
-  struct Message msg;
+  struct Message message;
   enum MessageTag tag;
-  const char *tagstr = NULL;
+  const char *tagString = NULL;
 
   if (data == NULL)
     fail("produce failed: data is NULL");
@@ -90,21 +90,21 @@ static int produce(void *data) {
 
   for (intptr_t value = 0; value <= count;) {
     tag = (value < count) ? SOME : NONE;
-    tagstr = msgq_tagstr(tag);
+    tagString = msgq_tag(tag);
 
-    msg.tag = tag;
-    msg.value = value;
+    message.tag = tag;
+    message.value = value;
 
-    rc = msgq_put(queue, (void *)&msg);
+    rc = msgq_put(queue, (void *)&message);
     if (rc < 0) {
-      qfail(rc, "msgq_put failed");
+      msgq_fail(rc, "msgq_put failed");
     } else if (rc == 1) {
       SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
-                   tagstr, value);
+                   tagString, value);
       continue;
     } else {
       SDL_LogInfo(APP, "Produced {%s, %" PRIdPTR "}",
-                  tagstr, value);
+                  tagString, value);
       value += 1;
     }
   }
@@ -122,24 +122,24 @@ static int produce(void *data) {
 /// @see produce()
 ///
 static int consume(struct MessageQueue *queue) {
-  struct Message msg;
+  struct Message message;
 
-  const int rc = msgq_get(queue, (void *)&msg);
+  const int rc = msgq_get(queue, (void *)&message);
   if (rc < 0)
-    qfail(rc, "msgq_get failed");
+    msgq_fail(rc, "msgq_get failed");
 
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_tagstr(msg.tag), msg.value);
+              msgq_tag(message.tag), message.value);
 
-  return msg.tag != NONE;
+  return message.tag != NONE;
 }
 
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
 ///
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern struct MessageQueue q;
-  extern const uint32_t qcap;
+  extern struct MessageQueue queue;
+  extern const uint32_t queueCapacity;
 
   int rc;
   SDL_Thread *producer;
@@ -148,22 +148,22 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc < 0)
-    sdlfail("SDL_Init failed");
+    sdl_fail("SDL_Init failed");
 
-  exitwith(SDL_Quit);
+  AT_EXIT(SDL_Quit);
 
-  rc = msgq_init(&q, qcap);
+  rc = msgq_init(&queue, queueCapacity);
   if (rc < 0)
-    qfail(rc, "msgq_init failed");
+    msgq_fail(rc, "msgq_init failed");
 
-  exitwith(qfinish);
+  AT_EXIT(finishQueue);
 
-  producer = SDL_CreateThread(produce, "producer", &q);
+  producer = SDL_CreateThread(produce, "producer", &queue);
   if (producer == NULL)
-    sdlfail("SDL_CreateThread failed");
+    sdl_fail("SDL_CreateThread failed");
 
   for (;;) {
-    rc = consume(&q);
+    rc = consume(&queue);
     if (rc == 0) {
       break;
     } else if (rc < 0) {

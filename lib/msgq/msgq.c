@@ -2,21 +2,21 @@
 
 #include "msgq.h"
 
-static const char *const tagstr[] = {
+static const char *const tagString[] = {
   [NONE >> 1] = "NONE",
   [SOME >> 1] = "SOME",
   [QUIT >> 1] = "QUIT",
 };
 
-const char *msgq_tagstr(enum MessageTag tag) {
-  extern const char *const tagstr[];
+const char *msgq_tag(enum MessageTag tag) {
+  extern const char *const tagString[];
   if (tag > QUIT || tag < NONE) {
     return NULL;
   }
-  return tagstr[tag >> 1];
+  return tagString[tag >> 1];
 }
 
-static const char *const errorstr[] = {
+static const char *const errorString[] = {
   [-MSGQ_FAILURE_MALLOC] = "malloc failed",
   [-MSGQ_FAILURE_SEM_CREATE] = "SDL_CreateSemaphore failed",
   [-MSGQ_FAILURE_SEM_POST] = "SDL_SemPost failed",
@@ -27,136 +27,136 @@ static const char *const errorstr[] = {
   [-MSGQ_FAILURE_MUTEX_UNLOCK] = "SDL_UnlockMutex failed",
 };
 
-const char *msgq_errorstr(int rc) {
-  extern const char *const errorstr[];
+const char *msgq_error(int rc) {
+  extern const char *const errorString[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
   }
-  return errorstr[-rc];
+  return errorString[-rc];
 }
 
-int msgq_init(struct MessageQueue *q, uint32_t capacity) {
-  q->buffer = malloc((size_t)capacity * sizeof(*q->buffer));
-  if (q->buffer == NULL) {
+int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
+  queue->buffer = malloc((size_t)capacity * sizeof(*queue->buffer));
+  if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
   }
-  q->capacity = capacity;
-  q->front = 0;
-  q->rear = 0;
-  q->empty = SDL_CreateSemaphore(capacity);
-  if (q->empty == NULL) {
-    free(q->buffer);
+  queue->capacity = capacity;
+  queue->front = 0;
+  queue->rear = 0;
+  queue->empty = SDL_CreateSemaphore(capacity);
+  if (queue->empty == NULL) {
+    free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
-  q->full = SDL_CreateSemaphore(0);
-  if (q->empty == NULL) {
-    SDL_DestroySemaphore(q->empty);
-    free(q->buffer);
+  queue->full = SDL_CreateSemaphore(0);
+  if (queue->empty == NULL) {
+    SDL_DestroySemaphore(queue->empty);
+    free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
-  q->lock = SDL_CreateMutex();
-  if (q->lock == NULL) {
-    SDL_DestroySemaphore(q->full);
-    SDL_DestroySemaphore(q->empty);
-    free(q->buffer);
+  queue->lock = SDL_CreateMutex();
+  if (queue->lock == NULL) {
+    SDL_DestroySemaphore(queue->full);
+    SDL_DestroySemaphore(queue->empty);
+    free(queue->buffer);
     return MSGQ_FAILURE_MUTEX_CREATE;
   }
   return 0;
 }
 
 struct MessageQueue *msgq_create(uint32_t capacity) {
-  struct MessageQueue *q = malloc(sizeof(*q));
-  if (q == NULL) {
+  struct MessageQueue *queue = malloc(sizeof(*queue));
+  if (queue == NULL) {
     return NULL;
   }
-  int rc = msgq_init(q, capacity);
+  int rc = msgq_init(queue, capacity);
   if (rc < 0) {
-    free(q);
+    free(queue);
     return NULL;
   }
-  return q;
+  return queue;
 }
 
-int msgq_put(struct MessageQueue *q, struct Message *in) {
+int msgq_put(struct MessageQueue *queue, struct Message *in) {
   int rc;
 
-  rc = SDL_SemTryWait(q->empty);
+  rc = SDL_SemTryWait(queue->empty);
   if (rc == SDL_MUTEX_TIMEDOUT) {
     return 1;
   } else if (rc < 0) {
     return MSGQ_FAILURE_SEM_TRY_WAIT;
   }
-  rc = SDL_LockMutex(q->lock);
+  rc = SDL_LockMutex(queue->lock);
   if (rc == -1) {
     return MSGQ_FAILURE_MUTEX_LOCK;
   }
-  q->buffer[q->rear] = *in;
-  q->rear = (q->rear + 1) % q->capacity;
-  rc = SDL_UnlockMutex(q->lock);
+  queue->buffer[queue->rear] = *in;
+  queue->rear = (queue->rear + 1) % queue->capacity;
+  rc = SDL_UnlockMutex(queue->lock);
   if (rc == -1) {
     return MSGQ_FAILURE_MUTEX_UNLOCK;
   }
-  rc = SDL_SemPost(q->full);
+  rc = SDL_SemPost(queue->full);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_POST;
   }
   return 0;
 }
 
-int msgq_get(struct MessageQueue *q, struct Message *out) {
+int msgq_get(struct MessageQueue *queue, struct Message *out) {
   int rc;
 
-  rc = SDL_SemWait(q->full);
+  rc = SDL_SemWait(queue->full);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_WAIT;
   }
-  rc = SDL_LockMutex(q->lock);
+  rc = SDL_LockMutex(queue->lock);
   if (rc == -1) {
     return MSGQ_FAILURE_MUTEX_LOCK;
   }
-  *out = q->buffer[q->front];
-  q->front = (q->front + 1) % q->capacity;
-  rc = SDL_UnlockMutex(q->lock);
+  *out = queue->buffer[queue->front];
+  queue->front = (queue->front + 1) % queue->capacity;
+  rc = SDL_UnlockMutex(queue->lock);
   if (rc == -1) {
     return MSGQ_FAILURE_MUTEX_UNLOCK;
   }
-  rc = SDL_SemPost(q->empty);
+  rc = SDL_SemPost(queue->empty);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_POST;
   }
   return 0;
 }
 
-uint32_t msgq_size(struct MessageQueue *q) {
-  if (q == NULL) return 0;
-  return SDL_SemValue(q->full);
+uint32_t msgq_size(struct MessageQueue *queue) {
+  if (queue == NULL) return 0;
+  return SDL_SemValue(queue->full);
 }
 
-void msgq_finish(struct MessageQueue *q) {
-  if (q == NULL) return;
-  q->capacity = 0;
-  q->front = 0;
-  q->rear = 0;
-  if (q->buffer != NULL) {
-    free(q->buffer);
-    q->buffer = NULL;
+void msgq_finish(struct MessageQueue *queue) {
+  if (queue == NULL) return;
+  queue->capacity = 0;
+  queue->front = 0;
+  queue->rear = 0;
+  if (queue->buffer != NULL) {
+    free(queue->buffer);
+    queue->buffer = NULL;
   }
-  if (q->empty != NULL) {
-    SDL_DestroySemaphore(q->empty);
-    q->empty = NULL;
+  if (queue->empty != NULL) {
+    SDL_DestroySemaphore(queue->empty);
+    queue->empty = NULL;
   }
-  if (q->full != NULL) {
-    SDL_DestroySemaphore(q->full);
-    q->full = NULL;
+  if (queue->full != NULL) {
+    SDL_DestroySemaphore(queue->full);
+    queue->full = NULL;
   };
-  if (q->lock != NULL) {
-    SDL_DestroyMutex(q->lock);
-    q->lock = NULL;
+  if (queue->lock != NULL) {
+    SDL_DestroyMutex(queue->lock);
+    queue->lock = NULL;
   };
 }
 
-void msgq_destroy(struct MessageQueue *q) {
-  if (q == NULL) return;
-  msgq_finish(q);
-  free(q);
+void msgq_destroy(struct MessageQueue *queue) {
+  if (queue == NULL) return;
+  msgq_finish(queue);
+  free(queue);
 }

@@ -14,26 +14,26 @@
 #define _packed_     __attribute__((packed))
 #define _unused_     __attribute__((unused))
 
-#define array_size(array) (sizeof(array) / sizeof((array)[0]))
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
-#define typeof_member(type, member) typeof(((type *)0)->member)
+#define TYPEOF_MEMBER(type, member) typeof(((type *)0)->member)
 
-#define same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+#define SAME_TYPE(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 
-#define container_of(ptr, type, member) ({                                         \
+#define CONTAINER_OF(ptr, type, member) ({                                         \
   void *__mptr = (void *)(ptr);                                                    \
-  static_assert(same_type(*(ptr), ((type *)0)->member) || same_type(*(ptr), void), \
+  static_assert(SAME_TYPE(*(ptr), ((type *)0)->member) || SAME_TYPE(*(ptr), void), \
                 "pointer type mismatch");                                          \
   ((type *)(__mptr - offsetof(type, member)));                                     \
 })
 
-#define container_of_const(ptr, type, member)                                \
+#define CONTAINER_OF_CONST(ptr, type, member)                                \
   _Generic(                                                                  \
     ptr,                                                                     \
-    const typeof(*(ptr)) *: ((const type *)container_of(ptr, type, member)), \
-    default: ((type *)container_of(ptr, type, member)))
+    const typeof(*(ptr)) *: ((const type *)CONTAINER_OF(ptr, type, member)), \
+    default: ((type *)CONTAINER_OF(ptr, type, member)))
 
-#define send(obj, method, ...) ({    \
+#define SEND(obj, method, ...) ({    \
   typeof(obj) _obj = (obj);          \
   _obj->method(_obj, ##__VA_ARGS__); \
 })
@@ -44,7 +44,7 @@
 #define debug_printf(fmt, ...) ({})
 #endif
 
-#define exitwith(func) ({                          \
+#define AT_EXIT(func) ({                           \
   if (atexit(func) != 0) {                         \
     fprintf(stderr, "atexit(%s) failed\n", #func); \
     exit(EXIT_FAILURE);                            \

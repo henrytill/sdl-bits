@@ -13,20 +13,20 @@ enum {
 };
 
 static void freetype(void) {
-  FT_Library ftlib = NULL;
+  FT_Library lib = NULL;
   FT_Int major;
   FT_Int minor;
   FT_Int patch;
   int rc;
 
-  rc = FT_Init_FreeType(&ftlib);
+  rc = FT_Init_FreeType(&lib);
   if (rc != 0) {
     SDL_LogError(UNHANDLED, "Failed to initialize FreeType");
     return;
   }
-  FT_Library_Version(ftlib, &major, &minor, &patch);
+  FT_Library_Version(lib, &major, &minor, &patch);
   SDL_LogInfo(UNHANDLED, "Linking against FreeType %u.%u.%u", major, minor, patch);
-  FT_Done_FreeType(ftlib);
+  FT_Done_FreeType(lib);
 }
 
 static void lua(void) {
@@ -35,20 +35,20 @@ static void lua(void) {
     SDL_LogError(UNHANDLED, "Failed to initialize Lua");
     return;
   }
-  const lua_Number lded = lua_version(state);
+  const lua_Number linked = lua_version(state);
   SDL_LogInfo(UNHANDLED, "Compiled against Lua %s ...", LUA_RELEASE);
-  SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f", lded);
+  SDL_LogInfo(UNHANDLED, "... and linking against Lua %.2f", linked);
   lua_close(state);
 }
 
 static void sdl(void) {
-  SDL_version cced;
-  SDL_version lded;
+  SDL_version compiled;
+  SDL_version linked;
 
-  SDL_VERSION(&cced);
-  SDL_GetVersion(&lded);
-  SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...", cced.major, cced.minor, cced.patch);
-  SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.", lded.major, lded.minor, lded.patch);
+  SDL_VERSION(&compiled);
+  SDL_GetVersion(&linked);
+  SDL_LogInfo(UNHANDLED, "Compiled against SDL %u.%u.%u ...", compiled.major, compiled.minor, compiled.patch);
+  SDL_LogInfo(UNHANDLED, "... and linking against SDL %u.%u.%u.", linked.major, linked.minor, linked.patch);
 }
 
 int main(_unused_ int argc, _unused_ char *argv[]) {

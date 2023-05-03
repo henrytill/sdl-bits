@@ -4,15 +4,15 @@
 
 static int enumdisp(void) {
   SDL_DisplayMode mode;
-  int rc, ndisp;
+  int rc, numDisplays;
 
-  ndisp = SDL_GetNumVideoDisplays();
-  if (ndisp < 0) {
+  numDisplays = SDL_GetNumVideoDisplays();
+  if (numDisplays < 0) {
     const char *err = SDL_GetError();
     SDL_Log("Failed to get number of video displays: %s", err);
     return -1;
   }
-  for (int i = 0; i < ndisp; ++i) {
+  for (int i = 0; i < numDisplays; ++i) {
     rc = SDL_GetCurrentDisplayMode(i, &mode);
     if (rc != 0) {
       const char *err = SDL_GetError();

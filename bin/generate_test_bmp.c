@@ -19,11 +19,11 @@ static const struct bmp_Pixel32 buf[] = {
   {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static const char *const bmpfile = "./test.bmp";
+static const char *const bmpFile = "./test.bmp";
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
   extern const struct bmp_Pixel32 buf[];
-  extern const char *const bmpfile;
+  extern const char *const bmpFile;
 
-  return (bmp_v4write(buf, WIDTH, HEIGHT, bmpfile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return (bmp_v4write(buf, WIDTH, HEIGHT, bmpFile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

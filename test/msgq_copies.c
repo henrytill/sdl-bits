@@ -17,20 +17,20 @@
 #include "macro.h"
 #include "msgq.h"
 
-#define LOGMSG(msg) ({                          \
-  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",  \
-              __func__, #msg,                   \
-              msgq_tagstr(msg.tag), msg.value); \
+#define LOG(message) ({                              \
+  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",       \
+              __func__, #message,                    \
+              msgq_tag(message.tag), message.value); \
 })
 
-#define CHECKMSG(msg, extag, exvalue) ({                       \
-  if (msg.tag != extag || msg.value != exvalue) {              \
-    SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
-                 __func__, #msg,                               \
-                 msgq_tagstr(msg.tag), msg.value,              \
-                 msgq_tagstr(extag), exvalue);                 \
-    exit(EXIT_FAILURE);                                        \
-  }                                                            \
+#define CHECK(message, expectedTag, expectedValue) ({                 \
+  if (message.tag != expectedTag || message.value != expectedValue) { \
+    SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}",        \
+                 __func__, #message,                                  \
+                 msgq_tag(message.tag), message.value,                \
+                 msgq_tag(expectedTag), expectedValue);               \
+    exit(EXIT_FAILURE);                                               \
+  }                                                                   \
 });
 
 /// Log categories to use with SDL logging functions.
@@ -43,29 +43,29 @@ enum LogCategory {
 static const uint32_t delay = 2000U;
 
 /// Capacity of the MessageQueue.
-static const uint32_t qcap = 1U;
+static const uint32_t queueCapacity = 1U;
 
 /// MessageQueue for testing.
-static struct MessageQueue q;
+static struct MessageQueue queue;
 
 ///
-/// Call msgq_finish() on q.
+/// Call msgq_finish() on queue.
 ///
 /// @see msgq_finish()
 ///
-static void qfinish(void) {
-  extern struct MessageQueue q;
-  msgq_finish(&q);
+static void finishQueue(void) {
+  extern struct MessageQueue queue;
+  msgq_finish(&queue);
 }
 
 /// Log a msgq error message and exits.
-static void qfail(int err, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_errorstr(err));
+static void msgq_fail(int err, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exits.
-static void sdlfail(const char *msg) {
+static void sdl_fail(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0)
     SDL_LogError(ERR, "%s (%s)", msg, err);
@@ -85,34 +85,34 @@ static void sdlfail(const char *msg) {
 ///
 static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
-  struct Message m;
+  struct Message message;
 
-  m.tag = SOME;
-  m.value = 42;
+  message.tag = SOME;
+  message.value = 42;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &m);
+    rc = msgq_put(queue, &message);
     if (rc < 0)
-      qfail(rc, "msgq_put failed");
+      msgq_fail(rc, "msgq_put failed");
   }
-  LOGMSG(m);
+  LOG(message);
 
-  m.tag = SOME;
-  m.value = 0;
+  message.tag = SOME;
+  message.value = 0;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &m);
+    rc = msgq_put(queue, &message);
     if (rc < 0)
-      qfail(rc, "msgq_put failed");
+      msgq_fail(rc, "msgq_put failed");
   }
-  LOGMSG(m);
+  LOG(message);
 
-  m.tag = SOME;
-  m.value = 1;
+  message.tag = SOME;
+  message.value = 1;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &m);
+    rc = msgq_put(queue, &message);
     if (rc < 0)
-      qfail(rc, "msgq_put failed");
+      msgq_fail(rc, "msgq_put failed");
   }
-  LOGMSG(m);
+  LOG(message);
 
   return 0;
 }
@@ -136,19 +136,19 @@ static int consume(struct MessageQueue *queue) {
   SDL_Delay(delay);
 
   msgq_get(queue, (void *)&a);
-  LOGMSG(a);
-  CHECKMSG(a, SOME, 42l);
+  LOG(a);
+  CHECK(a, SOME, 42l);
 
   msgq_get(queue, (void *)&b);
-  LOGMSG(b);
-  CHECKMSG(a, SOME, 42l);
-  CHECKMSG(b, SOME, 0l);
+  LOG(b);
+  CHECK(a, SOME, 42l);
+  CHECK(b, SOME, 0l);
 
   msgq_get(queue, (void *)&c);
-  LOGMSG(c);
-  CHECKMSG(a, SOME, 42l);
-  CHECKMSG(b, SOME, 0l);
-  CHECKMSG(c, SOME, 1l);
+  LOG(c);
+  CHECK(a, SOME, 42l);
+  CHECK(b, SOME, 0l);
+  CHECK(c, SOME, 1l);
 
   return 0;
 }
@@ -157,8 +157,8 @@ static int consume(struct MessageQueue *queue) {
 /// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
 ///
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern struct MessageQueue q;
-  extern const uint32_t qcap;
+  extern struct MessageQueue queue;
+  extern const uint32_t queueCapacity;
 
   int rc;
   SDL_Thread *producer;
@@ -167,21 +167,21 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc != 0)
-    sdlfail("SDL_Init failed");
+    sdl_fail("SDL_Init failed");
 
-  exitwith(SDL_Quit);
+  AT_EXIT(SDL_Quit);
 
-  rc = msgq_init(&q, qcap);
+  rc = msgq_init(&queue, queueCapacity);
   if (rc != 0)
-    qfail(rc, "msgq_init failed");
+    msgq_fail(rc, "msgq_init failed");
 
-  exitwith(qfinish);
+  AT_EXIT(finishQueue);
 
-  producer = SDL_CreateThread(produce, "producer", (void *)&q);
+  producer = SDL_CreateThread(produce, "producer", (void *)&queue);
   if (producer == NULL)
-    sdlfail("SDL_CreateThread failed");
+    sdl_fail("SDL_CreateThread failed");
 
-  if (consume(&q) != 0)
+  if (consume(&queue) != 0)
     return EXIT_FAILURE;
 
   SDL_WaitThread(producer, NULL);
