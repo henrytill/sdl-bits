@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "bmp.h"
+#include "macro.h"
 
 enum {
   DWORDBITS = 32,
@@ -13,6 +14,9 @@ const uint16_t FILETYPE = 0x4D42;
 const uint32_t BI_BITFIELDS = 0x0003;
 const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
+DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose);
+#define _cleanup_FILE_ _cleanup_(fclosep)
+
 size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
   const double pixelBits = (double)bitsPerPixel * width;
   return (size_t)(ceil(pixelBits / DWORDBITS)) * DWORDBYTES;
@@ -20,129 +24,117 @@ size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
 
 int bmp_read(const char *file, struct bmp_FileHeader *fileHeader,
              struct bmp_InfoHeader *infoHeader, char **image) {
-  int ret = -1;
   int rc;
   size_t reads;
-  FILE *fileHandle = NULL;
   uint32_t size;
   fpos_t pos;
 
-  fileHandle = fopen(file, "r");
+  _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
-    return ret;
+    return -1;
 
   reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
 
   rc = fgetpos(fileHandle, &pos);
   if (rc != 0)
-    goto out;
+    return -1;
 
   reads = fread(&size, sizeof(size), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
   if (size != BITMAPINFOHEADER)
-    goto out;
+    return -1;
 
   rc = fsetpos(fileHandle, &pos);
   if (rc != 0)
-    goto out;
+    return -1;
 
   reads = fread(infoHeader, sizeof(*infoHeader), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
 
   const uint32_t imageSize = infoHeader->imageSize;
   *image = calloc(imageSize, sizeof(**image));
   if (*image == NULL)
-    goto out;
+    return -1;
 
   reads = fread(*image, imageSize * sizeof(**image), 1, fileHandle);
   if (reads != 1) {
     free(*image);
-    goto out;
+    return -1;
   }
 
-  ret = 0;
-out:
-  fclose(fileHandle);
-  return ret;
+  return 0;
 }
 
 int bmp_v4read(const char *file, struct bmp_FileHeader *fileHeader,
                struct bmp_V4Header *v4Header, char **image) {
-  int ret = -1;
   int rc;
   size_t reads;
-  FILE *fileHandle = NULL;
   uint32_t size;
   fpos_t pos;
 
-  fileHandle = fopen(file, "r");
+  _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
-    return ret;
+    return -1;
 
   reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
 
   rc = fgetpos(fileHandle, &pos);
   if (rc != 0)
-    goto out;
+    return -1;
 
   reads = fread(&size, sizeof(size), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
   if (size != BITMAPV4HEADER)
-    goto out;
+    return -1;
 
   rc = fsetpos(fileHandle, &pos);
   if (rc != 0)
-    goto out;
+    return -1;
 
   reads = fread(v4Header, sizeof(*v4Header), 1, fileHandle);
   if (reads != 1)
-    goto out;
+    return -1;
 
   const uint32_t imageSize = v4Header->imageSize;
   *image = calloc(imageSize, sizeof(**image));
   if (*image == NULL)
-    goto out;
+    return -1;
 
   reads = fread(*image, imageSize * sizeof(**image), 1, fileHandle);
   if (reads != 1) {
     free(*image);
-    goto out;
+    return -1;
   }
 
-  ret = 0;
-out:
-  fclose(fileHandle);
-  return ret;
+  return 0;
 }
 
 int bmp_v4write(const struct bmp_Pixel32 *buffer,
                 size_t width, size_t height,
                 const char *file) {
-  int ret = -1;
   size_t writes;
-  FILE *fileHandle = NULL;
 
   if (buffer == NULL || file == NULL)
-    return ret;
+    return -1;
   if (width > INT32_MAX || height > INT32_MAX)
-    return ret;
+    return -1;
 
   const size_t imageSize = (width * height) * sizeof(struct bmp_Pixel32);
   if (imageSize > UINT32_MAX)
-    return ret;
+    return -1;
 
   const size_t offset = sizeof(struct bmp_FileHeader) + sizeof(struct bmp_V4Header);
 
   const size_t fileSize = offset + imageSize;
   if (fileSize > UINT32_MAX)
-    return ret;
+    return -1;
 
   struct bmp_FileHeader fileHeader = {
     .fileType = FILETYPE,
@@ -175,24 +167,21 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
     .blueGamma = 0,
   };
 
-  fileHandle = fopen(file, "wb");
+  _cleanup_FILE_ FILE *fileHandle = fopen(file, "wb");
   if (fileHandle == NULL)
-    return ret;
+    return -1;
 
   writes = fwrite(&fileHeader, sizeof(struct bmp_FileHeader), 1, fileHandle);
   if (writes != 1)
-    goto out;
+    return -1;
 
   writes = fwrite(&v4Header, sizeof(struct bmp_V4Header), 1, fileHandle);
   if (writes != 1)
-    goto out;
+    return -1;
 
   writes = fwrite(buffer, imageSize, 1, fileHandle);
   if (writes != 1)
-    goto out;
+    return -1;
 
-  ret = 0;
-out:
-  fclose(fileHandle);
-  return ret;
+  return 0;
 }
