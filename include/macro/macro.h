@@ -6,15 +6,29 @@
 #define DEBUG
 #endif
 
+// C2X compatibility
+
 #ifndef static_assert
 #define static_assert _Static_assert
 #endif
+
+// Attributes
 
 #define _cleanup_(f) __attribute__((cleanup(f)))
 #define _packed_     __attribute__((packed))
 #define _unused_     __attribute__((unused))
 
+// General
+
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+
+#ifdef DEBUG
+#define debug_printf(fmt, ...) printf(fmt, __VA_ARGS__)
+#else
+#define debug_printf(fmt, ...) ({})
+#endif
+
+// OOP
 
 #define TYPEOF_MEMBER(type, member) typeof(((type *)0)->member)
 
@@ -33,16 +47,12 @@
     const typeof(*(ptr)) *: ((const type *)CONTAINER_OF(ptr, type, member)), \
     default: ((type *)CONTAINER_OF(ptr, type, member)))
 
-#define SEND(obj, method, ...) ({    \
-  typeof(obj) _obj = (obj);          \
-  _obj->method(_obj, ##__VA_ARGS__); \
+#define SEND(obj, method, ...) ({      \
+  typeof(obj) __obj = (obj);           \
+  __obj->method(__obj, ##__VA_ARGS__); \
 })
 
-#ifdef DEBUG
-#define debug_printf(fmt, ...) printf(fmt, __VA_ARGS__)
-#else
-#define debug_printf(fmt, ...) ({})
-#endif
+// Cleanup
 
 #define AT_EXIT(func) ({                           \
   if (atexit(func) != 0) {                         \
