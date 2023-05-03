@@ -128,6 +128,7 @@ static int produce(void *data) {
 ///
 static int consume(struct MessageQueue *queue) {
   extern const uint32_t delay;
+
   struct Message a;
   struct Message b;
   struct Message c;

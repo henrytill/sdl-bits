@@ -78,6 +78,7 @@ static void sdl_fail(const char *msg) {
 ///
 static int produce(void *data) {
   extern const int count;
+
   int rc;
   struct Message message;
   enum MessageTag tag;

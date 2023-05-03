@@ -16,7 +16,7 @@ struct PersonOperations {
   void (*sayHello)(struct Person *self);
 };
 
-void Person_sayHello(struct Person *self) {
+static void Person_sayHello(struct Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
@@ -35,7 +35,7 @@ struct Person *Person_new(char *name, int age) {
 }
 
 /// Base class destructor.
-void Person_destroy(struct Person *self) {
+static void Person_destroy(struct Person *self) {
   free(self);
 }
 
@@ -46,7 +46,7 @@ struct Student {
 };
 
 /// Derived class override of PersonOperations::sayHello
-void Student_sayHello(struct Person *self) {
+static void Student_sayHello(struct Person *self) {
   struct Student *student = CONTAINER_OF(self, struct Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
@@ -68,7 +68,7 @@ struct Student *Student_new(char *name, int age, char *school) {
 }
 
 /// Derived class destructor.
-void Student_destroy(struct Student *self) {
+static void Student_destroy(struct Student *self) {
   free(self);
 }
 

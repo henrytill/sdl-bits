@@ -207,7 +207,7 @@ static void calcSine(void *userData, uint8_t *stream, _unused_ int len) {
 ///
 /// Calculate the time in milliseconds for a frame.
 ///
-/// @param frameRate The framerate
+/// @param frameRate The frame rate
 /// @return The time in milliseconds for a frame
 ///
 static double calcFrameTime(int frameRate) {
@@ -256,6 +256,7 @@ static void delay(double frameTime, uint64_t begin) {
 static int initWindow(struct Config *config, const char *title, struct Window *window) {
   extern const uint32_t windowTypeFlags[];
   extern const char *const windowTypeString[];
+
   SDL_LogInfo(APP, "Window type: %s", windowTypeString[config->windowType]);
   window->window = SDL_CreateWindow(title,
                                     config->x, config->y,
