@@ -85,10 +85,8 @@ static void sdl_fail(const char *msg) {
 ///
 static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
-  struct Message message;
+  struct Message message = {.tag = SOME, .value = 42};
 
-  message.tag = SOME;
-  message.value = 42;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &message);
     if (rc < 0)
@@ -129,9 +127,9 @@ static int produce(void *data) {
 static int consume(struct MessageQueue *queue) {
   extern const uint32_t delay;
 
-  struct Message a;
-  struct Message b;
-  struct Message c;
+  struct Message a = {0};
+  struct Message b = {0};
+  struct Message c = {0};
 
   SDL_LogInfo(APP, "%s: pausing for %d...", __func__, delay);
   SDL_Delay(delay);
@@ -161,12 +159,9 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue queue;
   extern const uint32_t queueCapacity;
 
-  int rc;
-  SDL_Thread *producer;
-
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
-  rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
+  int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc != 0)
     sdl_fail("SDL_Init failed");
 
@@ -178,7 +173,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(finishQueue);
 
-  producer = SDL_CreateThread(produce, "producer", (void *)&queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", (void *)&queue);
   if (producer == NULL)
     sdl_fail("SDL_CreateThread failed");
 

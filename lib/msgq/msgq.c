@@ -78,9 +78,7 @@ struct MessageQueue *msgq_create(uint32_t capacity) {
 }
 
 int msgq_put(struct MessageQueue *queue, struct Message *in) {
-  int rc;
-
-  rc = SDL_SemTryWait(queue->empty);
+  int rc = SDL_SemTryWait(queue->empty);
   if (rc == SDL_MUTEX_TIMEDOUT) {
     return 1;
   } else if (rc < 0) {
@@ -104,9 +102,7 @@ int msgq_put(struct MessageQueue *queue, struct Message *in) {
 }
 
 int msgq_get(struct MessageQueue *queue, struct Message *out) {
-  int rc;
-
-  rc = SDL_SemWait(queue->full);
+  int rc = SDL_SemWait(queue->full);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_WAIT;
   }

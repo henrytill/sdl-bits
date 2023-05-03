@@ -79,9 +79,8 @@ static void sdl_fail(const char *msg) {
 static int produce(void *data) {
   extern const int count;
 
-  int rc;
-  struct Message message;
-  enum MessageTag tag;
+  struct Message message = {0};
+  enum MessageTag tag = NONE;
   const char *tagString = NULL;
 
   if (data == NULL)
@@ -96,7 +95,7 @@ static int produce(void *data) {
     message.tag = tag;
     message.value = value;
 
-    rc = msgq_put(queue, (void *)&message);
+    const int rc = msgq_put(queue, (void *)&message);
     if (rc < 0) {
       msgq_fail(rc, "msgq_put failed");
     } else if (rc == 1) {
@@ -142,12 +141,9 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue queue;
   extern const uint32_t queueCapacity;
 
-  int rc;
-  SDL_Thread *producer;
-
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
-  rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
+  int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc < 0)
     sdl_fail("SDL_Init failed");
 
@@ -159,7 +155,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(finishQueue);
 
-  producer = SDL_CreateThread(produce, "producer", &queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", &queue);
   if (producer == NULL)
     sdl_fail("SDL_CreateThread failed");
 

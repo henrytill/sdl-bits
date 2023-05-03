@@ -24,23 +24,20 @@ size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
 
 int bmp_read(const char *file, struct bmp_FileHeader *fileHeader,
              struct bmp_InfoHeader *infoHeader, char **image) {
-  int rc;
-  size_t reads;
-  uint32_t size;
-  fpos_t pos;
-
   _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
 
-  reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
+  size_t reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
   if (reads != 1)
     return -1;
 
-  rc = fgetpos(fileHandle, &pos);
+  fpos_t pos;
+  int rc = fgetpos(fileHandle, &pos);
   if (rc != 0)
     return -1;
 
+  uint32_t size = 0;
   reads = fread(&size, sizeof(size), 1, fileHandle);
   if (reads != 1)
     return -1;
@@ -71,23 +68,20 @@ int bmp_read(const char *file, struct bmp_FileHeader *fileHeader,
 
 int bmp_v4read(const char *file, struct bmp_FileHeader *fileHeader,
                struct bmp_V4Header *v4Header, char **image) {
-  int rc;
-  size_t reads;
-  uint32_t size;
-  fpos_t pos;
-
   _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
 
-  reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
+  size_t reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
   if (reads != 1)
     return -1;
 
-  rc = fgetpos(fileHandle, &pos);
+  fpos_t pos;
+  int rc = fgetpos(fileHandle, &pos);
   if (rc != 0)
     return -1;
 
+  uint32_t size = 0;
   reads = fread(&size, sizeof(size), 1, fileHandle);
   if (reads != 1)
     return -1;
@@ -119,8 +113,6 @@ int bmp_v4read(const char *file, struct bmp_FileHeader *fileHeader,
 int bmp_v4write(const struct bmp_Pixel32 *buffer,
                 size_t width, size_t height,
                 const char *file) {
-  size_t writes;
-
   if (buffer == NULL || file == NULL)
     return -1;
   if (width > INT32_MAX || height > INT32_MAX)
@@ -171,7 +163,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
   if (fileHandle == NULL)
     return -1;
 
-  writes = fwrite(&fileHeader, sizeof(struct bmp_FileHeader), 1, fileHandle);
+  size_t writes = fwrite(&fileHeader, sizeof(struct bmp_FileHeader), 1, fileHandle);
   if (writes != 1)
     return -1;
 

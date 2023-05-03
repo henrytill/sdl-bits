@@ -14,12 +14,11 @@ enum {
 
 static void freetype(void) {
   FT_Library lib = NULL;
-  FT_Int major;
-  FT_Int minor;
-  FT_Int patch;
-  int rc;
+  FT_Int major = 0;
+  FT_Int minor = 0;
+  FT_Int patch = 0;
 
-  rc = FT_Init_FreeType(&lib);
+  int rc = FT_Init_FreeType(&lib);
   if (rc != 0) {
     SDL_LogError(APP, "Failed to initialize FreeType");
     return;
@@ -43,8 +42,8 @@ static void lua(void) {
 }
 
 static void sdl(void) {
-  SDL_version compiled;
-  SDL_version linked;
+  SDL_version compiled = {0};
+  SDL_version linked = {0};
 
   SDL_VERSION(&compiled);
   SDL_GetVersion(&linked);

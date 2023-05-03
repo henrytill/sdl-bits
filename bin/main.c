@@ -365,20 +365,11 @@ int main(int argc, char *argv[]) {
   extern struct Config config;
   extern struct State state;
 
-  int rc;
-  SDL_AudioSpec want, have;
-  SDL_Rect windowRect = {0, 0, 0, 0};
-  SDL_Event event;
-  const char *const winTitle = "Hello, world!";
-  const char *const testBmp = "test.bmp";
-  uint64_t begin, end;
-  double delta;
-
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
   parseArgs(argc, argv, &args);
   loadConfig(args.configFile, &config);
 
-  rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+  int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != 0) {
     logSDLError("init failed");
     return EXIT_FAILURE;
@@ -388,12 +379,15 @@ int main(int argc, char *argv[]) {
 
   perfFreq = SDL_GetPerformanceFrequency();
 
-  want.freq = state.audio.sampleRate;
-  want.format = AUDIO_F32;
-  want.channels = 2;
-  want.samples = state.audio.bufferSize;
-  want.callback = calcSine;
-  want.userdata = (void *)&state.audio;
+  SDL_AudioSpec want = {
+    .freq = state.audio.sampleRate,
+    .format = AUDIO_F32,
+    .channels = 2,
+    .samples = state.audio.bufferSize,
+    .callback = calcSine,
+    .userdata = (void *)&state.audio,
+  };
+  SDL_AudioSpec have = {0};
 
   _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   state.audioDevice = audioDevice;
@@ -402,15 +396,18 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  const char *const winTitle = "Hello, world!";
   _cleanup_Window_ struct Window *window = createWindow(&config, winTitle);
   if (window == NULL)
     return EXIT_FAILURE;
 
+  SDL_Rect windowRect = {0, 0, 0, 0};
   rc = getRect(window, &windowRect);
   if (rc != 0)
     return EXIT_FAILURE;
 
   _cleanup_SDL_Texture_ SDL_Texture *texture = ({
+    const char *const testBmp = "test.bmp";
     _cleanup_str_ char *bmpFile = joinPath(config.assetDir, testBmp);
     if (bmpFile == NULL)
       return EXIT_FAILURE;
@@ -433,8 +430,11 @@ int main(int argc, char *argv[]) {
 
   SDL_PauseAudioDevice(state.audioDevice, 0);
 
-  delta = frameTime;
-  begin = now();
+  SDL_Event event = {0};
+  double delta = frameTime;
+  uint64_t begin = now();
+  uint64_t end = 0;
+
   while (state.loopStat == 1) {
     while (SDL_PollEvent(&event) != 0) {
       switch (event.type) {

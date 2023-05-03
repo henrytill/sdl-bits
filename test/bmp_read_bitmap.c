@@ -15,8 +15,8 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
   struct bmp_FileHeader fileHeader;
   struct bmp_InfoHeader infoHeader;
   const char *const bmpFile = "./assets/sample_24bit.bmp";
-
   _cleanup_str_ char *image = NULL;
+
   if (bmp_read(bmpFile, &fileHeader, &infoHeader, &image) != 0)
     return EXIT_FAILURE;
 
