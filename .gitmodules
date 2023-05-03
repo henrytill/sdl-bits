@@ -4,6 +4,3 @@
 [submodule "third-party/lua"]
 	path = third-party/lua
 	url = https://github.com/henrytill/lua.git
-[submodule "third-party/vcpkg"]
-	path = third-party/vcpkg
-	url = https://github.com/microsoft/vcpkg.git
