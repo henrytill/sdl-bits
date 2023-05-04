@@ -27,11 +27,11 @@ static const struct PersonOperations Person_ops = {
 };
 
 /// Base class constructor.
-#define Person(__name, __age) \
-  ((struct Person){           \
-    .ops = &Person_ops,       \
-    .name = (__name),         \
-    .age = (__age),           \
+#define Person(_name, _age) \
+  ((struct Person){         \
+    .ops = &Person_ops,     \
+    .name = (_name),        \
+    .age = (_age),          \
   })
 
 /// Derived class.
@@ -53,14 +53,14 @@ static const struct PersonOperations Student_ops = {
 };
 
 /// Derived class constructor.
-#define Student(__name, __age, __school) \
-  ((struct Student){                     \
-    .person = {                          \
-      .ops = &Student_ops,               \
-      .name = (__name),                  \
-      .age = (__age),                    \
-    },                                   \
-    .school = (__school),                \
+#define Student(_name, _age, _school) \
+  ((struct Student){                  \
+    .person = {                       \
+      .ops = &Student_ops,            \
+      .name = (_name),                \
+      .age = (_age),                  \
+    },                                \
+    .school = (_school),              \
   })
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
