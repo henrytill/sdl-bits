@@ -21,11 +21,11 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
     return EXIT_FAILURE;
 
   struct bmp_Pixel24 *pixel = (struct bmp_Pixel24 *)image;
-  if (pixel->blue != 0)
+  if (pixel->b != 0)
     return EXIT_FAILURE;
-  if (pixel->green != 0)
+  if (pixel->g != 0)
     return EXIT_FAILURE;
-  if (pixel->red != 255)
+  if (pixel->r != 255)
     return EXIT_FAILURE;
 
   return EXIT_SUCCESS;

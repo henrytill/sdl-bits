@@ -210,7 +210,7 @@ static void calcSine(void *userData, uint8_t *stream, _unused_ int len) {
 /// @param frameRate The frame rate
 /// @return The time in milliseconds for a frame
 ///
-static double calcFrameTime(int frameRate) {
+static double calcFrameTime(const int frameRate) {
   extern const double second;
   assert(frameRate > 0);
   return second / (double)frameRate;
@@ -223,7 +223,7 @@ static double calcFrameTime(int frameRate) {
 /// @param end A final timestamp in ticks
 /// @return The time in milliseconds between the two timestamps
 ///
-static double calcDelta(uint64_t begin, uint64_t end) {
+static double calcDelta(const uint64_t begin, const uint64_t end) {
   extern const double second;
   extern uint64_t perfFreq;
   assert(perfFreq > 0);
@@ -238,7 +238,7 @@ static double calcDelta(uint64_t begin, uint64_t end) {
 /// @param frameTime The desired time in milliseconds for a frame
 /// @param begin The timestamp in ticks when the frame started
 ///
-static void delay(double frameTime, uint64_t begin) {
+static void delay(const double frameTime, const uint64_t begin) {
   if (calcDelta(begin, now()) >= frameTime) return;
   const uint32_t time = (uint32_t)(frameTime - calcDelta(begin, now()) - 1.0);
   if (time > 0) SDL_Delay(time);
