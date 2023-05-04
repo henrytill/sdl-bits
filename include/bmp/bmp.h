@@ -5,11 +5,11 @@
 
 #include "macro.h"
 
-extern const uint16_t FILETYPE;
-extern const uint32_t BI_BITFIELDS;
-extern const uint32_t LCS_WINDOWS_COLOR_SPACE;
+extern const uint16_t bmp_FILETYPE;
+extern const uint32_t bmp_BI_BITFIELDS;
+extern const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE;
 
-enum HeaderSize {
+enum bmp_HeaderSize {
   BITMAPCOREHEADER = 12,
   OS22XBITMAPHEADER = 64,
   BITMAPINFOHEADER = 40,

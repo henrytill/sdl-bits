@@ -10,9 +10,9 @@ enum {
   DWORDBYTES = 4,
 };
 
-const uint16_t FILETYPE = 0x4D42;
-const uint32_t BI_BITFIELDS = 0x0003;
-const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
+const uint16_t bmp_FILETYPE = 0x4D42;
+const uint32_t bmp_BI_BITFIELDS = 0x0003;
+const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose)
 #define _cleanup_FILE_ _cleanup_(fclosep)
@@ -129,7 +129,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
     return -1;
 
   struct bmp_FileHeader fileHeader = {
-    .fileType = FILETYPE,
+    .fileType = bmp_FILETYPE,
     .fileSize = (uint32_t)fileSize,
     .reserved1 = 0,
     .reserved2 = 0,
@@ -142,7 +142,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
     .height = (int32_t)height,
     .planes = 1,
     .bitsPerPixel = 32,
-    .compression = BI_BITFIELDS,
+    .compression = bmp_BI_BITFIELDS,
     .imageSize = (uint32_t)imageSize,
     .hRes = 0,
     .vRes = 0,
@@ -152,7 +152,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
     .gMask = 0x0000FF00,
     .bMask = 0x000000FF,
     .aMask = 0xFF000000,
-    .colorspaceType = LCS_WINDOWS_COLOR_SPACE,
+    .colorspaceType = bmp_LCS_WINDOWS_COLOR_SPACE,
     .colorspace = {0, 0, 0, 0, 0, 0, 0, 0, 0},
     .rGamma = 0,
     .gGamma = 0,
