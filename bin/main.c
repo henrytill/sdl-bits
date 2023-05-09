@@ -9,11 +9,6 @@
 #include "prelude.h"
 
 enum {
-  APP = SDL_LOG_CATEGORY_CUSTOM,
-  ERR,
-};
-
-enum {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
@@ -97,19 +92,6 @@ static struct State state = {
   .loopStat = 1,
   .toneStat = 0,
 };
-
-///
-/// Log a message and the contents of SDL_GetError().
-///
-/// @param message The message to log
-///
-static void logSDLError(char *message) {
-  const char *error = SDL_GetError();
-  if (strlen(error) != 0)
-    SDL_LogError(ERR, "%s (%s)", message, error);
-  else
-    SDL_LogError(ERR, "%s", message);
-}
 
 ///
 /// Parse command line arguments and populate an Args struct with the results.
@@ -263,13 +245,13 @@ static int initWindow(struct Config *config, const char *title, struct Window *w
                                     config->width, config->height,
                                     windowTypeFlags[config->windowType]);
   if (window->window == NULL) {
-    logSDLError("SDL_CreateWindow failed");
+    sdl_error("SDL_CreateWindow failed");
     return -1;
   }
   window->renderer = SDL_CreateRenderer(window->window, -1, SDL_RENDERER_ACCELERATED);
   if (window->renderer == NULL) {
     SDL_DestroyWindow(window->window);
-    logSDLError("SDL_CreateRenderer failed");
+    sdl_error("SDL_CreateRenderer failed");
     return -1;
   }
   return SDL_SetRenderDrawColor(window->renderer, 0x00, 0x00, 0x00, 0xFF);
@@ -328,7 +310,7 @@ static int getRect(struct Window *window, SDL_Rect *rect) {
     return -1;
   const int rc = SDL_GetRendererOutputSize(window->renderer, &rect->w, &rect->h);
   if (rc != 0) {
-    logSDLError("SDL_GetRendererOutputSize failed");
+    sdl_error("SDL_GetRendererOutputSize failed");
     return -1;
   }
   return 0;
@@ -371,7 +353,7 @@ int main(int argc, char *argv[]) {
 
   int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != 0) {
-    logSDLError("init failed");
+    sdl_error("init failed");
     return EXIT_FAILURE;
   }
 
@@ -392,7 +374,7 @@ int main(int argc, char *argv[]) {
   _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   state.audioDevice = audioDevice;
   if (state.audioDevice < 2) {
-    logSDLError("SDL_OpenAudio failed");
+    sdl_error("SDL_OpenAudio failed");
     return EXIT_FAILURE;
   }
 
@@ -414,13 +396,13 @@ int main(int argc, char *argv[]) {
 
     _cleanup_SDL_Surface_ SDL_Surface *surface = SDL_LoadBMP(bmpFile);
     if (surface == NULL) {
-      logSDLError("SDL_LoadBMP failed");
+      sdl_error("SDL_LoadBMP failed");
       return EXIT_FAILURE;
     }
 
     SDL_Texture *tmp = SDL_CreateTextureFromSurface(window->renderer, surface);
     if (tmp == NULL) {
-      logSDLError("SDL_CreateTextureFromSurface failed");
+      sdl_error("SDL_CreateTextureFromSurface failed");
       return EXIT_FAILURE;
     }
     tmp;
@@ -451,12 +433,12 @@ int main(int argc, char *argv[]) {
 
     rc = SDL_RenderClear(window->renderer);
     if (rc != 0) {
-      logSDLError("SDL_RenderClear failed");
+      sdl_error("SDL_RenderClear failed");
       return EXIT_FAILURE;
     }
     rc = SDL_RenderCopy(window->renderer, texture, NULL, &windowRect);
     if (rc != 0) {
-      logSDLError("SDL_RenderCopy failed");
+      sdl_error("SDL_RenderCopy failed");
       return EXIT_FAILURE;
     }
     SDL_RenderPresent(window->renderer);

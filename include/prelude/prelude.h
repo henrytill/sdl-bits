@@ -14,6 +14,12 @@
 
 #define now SDL_GetPerformanceCounter
 
+/// Log categories to use with SDL logging functions.
+enum LogCategory {
+  APP = SDL_LOG_CATEGORY_CUSTOM,
+  ERR,
+};
+
 // General cleanup functions
 
 static inline void freestr(char *str) {
@@ -80,4 +86,19 @@ static inline void *ecalloc(size_t nmemb, size_t size) {
     exit(EXIT_FAILURE);
   }
   return p;
+}
+
+// SDL Utility Functions
+
+///
+/// Log a message and the contents of SDL_GetError().
+///
+/// @param message The message to log
+///
+static inline void sdl_error(const char *msg) {
+  const char *error = SDL_GetError();
+  if (strlen(error) != 0)
+    SDL_LogError(ERR, "%s (%s)", msg, error);
+  else
+    SDL_LogError(ERR, "%s", msg);
 }

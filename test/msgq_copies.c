@@ -14,8 +14,8 @@
 
 #include <SDL.h>
 
-#include "macro.h"
 #include "msgq.h"
+#include "prelude.h"
 
 #define LOG(message) ({                              \
   SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",       \
@@ -32,12 +32,6 @@
     exit(EXIT_FAILURE);                                               \
   }                                                                   \
 });
-
-/// Log categories to use with SDL logging functions.
-enum LogCategory {
-  APP = SDL_LOG_CATEGORY_CUSTOM,
-  ERR,
-};
 
 /// Delay before consuming messages.
 static const uint32_t delay = 2000U;
@@ -66,11 +60,7 @@ static void msgq_fail(int err, const char *msg) {
 
 /// Log a SDL error message and exits.
 static void sdl_fail(const char *msg) {
-  const char *err = SDL_GetError();
-  if (strlen(err) != 0)
-    SDL_LogError(ERR, "%s (%s)", msg, err);
-  else
-    SDL_LogError(ERR, "%s", msg);
+  sdl_error(msg);
   exit(EXIT_FAILURE);
 }
 

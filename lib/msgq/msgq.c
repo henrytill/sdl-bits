@@ -1,5 +1,3 @@
-#include <SDL.h>
-
 #include "msgq.h"
 
 static const char *const tagString[] = {
