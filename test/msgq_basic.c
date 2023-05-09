@@ -36,19 +36,19 @@ static void finishQueue(void) {
   msgq_finish(&queue);
 }
 
-/// Log an error message and exits.
+/// Log an error message and exit.
 static void fail(const char *msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
-/// Log a msgq error message and exits.
+/// Log a msgq error message and exit.
 static void msgq_fail(int err, const char *msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
   exit(EXIT_FAILURE);
 }
 
-/// Log a SDL error message and exits.
+/// Log a SDL error message and exit.
 static void sdl_fail(const char *msg) {
   sdl_error(msg);
   exit(EXIT_FAILURE);
