@@ -55,7 +55,7 @@ static_assert(__builtin_types_compatible_p(Sint64, int64_t), "SDL-defined Sint64
 static_assert(__builtin_types_compatible_p(SDL_AudioFormat, uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
 static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
 
-// Utility functions
+// General utility functions
 
 ///
 /// Allocate or die.
@@ -88,7 +88,7 @@ static inline void *ecalloc(size_t nmemb, size_t size) {
   return p;
 }
 
-// SDL Utility Functions
+// SDL utility functions
 
 ///
 /// Log a message and the contents of SDL_GetError().
