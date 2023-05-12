@@ -163,7 +163,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(finishQueue);
 
-  SDL_Thread *producer = SDL_CreateThread(produce, "producer", (void *)&queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", &queue);
   if (producer == NULL)
     sdl_fail("SDL_CreateThread failed");
 
