@@ -23,7 +23,7 @@
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 
 #ifdef DEBUG
-#define debug_printf(fmt, ...) printf(fmt, __VA_ARGS__)
+#define debug_printf(fmt, ...) printf(fmt, ##__VA_ARGS__)
 #else
 #define debug_printf(fmt, ...) ({})
 #endif
