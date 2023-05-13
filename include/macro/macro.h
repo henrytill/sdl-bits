@@ -34,18 +34,22 @@
 
 #define SAME_TYPE(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 
-#define CONTAINER_OF(ptr, type, member) ({                                         \
+#define _CONTAINER_OF(ptr, type, member) ({                                        \
   void *__mptr = (void *)(ptr);                                                    \
   static_assert(SAME_TYPE(*(ptr), ((type *)0)->member) || SAME_TYPE(*(ptr), void), \
                 "pointer type mismatch");                                          \
   ((type *)(__mptr - offsetof(type, member)));                                     \
 })
 
-#define CONTAINER_OF_CONST(ptr, type, member)                                \
-  _Generic(                                                                  \
-    ptr,                                                                     \
-    const typeof(*(ptr)) *: ((const type *)CONTAINER_OF(ptr, type, member)), \
-    default: ((type *)CONTAINER_OF(ptr, type, member)))
+#ifdef HAS_GENERIC
+#define CONTAINER_OF(ptr, type, member)                                       \
+  _Generic(                                                                   \
+    ptr,                                                                      \
+    const typeof(*(ptr)) *: ((const type *)_CONTAINER_OF(ptr, type, member)), \
+    default: ((type *)_CONTAINER_OF(ptr, type, member)))
+#else
+#define CONTAINER_OF _CONTAINER_OF
+#endif
 
 #define SEND(obj, method, ...) ({      \
   typeof(obj) __obj = (obj);           \
