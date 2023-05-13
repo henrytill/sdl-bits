@@ -17,3 +17,29 @@ buildType:
       short: DebugUBSan
       long: Instrument with Undefined Behavior Sanitizer
       buildType: DebugUBSan
+
+linkage:
+  default: static
+  choices:
+    static:
+      short: Static
+      long: Create static libraries
+      linkage: static
+    shared:
+      short: Shared
+      long: Create shared libraries/DLLs
+      linkage: shared
+
+luaBuildObjects:
+  default: "ON"
+  choices:
+    "ON":
+      short: LuaObjects
+      long: Build Lua as an object library
+      settings:
+        LUA_BUILD_OBJECTS: ON
+    "OFF":
+      short: Lua
+      long: Build Lua as a regular library
+      settings:
+        LUA_BUILD_OBJECTS: OFF
