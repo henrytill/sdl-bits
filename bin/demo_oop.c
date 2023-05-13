@@ -14,10 +14,10 @@ struct Person {
 };
 
 struct PersonOperations {
-  void (*sayHello)(struct Person *self);
+  void (*sayHello)(const struct Person *self);
 };
 
-static void Person_sayHello(struct Person *self) {
+static void Person_sayHello(const struct Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
@@ -41,8 +41,8 @@ struct Student {
 };
 
 /// Derived class override of PersonOperations::sayHello
-static void Student_sayHello(struct Person *self) {
-  struct Student *student = CONTAINER_OF(self, struct Student, person);
+static void Student_sayHello(const struct Person *self) {
+  const struct Student *student = CONTAINER_OF(self, struct Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
 }
