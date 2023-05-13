@@ -53,13 +53,13 @@ struct Window {
 
 static const double second = 1000.0;
 
-static const uint32_t windowTypeFlags[] = {
+static const uint32_t winTypeFlags[] = {
   [WINDOWED] = SDL_WINDOW_SHOWN,
   [FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
   [BORDERLESS] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
 };
 
-static const char *const windowTypeString[] = {
+static const char *const winTypeStr[] = {
   [WINDOWED] = "Windowed",
   [FULLSCREEN] = "Fullscreen",
   [BORDERLESS] = "Borderless Fullscreen",
@@ -232,40 +232,40 @@ static void delay(const double frameTime, const uint64_t begin) {
 ///
 /// @param config The configuration.
 /// @param title The window title.
-/// @param window The window to initialize.
+/// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int initWindow(struct Config *config, const char *title, struct Window *window) {
-  extern const uint32_t windowTypeFlags[];
-  extern const char *const windowTypeString[];
+static int initWindow(struct Config *config, const char *title, struct Window *win) {
+  extern const uint32_t winTypeFlags[];
+  extern const char *const winTypeStr[];
 
-  SDL_LogInfo(APP, "Window type: %s", windowTypeString[config->windowType]);
-  window->window = SDL_CreateWindow(title,
-                                    config->x, config->y,
-                                    config->width, config->height,
-                                    windowTypeFlags[config->windowType]);
-  if (window->window == NULL) {
+  SDL_LogInfo(APP, "Window type: %s", winTypeStr[config->windowType]);
+  win->window = SDL_CreateWindow(title,
+                                 config->x, config->y,
+                                 config->width, config->height,
+                                 winTypeFlags[config->windowType]);
+  if (win->window == NULL) {
     sdl_error("SDL_CreateWindow failed");
     return -1;
   }
-  window->renderer = SDL_CreateRenderer(window->window, -1, SDL_RENDERER_ACCELERATED);
-  if (window->renderer == NULL) {
-    SDL_DestroyWindow(window->window);
+  win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
+  if (win->renderer == NULL) {
+    SDL_DestroyWindow(win->window);
     sdl_error("SDL_CreateRenderer failed");
     return -1;
   }
-  return SDL_SetRenderDrawColor(window->renderer, 0x00, 0x00, 0x00, 0xFF);
+  return SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
 }
 
 ///
 /// Destroy a window and renderer.
 ///
-/// @param window The window to destroy.
+/// @param win The window to destroy.
 ///
-static void finishWindow(struct Window *window) {
-  if (window == NULL) return;
-  if (window->renderer != NULL) SDL_DestroyRenderer(window->renderer);
-  if (window->window != NULL) SDL_DestroyWindow(window->window);
+static void finishWindow(struct Window *win) {
+  if (win == NULL) return;
+  if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
+  if (win->window != NULL) SDL_DestroyWindow(win->window);
 }
 
 ///
@@ -276,23 +276,23 @@ static void finishWindow(struct Window *window) {
 /// @return The window on success, NULL on failure.
 ///
 static struct Window *createWindow(struct Config *config, const char *title) {
-  struct Window *window = emalloc(sizeof(struct Window));
-  if (initWindow(config, title, window) != 0) {
-    free(window);
+  struct Window *win = emalloc(sizeof(struct Window));
+  if (initWindow(config, title, win) != 0) {
+    free(win);
     return NULL;
   }
-  return window;
+  return win;
 }
 
 ///
 /// Destroy a window and renderer.
 ///
-/// @param window The window to destroy.
+/// @param win The win to destroy.
 ///
-static void destroyWindow(struct Window *window) {
-  if (window == NULL) return;
-  finishWindow(window);
-  free(window);
+static void destroyWindow(struct Window *win) {
+  if (win == NULL) return;
+  finishWindow(win);
+  free(win);
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow)
@@ -301,14 +301,14 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow)
 ///
 /// Get the window's rectangle.
 ///
-/// @param window The window.
+/// @param win The window.
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int getRect(struct Window *window, SDL_Rect *rect) {
-  if (window == NULL || window->renderer == NULL)
+static int getRect(struct Window *win, SDL_Rect *rect) {
+  if (win == NULL || win->renderer == NULL)
     return -1;
-  const int rc = SDL_GetRendererOutputSize(window->renderer, &rect->w, &rect->h);
+  const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
   if (rc != 0) {
     sdl_error("SDL_GetRendererOutputSize failed");
     return -1;
@@ -379,12 +379,12 @@ int main(int argc, char *argv[]) {
   }
 
   const char *const winTitle = "Hello, world!";
-  _cleanup_Window_ struct Window *window = createWindow(&config, winTitle);
-  if (window == NULL)
+  _cleanup_Window_ struct Window *win = createWindow(&config, winTitle);
+  if (win == NULL)
     return EXIT_FAILURE;
 
-  SDL_Rect windowRect = {0, 0, 0, 0};
-  rc = getRect(window, &windowRect);
+  SDL_Rect winRect = {0, 0, 0, 0};
+  rc = getRect(win, &winRect);
   if (rc != 0)
     return EXIT_FAILURE;
 
@@ -400,7 +400,7 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-    SDL_Texture *tmp = SDL_CreateTextureFromSurface(window->renderer, surface);
+    SDL_Texture *tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
     if (tmp == NULL) {
       sdl_error("SDL_CreateTextureFromSurface failed");
       return EXIT_FAILURE;
@@ -431,17 +431,17 @@ int main(int argc, char *argv[]) {
 
     update(delta);
 
-    rc = SDL_RenderClear(window->renderer);
+    rc = SDL_RenderClear(win->renderer);
     if (rc != 0) {
       sdl_error("SDL_RenderClear failed");
       return EXIT_FAILURE;
     }
-    rc = SDL_RenderCopy(window->renderer, texture, NULL, &windowRect);
+    rc = SDL_RenderCopy(win->renderer, texture, NULL, &winRect);
     if (rc != 0) {
       sdl_error("SDL_RenderCopy failed");
       return EXIT_FAILURE;
     }
-    SDL_RenderPresent(window->renderer);
+    SDL_RenderPresent(win->renderer);
 
     delay(frameTime, begin);
     end = now();

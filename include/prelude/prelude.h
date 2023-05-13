@@ -57,6 +57,8 @@ static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-de
 
 // General utility functions
 
+#define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
+
 ///
 /// Allocate or die.
 ///
@@ -66,7 +68,7 @@ static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-de
 static inline void *emalloc(size_t size) {
   void *p = malloc(size);
   if (p == NULL) {
-    fprintf(stderr, "Failed to allocate.\n");
+    fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
   }
   return p;
@@ -82,7 +84,7 @@ static inline void *emalloc(size_t size) {
 static inline void *ecalloc(size_t nmemb, size_t size) {
   void *p = calloc(nmemb, size);
   if (p == NULL) {
-    fprintf(stderr, "Failed to allocate.\n");
+    fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
   }
   return p;
@@ -93,12 +95,12 @@ static inline void *ecalloc(size_t nmemb, size_t size) {
 ///
 /// Log a message and the contents of SDL_GetError().
 ///
-/// @param message The message to log
+/// @param msg The message to log
 ///
 static inline void sdl_error(const char *msg) {
-  const char *error = SDL_GetError();
-  if (strlen(error) != 0)
-    SDL_LogError(ERR, "%s (%s)", msg, error);
+  const char *err = SDL_GetError();
+  if (strlen(err) != 0)
+    SDL_LogError(ERR, "%s (%s)", msg, err);
   else
     SDL_LogError(ERR, "%s", msg);
 }

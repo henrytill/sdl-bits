@@ -1,20 +1,20 @@
 #include "msgq.h"
 
-static const char *const tagString[] = {
+static const char *const tagStr[] = {
   [NONE >> 1] = "NONE",
   [SOME >> 1] = "SOME",
   [QUIT >> 1] = "QUIT",
 };
 
 const char *msgq_tag(enum MessageTag tag) {
-  extern const char *const tagString[];
+  extern const char *const tagStr[];
   if (tag > QUIT || tag < NONE) {
     return NULL;
   }
-  return tagString[tag >> 1];
+  return tagStr[tag >> 1];
 }
 
-static const char *const errorString[] = {
+static const char *const errorStr[] = {
   [-MSGQ_FAILURE_MALLOC] = "malloc failed",
   [-MSGQ_FAILURE_SEM_CREATE] = "SDL_CreateSemaphore failed",
   [-MSGQ_FAILURE_SEM_POST] = "SDL_SemPost failed",
@@ -26,11 +26,11 @@ static const char *const errorString[] = {
 };
 
 const char *msgq_error(int rc) {
-  extern const char *const errorString[];
+  extern const char *const errorStr[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
   }
-  return errorString[-rc];
+  return errorStr[-rc];
 }
 
 int msgq_init(struct MessageQueue *queue, uint32_t capacity) {

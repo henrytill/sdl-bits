@@ -21,7 +21,7 @@
 static const int count = 100;
 
 /// Capacity of the MessageQueue.
-static const uint32_t queueCapacity = 4;
+static const uint32_t queueCap = 4;
 
 /// MessageQueue for testing.
 static struct MessageQueue queue;
@@ -67,9 +67,9 @@ static void sdl_fail(const char *msg) {
 static int produce(void *data) {
   extern const int count;
 
-  struct Message message = {0};
+  struct Message msg = {0};
   enum MessageTag tag = NONE;
-  const char *tagString = NULL;
+  const char *tagStr = NULL;
 
   if (data == NULL)
     fail("produce failed: data is NULL");
@@ -78,21 +78,21 @@ static int produce(void *data) {
 
   for (intptr_t value = 0; value <= count;) {
     tag = (value < count) ? SOME : NONE;
-    tagString = msgq_tag(tag);
+    tagStr = msgq_tag(tag);
 
-    message.tag = tag;
-    message.value = value;
+    msg.tag = tag;
+    msg.value = value;
 
-    const int rc = msgq_put(queue, (void *)&message);
+    const int rc = msgq_put(queue, &msg);
     if (rc < 0) {
       msgq_fail(rc, "msgq_put failed");
     } else if (rc == 1) {
       SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
-                   tagString, value);
+                   tagStr, value);
       continue;
     } else {
       SDL_LogInfo(APP, "Produced {%s, %" PRIdPTR "}",
-                  tagString, value);
+                  tagStr, value);
       value += 1;
     }
   }
@@ -110,16 +110,16 @@ static int produce(void *data) {
 /// @see produce()
 ///
 static int consume(struct MessageQueue *queue) {
-  struct Message message;
+  struct Message msg;
 
-  const int rc = msgq_get(queue, (void *)&message);
+  const int rc = msgq_get(queue, &msg);
   if (rc < 0)
     msgq_fail(rc, "msgq_get failed");
 
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_tag(message.tag), message.value);
+              msgq_tag(msg.tag), msg.value);
 
-  return message.tag != NONE;
+  return msg.tag != NONE;
 }
 
 ///
@@ -127,7 +127,7 @@ static int consume(struct MessageQueue *queue) {
 ///
 int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue queue;
-  extern const uint32_t queueCapacity;
+  extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
@@ -137,7 +137,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(SDL_Quit);
 
-  rc = msgq_init(&queue, queueCapacity);
+  rc = msgq_init(&queue, queueCap);
   if (rc < 0)
     msgq_fail(rc, "msgq_init failed");
 

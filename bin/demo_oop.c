@@ -70,9 +70,8 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   struct Person *people[] = {&alice, &bob, &carol.person};
 
-  for (size_t i = 0; i < ARRAY_SIZE(people); ++i) {
+  for (size_t i = 0; i < ARRAY_SIZE(people); ++i)
     SEND(people[i], ops->sayHello);
-  }
 
   return EXIT_SUCCESS;
 }

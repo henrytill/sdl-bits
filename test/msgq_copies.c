@@ -17,27 +17,27 @@
 #include "msgq.h"
 #include "prelude.h"
 
-#define LOG(message) ({                              \
-  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",       \
-              __func__, #message,                    \
-              msgq_tag(message.tag), message.value); \
+#define LOG(msg) ({                            \
+  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}", \
+              __func__, #msg,                  \
+              msgq_tag(msg.tag), msg.value);   \
 })
 
-#define CHECK(message, expectedTag, expectedValue) ({                 \
-  if (message.tag != expectedTag || message.value != expectedValue) { \
-    SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}",        \
-                 __func__, #message,                                  \
-                 msgq_tag(message.tag), message.value,                \
-                 msgq_tag(expectedTag), expectedValue);               \
-    exit(EXIT_FAILURE);                                               \
-  }                                                                   \
+#define CHECK(msg, exTag, exVal) ({                            \
+  if (msg.tag != exTag || msg.value != exVal) {                \
+    SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
+                 __func__, #msg,                               \
+                 msgq_tag(msg.tag), msg.value,                 \
+                 msgq_tag(exTag), exVal);                      \
+    exit(EXIT_FAILURE);                                        \
+  }                                                            \
 });
 
 /// Delay before consuming messages.
 static const uint32_t delay = 2000U;
 
 /// Capacity of the MessageQueue.
-static const uint32_t queueCapacity = 1U;
+static const uint32_t queueCap = 1U;
 
 /// MessageQueue for testing.
 static struct MessageQueue queue;
@@ -75,32 +75,32 @@ static void sdl_fail(const char *msg) {
 ///
 static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
-  struct Message message = {.tag = SOME, .value = 42};
+  struct Message msg = {.tag = SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &message);
+    rc = msgq_put(queue, &msg);
     if (rc < 0)
       msgq_fail(rc, "msgq_put failed");
   }
-  LOG(message);
+  LOG(msg);
 
-  message.tag = SOME;
-  message.value = 0;
+  msg.tag = SOME;
+  msg.value = 0;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &message);
+    rc = msgq_put(queue, &msg);
     if (rc < 0)
       msgq_fail(rc, "msgq_put failed");
   }
-  LOG(message);
+  LOG(msg);
 
-  message.tag = SOME;
-  message.value = 1;
+  msg.tag = SOME;
+  msg.value = 1;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &message);
+    rc = msgq_put(queue, &msg);
     if (rc < 0)
       msgq_fail(rc, "msgq_put failed");
   }
-  LOG(message);
+  LOG(msg);
 
   return 0;
 }
@@ -124,16 +124,16 @@ static int consume(struct MessageQueue *queue) {
   SDL_LogInfo(APP, "%s: pausing for %d...", __func__, delay);
   SDL_Delay(delay);
 
-  msgq_get(queue, (void *)&a);
+  msgq_get(queue, &a);
   LOG(a);
   CHECK(a, SOME, 42l);
 
-  msgq_get(queue, (void *)&b);
+  msgq_get(queue, &b);
   LOG(b);
   CHECK(a, SOME, 42l);
   CHECK(b, SOME, 0l);
 
-  msgq_get(queue, (void *)&c);
+  msgq_get(queue, &c);
   LOG(c);
   CHECK(a, SOME, 42l);
   CHECK(b, SOME, 0l);
@@ -147,7 +147,7 @@ static int consume(struct MessageQueue *queue) {
 ///
 int main(_unused_ int argc, _unused_ char *argv[]) {
   extern struct MessageQueue queue;
-  extern const uint32_t queueCapacity;
+  extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
@@ -157,7 +157,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(SDL_Quit);
 
-  rc = msgq_init(&queue, queueCapacity);
+  rc = msgq_init(&queue, queueCap);
   if (rc != 0)
     msgq_fail(rc, "msgq_init failed");
 
