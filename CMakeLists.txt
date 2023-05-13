@@ -15,6 +15,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(BuildType)
 include(Coverage)
 include(FeatureTest)
+include(AddressSanitizer)
+include(UndefinedBehaviorSanitizer)
 
 test_has_attribute_cleanup()
 test_has_builtin_types_compatible_p()
