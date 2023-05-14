@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -194,7 +195,8 @@ static void calcSine(void *userData, uint8_t *stream, _unused_ int len) {
 ///
 static double calcFrameTime(const int frameRate) {
   extern const double second;
-  assert(frameRate > 0);
+  assert((double)frameRate > 0);
+  assert((double)frameRate < DBL_MAX);
   return second / (double)frameRate;
 }
 
@@ -208,8 +210,9 @@ static double calcFrameTime(const int frameRate) {
 static double calcDelta(const uint64_t begin, const uint64_t end) {
   extern const double second;
   extern uint64_t perfFreq;
-  assert(perfFreq > 0);
   assert(begin <= end);
+  assert((double)perfFreq > 0);
+  assert((double)perfFreq < DBL_MAX);
   const double deltaTicks = (double)(end - begin);
   return (deltaTicks * second) / (double)perfFreq;
 }
