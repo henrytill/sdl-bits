@@ -75,7 +75,7 @@ static void sdl_fail(const char *msg) {
 ///
 static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
-  struct Message msg = {.tag = SOME, .value = 42};
+  struct Message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &msg);
@@ -84,7 +84,7 @@ static int produce(void *data) {
   }
   LOG(msg);
 
-  msg.tag = SOME;
+  msg.tag = MSG_TAG_SOME;
   msg.value = 0;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &msg);
@@ -93,7 +93,7 @@ static int produce(void *data) {
   }
   LOG(msg);
 
-  msg.tag = SOME;
+  msg.tag = MSG_TAG_SOME;
   msg.value = 1;
   for (int rc = 1; rc == 1;) {
     rc = msgq_put(queue, &msg);
@@ -126,18 +126,18 @@ static int consume(struct MessageQueue *queue) {
 
   msgq_get(queue, &a);
   LOG(a);
-  CHECK(a, SOME, 42l);
+  CHECK(a, MSG_TAG_SOME, 42l);
 
   msgq_get(queue, &b);
   LOG(b);
-  CHECK(a, SOME, 42l);
-  CHECK(b, SOME, 0l);
+  CHECK(a, MSG_TAG_SOME, 42l);
+  CHECK(b, MSG_TAG_SOME, 0l);
 
   msgq_get(queue, &c);
   LOG(c);
-  CHECK(a, SOME, 42l);
-  CHECK(b, SOME, 0l);
-  CHECK(c, SOME, 1l);
+  CHECK(a, MSG_TAG_SOME, 42l);
+  CHECK(b, MSG_TAG_SOME, 0l);
+  CHECK(c, MSG_TAG_SOME, 1l);
 
   return 0;
 }

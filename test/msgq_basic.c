@@ -56,7 +56,7 @@ static void sdl_fail(const char *msg) {
 
 ///
 /// Produce messages with values from 0 to count. The last message has
-/// tag NONE.
+/// tag MSG_TAG_QUIT.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
 ///
@@ -68,7 +68,7 @@ static int produce(void *data) {
   extern const int count;
 
   struct Message msg = {0};
-  enum MessageTag tag = NONE;
+  enum MessageTag tag = MSG_TAG_NONE;
   const char *tagStr = NULL;
 
   if (data == NULL)
@@ -77,7 +77,7 @@ static int produce(void *data) {
   struct MessageQueue *queue = (struct MessageQueue *)data;
 
   for (intptr_t value = 0; value <= count;) {
-    tag = (value < count) ? SOME : NONE;
+    tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     tagStr = msgq_tag(tag);
 
     msg.tag = tag;
@@ -106,7 +106,7 @@ static int produce(void *data) {
 /// This function is meant to be run on the main thread.
 ///
 /// @param queue Pointer to a MessageQueue.
-/// @return 0 when a message with tag NONE is received, 1 when a message with tag SOME is received,
+/// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 when a message with tag MSG_TAG_SOME is received,
 /// @see produce()
 ///
 static int consume(struct MessageQueue *queue) {
@@ -119,7 +119,7 @@ static int consume(struct MessageQueue *queue) {
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
               msgq_tag(msg.tag), msg.value);
 
-  return msg.tag != NONE;
+  return msg.tag != MSG_TAG_QUIT;
 }
 
 ///

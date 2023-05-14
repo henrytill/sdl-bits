@@ -6,21 +6,31 @@
 
 #include "macro.h"
 
+#define MSGQ_FAILURE_VARIANTS                     \
+  X(MALLOC, -1, "malloc failed")                  \
+  X(SEM_CREATE, -2, "SDL_CreateSemaphore failed") \
+  X(SEM_POST, -3, "SDL_SemPost failed")           \
+  X(SEM_TRY_WAIT, -4, "SDL_SemTryWait failed")    \
+  X(SEM_WAIT, -5, "SDL_SemWait failed")           \
+  X(MUTEX_CREATE, -6, "SDL_CreateMutex failed")   \
+  X(MUTEX_LOCK, -7, "SDL_LockMutex failed")       \
+  X(MUTEX_UNLOCK, -8, "SDL_UnlockMutex failed")
+
 enum MessageQueueFailure {
-  MSGQ_FAILURE_MALLOC = -1,
-  MSGQ_FAILURE_SEM_CREATE = -2,
-  MSGQ_FAILURE_SEM_POST = -3,
-  MSGQ_FAILURE_SEM_TRY_WAIT = -4,
-  MSGQ_FAILURE_SEM_WAIT = -5,
-  MSGQ_FAILURE_MUTEX_CREATE = -6,
-  MSGQ_FAILURE_MUTEX_LOCK = -7,
-  MSGQ_FAILURE_MUTEX_UNLOCK = -8,
+#define X(variant, i, str) MSGQ_FAILURE_##variant = i,
+  MSGQ_FAILURE_VARIANTS
+#undef X
 };
 
+#define MSG_TAG_VARIANTS \
+  X(NONE, 0, "NONE")     \
+  X(SOME, 1, "SOME")     \
+  X(QUIT, 2, "QUIT")
+
 enum MessageTag {
-  NONE = 1 << 0,
-  SOME = 1 << 1,
-  QUIT = 1 << 2,
+#define X(variant, i, str) MSG_TAG_##variant = 1 << i,
+  MSG_TAG_VARIANTS
+#undef X
 };
 
 struct Message {

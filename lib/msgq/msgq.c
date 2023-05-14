@@ -1,28 +1,23 @@
 #include "msgq.h"
 
 static const char *const tagStr[] = {
-  [NONE >> 1] = "NONE",
-  [SOME >> 1] = "SOME",
-  [QUIT >> 1] = "QUIT",
+#define X(variant, i, str) [MSG_TAG_##variant >> 1] = str,
+  MSG_TAG_VARIANTS
+#undef X
 };
 
 const char *msgq_tag(enum MessageTag tag) {
   extern const char *const tagStr[];
-  if (tag > QUIT || tag < NONE) {
+  if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
   }
   return tagStr[tag >> 1];
 }
 
 static const char *const errorStr[] = {
-  [-MSGQ_FAILURE_MALLOC] = "malloc failed",
-  [-MSGQ_FAILURE_SEM_CREATE] = "SDL_CreateSemaphore failed",
-  [-MSGQ_FAILURE_SEM_POST] = "SDL_SemPost failed",
-  [-MSGQ_FAILURE_SEM_TRY_WAIT] = "SDL_SemTryWait failed",
-  [-MSGQ_FAILURE_SEM_WAIT] = "SDL_SemWait failed",
-  [-MSGQ_FAILURE_MUTEX_CREATE] = "SDL_CreateMutex failed",
-  [-MSGQ_FAILURE_MUTEX_LOCK] = "SDL_LockMutex failed",
-  [-MSGQ_FAILURE_MUTEX_UNLOCK] = "SDL_UnlockMutex failed",
+#define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = str,
+  MSGQ_FAILURE_VARIANTS
+#undef X
 };
 
 const char *msgq_error(int rc) {
