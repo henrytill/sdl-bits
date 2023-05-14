@@ -66,12 +66,12 @@ static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-de
 /// @return A pointer to the allocated memory.
 ///
 static inline void *emalloc(size_t size) {
-  void *p = malloc(size);
-  if (p == NULL) {
+  void *ret = malloc(size);
+  if (ret == NULL) {
     fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
   }
-  return p;
+  return ret;
 }
 
 ///
@@ -82,12 +82,12 @@ static inline void *emalloc(size_t size) {
 /// @return A pointer to the allocated memory.
 ///
 static inline void *ecalloc(size_t nmemb, size_t size) {
-  void *p = calloc(nmemb, size);
-  if (p == NULL) {
+  void *ret = calloc(nmemb, size);
+  if (ret == NULL) {
     fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
   }
-  return p;
+  return ret;
 }
 
 // SDL utility functions
