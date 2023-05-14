@@ -28,7 +28,7 @@ enum MessageQueueFailure {
   X(QUIT, 2, "QUIT")
 
 enum MessageTag {
-#define X(variant, i, str) MSG_TAG_##variant = 1 << i,
+#define X(variant, i, str) MSG_TAG_##variant = i,
   MSG_TAG_VARIANTS
 #undef X
 };

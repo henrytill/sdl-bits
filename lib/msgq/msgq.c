@@ -1,7 +1,7 @@
 #include "msgq.h"
 
 static const char *const tagStr[] = {
-#define X(variant, i, str) [MSG_TAG_##variant >> 1] = str,
+#define X(variant, i, str) [MSG_TAG_##variant] = str,
   MSG_TAG_VARIANTS
 #undef X
 };
@@ -11,7 +11,7 @@ const char *msgq_tag(enum MessageTag tag) {
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
   }
-  return tagStr[tag >> 1];
+  return tagStr[tag];
 }
 
 static const char *const errorStr[] = {
