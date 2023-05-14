@@ -15,8 +15,8 @@ enum {
   CODE_SIZE = 94, // ('~' - '!') + 1
 };
 
-static const char *const fontFile = "./ucs-fonts/10x20.bdf";
-static const char *const bmpFile = "./10x20.bmp";
+static const char *const fontFile = "./assets/ucs-fonts/10x20.bdf";
+static const char *const bmpFile = "./assets/10x20.bmp";
 
 static const struct bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};

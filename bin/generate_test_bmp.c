@@ -19,7 +19,7 @@ static const struct bmp_Pixel32 buf[] = {
   {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static const char *const bmpFile = "./test.bmp";
+static const char *const bmpFile = "./assets/test.bmp";
 
 int main(_unused_ int argc, _unused_ char *argv[]) {
   extern const struct bmp_Pixel32 buf[];

@@ -22,7 +22,7 @@ set(FONT_BMP_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/10x20.bmp)
 
 add_custom_command(OUTPUT ${FONT_BMP_OUTPUT_PATH}
                    COMMAND generate_atlas_from_bdf
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                    DEPENDS generate_atlas_from_bdf ucs_fonts)
 
 add_custom_target(font_bmp ALL DEPENDS ${FONT_BMP_OUTPUT_PATH})
@@ -34,7 +34,7 @@ set(TEST_BMP_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/test.bmp)
 
 add_custom_command(OUTPUT ${TEST_BMP_OUTPUT_PATH}
                    COMMAND generate_test_bmp
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                    DEPENDS generate_test_bmp)
 
 add_custom_target(test_bmp ALL DEPENDS ${TEST_BMP_OUTPUT_PATH})

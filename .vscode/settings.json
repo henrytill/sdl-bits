@@ -1,6 +1,9 @@
 {
   "cmake.configureOnOpen": false,
   "cmake.configureSettings": {},
+  "cmake.debugConfig": {
+    "cwd": "${workspaceFolder}"
+  },
   "python.formatting.provider": "black",
   "files.associations": {
     "queue.h": "c",
