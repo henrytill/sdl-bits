@@ -17,12 +17,19 @@ struct Args {
   char *configFile;
 };
 
+#define WINDOW_TYPE_VARIANTS                                               \
+  X(WINDOWED, 0, SDL_WINDOW_SHOWN, "Windowed")                             \
+  X(FULLSCREEN, 1, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN, "Fullscreen") \
+  X(BORDERLESS, 2, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP, "Borderless Fullscreen")
+
+enum WindowType {
+#define X(variant, i, flags, str) variant = i,
+  WINDOW_TYPE_VARIANTS
+#undef X
+};
+
 struct Config {
-  enum WindowType {
-    WINDOWED = 0,
-    FULLSCREEN = 1,
-    BORDERLESS = 2,
-  } windowType;
+  enum WindowType windowType;
   int x;
   int y;
   int width;
@@ -55,15 +62,15 @@ struct Window {
 static const double second = 1000.0;
 
 static const uint32_t winTypeFlags[] = {
-  [WINDOWED] = SDL_WINDOW_SHOWN,
-  [FULLSCREEN] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
-  [BORDERLESS] = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
+#define X(variant, i, flags, str) [variant] = flags,
+  WINDOW_TYPE_VARIANTS
+#undef X
 };
 
 static const char *const winTypeStr[] = {
-  [WINDOWED] = "Windowed",
-  [FULLSCREEN] = "Fullscreen",
-  [BORDERLESS] = "Borderless Fullscreen",
+#define X(variant, i, flags, str) [variant] = str,
+  WINDOW_TYPE_VARIANTS
+#undef X
 };
 
 static uint64_t perfFreq = 0;
