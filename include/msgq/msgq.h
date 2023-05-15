@@ -50,20 +50,20 @@ struct MessageQueue {
 };
 
 ///
-/// Return the tag string associated with a message tag.
-///
-/// @param tag A message tag.
-/// @return The tag string associated with the given tag, or NULL if the tag is invalid.
-///
-const char *msgq_tag(enum MessageTag tag);
-
-///
 /// Returns the error message associated with a return code.
 ///
 /// @param rc A return code.
 /// @return The error message associated with the given return code, or NULL if the return code is invalid.
 ///
 const char *msgq_error(int rc);
+
+///
+/// Return the tag string associated with a message tag.
+///
+/// @param tag A message tag.
+/// @return The tag string associated with the given tag, or NULL if the tag is invalid.
+///
+const char *msgq_tag(enum MessageTag tag);
 
 ///
 /// Initializes a new bounded queue with the given capacity.

@@ -1,19 +1,5 @@
 #include "msgq.h"
 
-static const char *const tagStr[] = {
-#define X(variant, i, str) [MSG_TAG_##variant] = str,
-  MSG_TAG_VARIANTS
-#undef X
-};
-
-const char *msgq_tag(enum MessageTag tag) {
-  extern const char *const tagStr[];
-  if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
-    return NULL;
-  }
-  return tagStr[tag];
-}
-
 static const char *const errorStr[] = {
 #define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = str,
   MSGQ_FAILURE_VARIANTS
@@ -26,6 +12,20 @@ const char *msgq_error(int rc) {
     return NULL;
   }
   return errorStr[-rc];
+}
+
+static const char *const tagStr[] = {
+#define X(variant, i, str) [MSG_TAG_##variant] = str,
+  MSG_TAG_VARIANTS
+#undef X
+};
+
+const char *msgq_tag(enum MessageTag tag) {
+  extern const char *const tagStr[];
+  if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
+    return NULL;
+  }
+  return tagStr[tag];
 }
 
 int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
