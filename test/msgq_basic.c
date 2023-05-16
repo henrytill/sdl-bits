@@ -5,7 +5,7 @@
 /// The consumer consumes messages on the main thread until it receives a
 /// message with tag NONE.
 ///
-/// @see msgq_init()
+/// @see msgq_create()
 /// @see msgq_put()
 /// @see msgq_get()
 /// @see msgq_destroy()
@@ -22,19 +22,6 @@ static const int count = 100;
 
 /// Capacity of the MessageQueue.
 static const uint32_t queueCap = 4;
-
-/// MessageQueue for testing.
-static struct MessageQueue queue;
-
-///
-/// Call msgq_finish() on queue.
-///
-/// @see msgq_finish()
-///
-static void finishQueue(void) {
-  extern struct MessageQueue queue;
-  msgq_finish(&queue);
-}
 
 /// Log an error message and exit.
 static void fail(const char *msg) {
@@ -126,7 +113,6 @@ static int consume(struct MessageQueue *queue) {
 /// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
 ///
 int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern struct MessageQueue queue;
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
@@ -137,18 +123,16 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(SDL_Quit);
 
-  rc = msgq_init(&queue, queueCap);
-  if (rc < 0)
-    msgq_fail(rc, "msgq_init failed");
+  _cleanup_msgq_ struct MessageQueue *queue = msgq_create(queueCap);
+  if (queue == NULL)
+    fail("msgq_create failed");
 
-  AT_EXIT(finishQueue);
-
-  SDL_Thread *producer = SDL_CreateThread(produce, "producer", &queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
   if (producer == NULL)
     sdl_fail("SDL_CreateThread failed");
 
   for (;;) {
-    rc = consume(&queue);
+    rc = consume(queue);
     if (rc == 0) {
       break;
     } else if (rc < 0) {

@@ -1,4 +1,17 @@
+#include <SDL.h>
+
 #include "msgq.h"
+
+/// A synchronous bounded message queue
+struct MessageQueue {
+  struct Message *buffer; // Buffer to hold messages
+  uint32_t capacity;      // Maximum size of the buffer
+  size_t front;           // Index of the front message in the buffer
+  size_t rear;            // Index of the rear message in the buffer
+  SDL_sem *empty;         // Semaphore to track empty slots in the buffer
+  SDL_sem *full;          // Semaphore to track filled slots in the buffer
+  SDL_mutex *lock;        // Mutex lock to protect buffer access
+};
 
 static const char *const errorStr[] = {
 #define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = str,
@@ -28,7 +41,7 @@ const char *msgq_tag(enum MessageTag tag) {
   return tagStr[tag];
 }
 
-int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
+static int msgq_init(struct MessageQueue *queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -121,7 +134,7 @@ uint32_t msgq_size(struct MessageQueue *queue) {
   return SDL_SemValue(queue->full);
 }
 
-void msgq_finish(struct MessageQueue *queue) {
+static void msgq_finish(struct MessageQueue *queue) {
   if (queue == NULL) return;
   queue->capacity = 0;
   queue->front = 0;
