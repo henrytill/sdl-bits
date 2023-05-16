@@ -5,6 +5,7 @@ project(sdl-bits C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+include(CheckIncludeFile)
 include(CheckSymbolExists)
 
 # https://gitlab.kitware.com/cmake/cmake/-/issues/21730
@@ -65,6 +66,14 @@ if(UNIX)
   list(APPEND CMAKE_REQUIRED_LIBRARIES "m")
 endif()
 check_symbol_exists(ceil math.h HAVE_CEIL)
+
+# Dependency: pthreads
+set(CMAKE_THREAD_PREFER_PTHREAD ON)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads)
+
+# Dependency: semaphore
+CHECK_INCLUDE_FILE("semaphore.h" HAVE_SEMAPHORE_H)
 
 # Dependency: SDL
 find_package(SDL2 CONFIG REQUIRED)
