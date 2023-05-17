@@ -37,22 +37,22 @@ add_test(NAME msgq_copies
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
          COMMAND msgq_copies)
 
-if (TARGET msgq_pthread)
-  # msgq_basic_pthread
-  add_executable(msgq_basic_pthread msgq_basic.c)
-  target_compile_options_default(msgq_basic_pthread)
-  target_link_libraries(msgq_basic_pthread PRIVATE msgq_pthread)
-  target_link_libraries(msgq_basic_pthread PRIVATE prelude)
-  add_test(NAME msgq_basic_pthread
+if (TARGET msgq_posix)
+  # msgq_basic_posix
+  add_executable(msgq_basic_posix msgq_basic.c)
+  target_compile_options_default(msgq_basic_posix)
+  target_link_libraries(msgq_basic_posix PRIVATE msgq_posix)
+  target_link_libraries(msgq_basic_posix PRIVATE prelude)
+  add_test(NAME msgq_basic_posix
            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-           COMMAND msgq_basic_pthread)
+           COMMAND msgq_basic_posix)
 
-  # msgq_copies_pthread
-  add_executable(msgq_copies_pthread msgq_copies.c)
-  target_compile_options_default(msgq_copies_pthread)
-  target_link_libraries(msgq_copies_pthread PRIVATE msgq_pthread)
-  target_link_libraries(msgq_copies_pthread PRIVATE prelude)
-  add_test(NAME msgq_copies_pthread
+  # msgq_copies_posix
+  add_executable(msgq_copies_posix msgq_copies.c)
+  target_compile_options_default(msgq_copies_posix)
+  target_link_libraries(msgq_copies_posix PRIVATE msgq_posix)
+  target_link_libraries(msgq_copies_posix PRIVATE prelude)
+  add_test(NAME msgq_copies_posix
            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-           COMMAND msgq_copies_pthread)
+           COMMAND msgq_copies_posix)
 endif()
