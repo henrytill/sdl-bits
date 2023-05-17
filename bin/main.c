@@ -244,7 +244,7 @@ static void Delay(const double frameTime, const uint64_t begin) {
 }
 
 ///
-/// Create a window and renderer.
+/// Initialize a window and renderer.
 ///
 /// @param config The configuration.
 /// @param title The window title.
@@ -274,7 +274,7 @@ static int InitWindow(Config* config, const char* title, Window* win) {
 }
 
 ///
-/// Destroy a window and renderer.
+/// De-initialize a window and renderer.
 ///
 /// @param win The window to destroy.
 ///
