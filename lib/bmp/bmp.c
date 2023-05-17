@@ -14,7 +14,7 @@ const uint16_t bmp_FILETYPE = 0x4D42;
 const uint32_t bmp_BI_BITFIELDS = 0x0003;
 const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose)
+DEFINE_TRIVIAL_CLEANUP_FUNC(FILE*, fclose)
 #define _cleanup_FILE_ _cleanup_(fclosep)
 
 size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
@@ -22,9 +22,9 @@ size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
   return (size_t)(ceil(pixelBits / DWORDBITS)) * DWORDBYTES;
 }
 
-int bmp_read(const char *file, struct bmp_FileHeader *fileHeader,
-             struct bmp_InfoHeader *infoHeader, char **image) {
-  _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
+int bmp_read(const char* file, struct bmp_FileHeader* fileHeader,
+             struct bmp_InfoHeader* infoHeader, char** image) {
+  _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
 
@@ -66,9 +66,9 @@ int bmp_read(const char *file, struct bmp_FileHeader *fileHeader,
   return 0;
 }
 
-int bmp_v4read(const char *file, struct bmp_FileHeader *fileHeader,
-               struct bmp_V4Header *v4Header, char **image) {
-  _cleanup_FILE_ FILE *fileHandle = fopen(file, "r");
+int bmp_v4read(const char* file, struct bmp_FileHeader* fileHeader,
+               struct bmp_V4Header* v4Header, char** image) {
+  _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
 
@@ -110,9 +110,9 @@ int bmp_v4read(const char *file, struct bmp_FileHeader *fileHeader,
   return 0;
 }
 
-int bmp_v4write(const struct bmp_Pixel32 *buffer,
+int bmp_v4write(const struct bmp_Pixel32* buffer,
                 size_t width, size_t height,
-                const char *file) {
+                const char* file) {
   if (buffer == NULL || file == NULL)
     return -1;
   if (width > INT32_MAX || height > INT32_MAX)
@@ -159,7 +159,7 @@ int bmp_v4write(const struct bmp_Pixel32 *buffer,
     .bGamma = 0,
   };
 
-  _cleanup_FILE_ FILE *fileHandle = fopen(file, "wb");
+  _cleanup_FILE_ FILE* fileHandle = fopen(file, "wb");
   if (fileHandle == NULL)
     return -1;
 

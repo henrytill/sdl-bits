@@ -8,16 +8,16 @@ struct PersonOperations;
 
 /// Base class.
 struct Person {
-  const struct PersonOperations *ops;
-  char *name;
+  const struct PersonOperations* ops;
+  char* name;
   int age;
 };
 
 struct PersonOperations {
-  void (*sayHello)(const struct Person *self);
+  void (*sayHello)(const struct Person* self);
 };
 
-static void Person_sayHello(const struct Person *self) {
+static void Person_sayHello(const struct Person* self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
@@ -37,12 +37,12 @@ static const struct PersonOperations Person_ops = {
 /// Derived class.
 struct Student {
   struct Person person;
-  char *school;
+  char* school;
 };
 
 /// Derived class override of PersonOperations::sayHello
-static void Student_sayHello(const struct Person *self) {
-  const struct Student *student = CONTAINER_OF(self, struct Student, person);
+static void Student_sayHello(const struct Person* self) {
+  const struct Student* student = CONTAINER_OF(self, struct Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
 }
@@ -63,12 +63,12 @@ static const struct PersonOperations Student_ops = {
     .school = (_school),              \
   })
 
-int main(_unused_ int argc, _unused_ char *argv[]) {
+int main(_unused_ int argc, _unused_ char* argv[]) {
   struct Person alice = Person("Alice", 20);
   struct Person bob = Person("Bob", 21);
   struct Student carol = Student("Carol", 22, "MIT");
 
-  struct Person *people[] = {&alice, &bob, &carol.person};
+  struct Person* people[] = {&alice, &bob, &carol.person};
 
   for (size_t i = 0; i < ARRAY_SIZE(people); ++i)
     SEND(people[i], ops->sayHello);

@@ -29,7 +29,7 @@ static void freetype(void) {
 }
 
 static void lua(void) {
-  lua_State *state = luaL_newstate();
+  lua_State* state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(APP, "Failed to initialize Lua");
     return;
@@ -51,7 +51,7 @@ static void sdl(void) {
   SDL_LogInfo(APP, "... and linking against SDL %u.%u.%u.", linked.major, linked.minor, linked.patch);
 }
 
-int main(_unused_ int argc, _unused_ char *argv[]) {
+int main(_unused_ int argc, _unused_ char* argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
   freetype();

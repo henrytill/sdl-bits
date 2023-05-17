@@ -42,19 +42,19 @@ static const uint32_t delay = 2000U;
 static const uint32_t queueCap = 1U;
 
 /// Log an error message and exit.
-static void fail(const char *msg) {
+static void fail(const char* msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_fail(int err, const char *msg) {
+static void msgq_fail(int err, const char* msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_fail(const char *msg) {
+static void sdl_fail(const char* msg) {
   sdl_error(msg);
   exit(EXIT_FAILURE);
 }
@@ -68,8 +68,8 @@ static void sdl_fail(const char *msg) {
 /// @return 0 on success, 1 on failure.
 /// @see consume()
 ///
-static int produce(void *data) {
-  struct MessageQueue *queue = (struct MessageQueue *)data;
+static int produce(void* data) {
+  struct MessageQueue* queue = (struct MessageQueue*)data;
   struct Message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
@@ -109,7 +109,7 @@ static int produce(void *data) {
 /// @return 0 on success, 1 on failure.
 /// @see produce()
 ///
-static int consume(struct MessageQueue *queue) {
+static int consume(struct MessageQueue* queue) {
   extern const uint32_t delay;
 
   struct Message a = {0};
@@ -140,7 +140,7 @@ static int consume(struct MessageQueue *queue) {
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
 ///
-int main(_unused_ int argc, _unused_ char *argv[]) {
+int main(_unused_ int argc, _unused_ char* argv[]) {
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
@@ -151,11 +151,11 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   AT_EXIT(SDL_Quit);
 
-  _cleanup_msgq_ struct MessageQueue *queue = msgq_create(queueCap);
+  _cleanup_msgq_ struct MessageQueue* queue = msgq_create(queueCap);
   if (queue == NULL)
     fail("msgq_create failed");
 
-  SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
+  SDL_Thread* producer = SDL_CreateThread(produce, "producer", queue);
   if (producer == NULL)
     sdl_fail("SDL_CreateThread failed");
 

@@ -14,7 +14,7 @@ enum {
 };
 
 struct Args {
-  char *configFile;
+  char* configFile;
 };
 
 #define WINDOW_TYPE_VARIANTS                                               \
@@ -35,7 +35,7 @@ struct Config {
   int width;
   int height;
   int frameRate;
-  char *assetDir;
+  char* assetDir;
 };
 
 struct AudioState {
@@ -55,8 +55,8 @@ struct State {
 };
 
 struct Window {
-  SDL_Window *window;
-  SDL_Renderer *renderer;
+  SDL_Window* window;
+  SDL_Renderer* renderer;
 };
 
 static const double second = 1000.0;
@@ -67,7 +67,7 @@ static const uint32_t winTypeFlags[] = {
 #undef X
 };
 
-static const char *const winTypeStr[] = {
+static const char* const winTypeStr[] = {
 #define X(variant, i, flags, str) [variant] = str,
   WINDOW_TYPE_VARIANTS
 #undef X
@@ -108,9 +108,9 @@ static struct State state = {
 /// @param argv The arguments
 /// @param args The Args struct to populate
 ///
-static void parseArgs(int argc, char *argv[], struct Args *args) {
+static void parseArgs(int argc, char* argv[], struct Args* args) {
   for (int i = 0; i < argc;) {
-    char *arg = argv[i++];
+    char* arg = argv[i++];
     if (strcmp(arg, "-c") == 0)
       args->configFile = argv[i++];
   }
@@ -123,9 +123,9 @@ static void parseArgs(int argc, char *argv[], struct Args *args) {
 /// @param b The second path
 /// @return A new path, or NULL on failure
 ///
-static char *joinPath(const char *a, const char *b) {
+static char* joinPath(const char* a, const char* b) {
   size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
-  char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
+  char* ret = ecalloc(++len, sizeof(char)); // incr for terminator
   snprintf(ret, len, "%s/%s", a, b);
   return ret;
 }
@@ -137,8 +137,8 @@ static char *joinPath(const char *a, const char *b) {
 /// @param config The Config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int loadConfig(const char *file, struct Config *config) {
-  _cleanup_lua_State_ lua_State *state = luaL_newstate();
+static int loadConfig(const char* file, struct Config* config) {
+  _cleanup_lua_State_ lua_State* state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
     return -1;
@@ -177,9 +177,9 @@ static int loadConfig(const char *file, struct Config *config) {
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void calcSine(void *userData, uint8_t *stream, _unused_ int len) {
-  struct AudioState *as = (struct AudioState *)userData;
-  float *fstream = (float *)stream;
+static void calcSine(void* userData, uint8_t* stream, _unused_ int len) {
+  struct AudioState* as = (struct AudioState*)userData;
+  float* fstream = (float*)stream;
 
   assert((len / (4 * 2)) == as->bufferSize);
   const double sampleRate = (double)as->sampleRate;
@@ -245,9 +245,9 @@ static void delay(const double frameTime, const uint64_t begin) {
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int initWindow(struct Config *config, const char *title, struct Window *win) {
+static int initWindow(struct Config* config, const char* title, struct Window* win) {
   extern const uint32_t winTypeFlags[];
-  extern const char *const winTypeStr[];
+  extern const char* const winTypeStr[];
 
   SDL_LogInfo(APP, "Window type: %s", winTypeStr[config->windowType]);
   win->window = SDL_CreateWindow(title,
@@ -272,7 +272,7 @@ static int initWindow(struct Config *config, const char *title, struct Window *w
 ///
 /// @param win The window to destroy.
 ///
-static void finishWindow(struct Window *win) {
+static void finishWindow(struct Window* win) {
   if (win == NULL) return;
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
@@ -285,8 +285,8 @@ static void finishWindow(struct Window *win) {
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static struct Window *createWindow(struct Config *config, const char *title) {
-  struct Window *win = emalloc(sizeof(struct Window));
+static struct Window* createWindow(struct Config* config, const char* title) {
+  struct Window* win = emalloc(sizeof(struct Window));
   if (initWindow(config, title, win) != 0) {
     free(win);
     return NULL;
@@ -299,13 +299,13 @@ static struct Window *createWindow(struct Config *config, const char *title) {
 ///
 /// @param win The win to destroy.
 ///
-static void destroyWindow(struct Window *win) {
+static void destroyWindow(struct Window* win) {
   if (win == NULL) return;
   finishWindow(win);
   free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow)
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window*, destroyWindow)
 #define _cleanup_Window_ _cleanup_(destroyWindowp)
 
 ///
@@ -315,7 +315,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window *, destroyWindow)
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int getRect(struct Window *win, SDL_Rect *rect) {
+static int getRect(struct Window* win, SDL_Rect* rect) {
   if (win == NULL || win->renderer == NULL)
     return -1;
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
@@ -332,7 +332,7 @@ static int getRect(struct Window *win, SDL_Rect *rect) {
 /// @param key The keydown event.
 /// @param state The state.
 ///
-static void handleKeydown(SDL_KeyboardEvent *key, struct State *state) {
+static void handleKeydown(SDL_KeyboardEvent* key, struct State* state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
     state->loopStat = 0;
@@ -351,7 +351,7 @@ static void update(double delta) {
   (void)delta;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   extern uint64_t perfFreq;
   extern struct Args args;
   extern struct Config config;
@@ -377,7 +377,7 @@ int main(int argc, char *argv[]) {
     .channels = 2,
     .samples = state.audio.bufferSize,
     .callback = calcSine,
-    .userdata = (void *)&state.audio,
+    .userdata = (void*)&state.audio,
   };
   SDL_AudioSpec have = {0};
 
@@ -388,8 +388,8 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  const char *const winTitle = "Hello, world!";
-  _cleanup_Window_ struct Window *win = createWindow(&config, winTitle);
+  const char* const winTitle = "Hello, world!";
+  _cleanup_Window_ struct Window* win = createWindow(&config, winTitle);
   if (win == NULL)
     return EXIT_FAILURE;
 
@@ -398,19 +398,19 @@ int main(int argc, char *argv[]) {
   if (rc != 0)
     return EXIT_FAILURE;
 
-  _cleanup_SDL_Texture_ SDL_Texture *texture = ({
-    const char *const testBmp = "test.bmp";
-    _cleanup_str_ char *bmpFile = joinPath(config.assetDir, testBmp);
+  _cleanup_SDL_Texture_ SDL_Texture* texture = ({
+    const char* const testBmp = "test.bmp";
+    _cleanup_str_ char* bmpFile = joinPath(config.assetDir, testBmp);
     if (bmpFile == NULL)
       return EXIT_FAILURE;
 
-    _cleanup_SDL_Surface_ SDL_Surface *surface = SDL_LoadBMP(bmpFile);
+    _cleanup_SDL_Surface_ SDL_Surface* surface = SDL_LoadBMP(bmpFile);
     if (surface == NULL) {
       sdl_error("SDL_LoadBMP failed");
       return EXIT_FAILURE;
     }
 
-    SDL_Texture *tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
+    SDL_Texture* tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
     if (tmp == NULL) {
       sdl_error("SDL_CreateTextureFromSurface failed");
       return EXIT_FAILURE;

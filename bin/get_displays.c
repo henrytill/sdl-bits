@@ -5,7 +5,7 @@
 static int enumdisp(void) {
   const int numDisplays = SDL_GetNumVideoDisplays();
   if (numDisplays < 0) {
-    const char *err = SDL_GetError();
+    const char* err = SDL_GetError();
     SDL_Log("Failed to get number of video displays: %s", err);
     return -1;
   }
@@ -14,7 +14,7 @@ static int enumdisp(void) {
   for (int i = 0; i < numDisplays; ++i) {
     const int rc = SDL_GetCurrentDisplayMode(i, &mode);
     if (rc != 0) {
-      const char *err = SDL_GetError();
+      const char* err = SDL_GetError();
       SDL_Log("Failed to get mode for display #%d: %s", i, err);
       return -1;
     }
@@ -24,7 +24,7 @@ static int enumdisp(void) {
   return 0;
 }
 
-int main(_unused_ int argc, _unused_ char *argv[]) {
+int main(_unused_ int argc, _unused_ char* argv[]) {
   int rc = SDL_Init(SDL_INIT_VIDEO);
   if (rc != 0)
     return EXIT_FAILURE;

@@ -15,14 +15,14 @@ enum {
   CODE_SIZE = 94, // ('~' - '!') + 1
 };
 
-static const char *const fontFile = "./assets/ucs-fonts/10x20.bdf";
-static const char *const bmpFile = "./assets/10x20.bmp";
+static const char* const fontFile = "./assets/ucs-fonts/10x20.bdf";
+static const char* const bmpFile = "./assets/10x20.bmp";
 
 static const struct bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
 static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
 
-static char **allocImage(size_t height, size_t width);
-static void freeImage(char **image, size_t height);
+static char** allocImage(size_t height, size_t width);
+static void freeImage(char** image, size_t height);
 
 // pos = 0 is MSB
 static char getBit(unsigned char c, size_t pos) {
@@ -30,8 +30,8 @@ static char getBit(unsigned char c, size_t pos) {
   return (c >> (CHAR_BIT + ~pos)) & 1; // Also: c & (1 << (CHAR_BIT + ~pos));
 }
 
-static char **allocImage(size_t height, size_t width) {
-  char **ret = calloc(height, sizeof(*ret));
+static char** allocImage(size_t height, size_t width) {
+  char** ret = calloc(height, sizeof(*ret));
   if (ret == NULL)
     return ret;
   for (size_t i = 0; i < height; ++i) {
@@ -44,7 +44,7 @@ static char **allocImage(size_t height, size_t width) {
   return ret;
 }
 
-static void freeImage(char **image, size_t height) {
+static void freeImage(char** image, size_t height) {
   if (image == NULL) return;
   for (size_t i = 0; i < height; ++i)
     free(image[i]);
@@ -52,8 +52,8 @@ static void freeImage(char **image, size_t height) {
 }
 
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
-static void renderChar(FT_GlyphSlot slot, char **target, size_t offset) {
-  unsigned char *buffer = slot->bitmap.buffer;
+static void renderChar(FT_GlyphSlot slot, char** target, size_t offset) {
+  unsigned char* buffer = slot->bitmap.buffer;
   size_t rows = (size_t)slot->bitmap.rows;
   size_t width = (size_t)slot->bitmap.width;
   size_t pitch = (size_t)abs(slot->bitmap.pitch);
@@ -69,7 +69,7 @@ static void renderChar(FT_GlyphSlot slot, char **target, size_t offset) {
 }
 
 #ifdef DRAW_IMAGE
-static void drawImage(char **image, size_t width, size_t height) {
+static void drawImage(char** image, size_t width, size_t height) {
   for (size_t y = 0; y < height; ++y) {
     printf("%2zd|", y);
     for (size_t x = 0; x < width; ++x)
@@ -78,24 +78,24 @@ static void drawImage(char **image, size_t width, size_t height) {
   }
 }
 #else
-static inline void drawImage(_unused_ char **image, _unused_ size_t width, _unused_ size_t height) {
+static inline void drawImage(_unused_ char** image, _unused_ size_t width, _unused_ size_t height) {
 }
 #endif
 
-static void destroyBuffer(struct bmp_Pixel32 *buffer) {
+static void destroyBuffer(struct bmp_Pixel32* buffer) {
   free(buffer);
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct bmp_Pixel32 *, destroyBuffer)
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct bmp_Pixel32*, destroyBuffer)
 #define _cleanup_FT_Library_ _cleanup_(FT_Done_FreeTypep)
 #define _cleanup_FT_Face_    _cleanup_(FT_Done_Facep)
 #define _cleanup_buffer_     _cleanup_(destroyBufferp)
 
-int main(_unused_ int argc, _unused_ char *argv[]) {
-  extern const char *const fontFile;
-  extern const char *const bmpFile;
+int main(_unused_ int argc, _unused_ char* argv[]) {
+  extern const char* const fontFile;
+  extern const char* const bmpFile;
   extern const struct bmp_Pixel32 white;
   extern const struct bmp_Pixel32 black;
 
@@ -105,7 +105,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   const size_t width = WIDTH * CODE_SIZE;
   const size_t height = HEIGHT;
-  char **image = allocImage(height, width);
+  char** image = allocImage(height, width);
   if (image == NULL) {
     fprintf(stderr, "allocImage failed.");
     return EXIT_FAILURE;
@@ -166,7 +166,7 @@ int main(_unused_ int argc, _unused_ char *argv[]) {
 
   drawImage(image, width, height);
 
-  _cleanup_buffer_ struct bmp_Pixel32 *buffer = calloc(width * height, sizeof(struct bmp_Pixel32));
+  _cleanup_buffer_ struct bmp_Pixel32* buffer = calloc(width * height, sizeof(struct bmp_Pixel32));
   if (buffer == NULL) {
     freeImage(image, height);
     return EXIT_FAILURE;
