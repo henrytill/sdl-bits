@@ -4,57 +4,60 @@
 #include "macro.h"
 
 /// Base class methods.
-struct PersonOperations;
+typedef struct PersonOperations PersonOperations;
 
 /// Base class.
+typedef struct Person Person;
+
+struct PersonOperations {
+  void (*sayHello)(const Person* self);
+};
+
 struct Person {
-  const struct PersonOperations* ops;
+  const PersonOperations* ops;
   char* name;
   int age;
 };
 
-struct PersonOperations {
-  void (*sayHello)(const struct Person* self);
-};
-
-static void Person_sayHello(const struct Person* self) {
+static void Person_sayHello(const Person* self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
 /// Base class vtable.
-static const struct PersonOperations Person_ops = {
+static const PersonOperations Person_ops = {
   .sayHello = Person_sayHello,
 };
 
 /// Base class constructor.
 #define Person(_name, _age) \
-  ((struct Person){         \
+  ((Person){                \
     .ops = &Person_ops,     \
     .name = (_name),        \
     .age = (_age),          \
   })
 
 /// Derived class.
+typedef struct Student Student;
 struct Student {
-  struct Person person;
+  Person person;
   char* school;
 };
 
 /// Derived class override of PersonOperations::sayHello
-static void Student_sayHello(const struct Person* self) {
-  const struct Student* student = CONTAINER_OF(self, struct Student, person);
+static void Student_sayHello(const Person* self) {
+  const Student* student = CONTAINER_OF(self, Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
 }
 
 /// Derived class vtable.
-static const struct PersonOperations Student_ops = {
+static const PersonOperations Student_ops = {
   .sayHello = Student_sayHello,
 };
 
 /// Derived class constructor.
 #define Student(_name, _age, _school) \
-  ((struct Student){                  \
+  ((Student){                         \
     .person = {                       \
       .ops = &Student_ops,            \
       .name = (_name),                \
@@ -64,11 +67,11 @@ static const struct PersonOperations Student_ops = {
   })
 
 int main(_unused_ int argc, _unused_ char* argv[]) {
-  struct Person alice = Person("Alice", 20);
-  struct Person bob = Person("Bob", 21);
-  struct Student carol = Student("Carol", 22, "MIT");
+  Person alice = Person("Alice", 20);
+  Person bob = Person("Bob", 21);
+  Student carol = Student("Carol", 22, "MIT");
 
-  struct Person* people[] = {&alice, &bob, &carol.person};
+  Person* people[] = {&alice, &bob, &carol.person};
 
   for (size_t i = 0; i < ARRAY_SIZE(people); ++i)
     SEND(people[i], ops->sayHello);

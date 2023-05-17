@@ -22,8 +22,7 @@ size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
   return (size_t)(ceil(pixelBits / DWORDBITS)) * DWORDBYTES;
 }
 
-int bmp_read(const char* file, struct bmp_FileHeader* fileHeader,
-             struct bmp_InfoHeader* infoHeader, char** image) {
+int bmp_read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image) {
   _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
@@ -66,8 +65,7 @@ int bmp_read(const char* file, struct bmp_FileHeader* fileHeader,
   return 0;
 }
 
-int bmp_v4read(const char* file, struct bmp_FileHeader* fileHeader,
-               struct bmp_V4Header* v4Header, char** image) {
+int bmp_v4read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image) {
   _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
@@ -110,25 +108,23 @@ int bmp_v4read(const char* file, struct bmp_FileHeader* fileHeader,
   return 0;
 }
 
-int bmp_v4write(const struct bmp_Pixel32* buffer,
-                size_t width, size_t height,
-                const char* file) {
+int bmp_v4write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file) {
   if (buffer == NULL || file == NULL)
     return -1;
   if (width > INT32_MAX || height > INT32_MAX)
     return -1;
 
-  const size_t imageSize = (width * height) * sizeof(struct bmp_Pixel32);
+  const size_t imageSize = (width * height) * sizeof(bmp_Pixel32);
   if (imageSize > UINT32_MAX)
     return -1;
 
-  const size_t offset = sizeof(struct bmp_FileHeader) + sizeof(struct bmp_V4Header);
+  const size_t offset = sizeof(bmp_FileHeader) + sizeof(bmp_V4Header);
 
   const size_t fileSize = offset + imageSize;
   if (fileSize > UINT32_MAX)
     return -1;
 
-  struct bmp_FileHeader fileHeader = {
+  bmp_FileHeader fileHeader = {
     .fileType = bmp_FILETYPE,
     .fileSize = (uint32_t)fileSize,
     .reserved1 = 0,
@@ -136,7 +132,7 @@ int bmp_v4write(const struct bmp_Pixel32* buffer,
     .offset = (uint32_t)offset,
   };
 
-  struct bmp_V4Header v4Header = {
+  bmp_V4Header v4Header = {
     .size = BITMAPV4HEADER,
     .width = (int32_t)width,
     .height = (int32_t)height,
@@ -163,11 +159,11 @@ int bmp_v4write(const struct bmp_Pixel32* buffer,
   if (fileHandle == NULL)
     return -1;
 
-  size_t writes = fwrite(&fileHeader, sizeof(struct bmp_FileHeader), 1, fileHandle);
+  size_t writes = fwrite(&fileHeader, sizeof(bmp_FileHeader), 1, fileHandle);
   if (writes != 1)
     return -1;
 
-  writes = fwrite(&v4Header, sizeof(struct bmp_V4Header), 1, fileHandle);
+  writes = fwrite(&v4Header, sizeof(bmp_V4Header), 1, fileHandle);
   if (writes != 1)
     return -1;
 

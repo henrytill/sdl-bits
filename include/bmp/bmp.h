@@ -19,6 +19,7 @@ enum bmp_HeaderSize {
   BITMAPV5HEADER = 124
 };
 
+typedef struct bmp_FileHeader bmp_FileHeader;
 struct bmp_FileHeader {
   uint16_t fileType;
   uint32_t fileSize;
@@ -27,6 +28,7 @@ struct bmp_FileHeader {
   uint32_t offset;
 } _packed_;
 
+typedef struct bmp_InfoHeader bmp_InfoHeader;
 struct bmp_InfoHeader {
   uint32_t size;         // DIB Header size (bytes)
   int32_t width;         // Image width (pixels)
@@ -41,6 +43,7 @@ struct bmp_InfoHeader {
   uint32_t impColors;    // Important colors
 } _packed_;
 
+typedef struct bmp_Colorspace bmp_Colorspace;
 struct bmp_Colorspace {
   int32_t rx;
   int32_t ry;
@@ -53,6 +56,7 @@ struct bmp_Colorspace {
   int32_t bz;
 } _packed_;
 
+typedef struct bmp_V4Header bmp_V4Header;
 struct bmp_V4Header {
   uint32_t size;         // DIB Header Size (bytes)
   int32_t width;         // Image width (pixels)
@@ -70,18 +74,20 @@ struct bmp_V4Header {
   uint32_t bMask;
   uint32_t aMask;
   uint32_t colorspaceType;
-  struct bmp_Colorspace colorspace;
+  bmp_Colorspace colorspace;
   uint32_t rGamma;
   uint32_t gGamma;
   uint32_t bGamma;
 } _packed_;
 
+typedef struct bmp_Pixel24 bmp_Pixel24;
 struct bmp_Pixel24 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
 } _packed_;
 
+typedef struct bmp_Pixel32 bmp_Pixel32;
 struct bmp_Pixel32 {
   uint8_t b;
   uint8_t g;
@@ -107,7 +113,7 @@ size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width);
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_read(const char* file, struct bmp_FileHeader* fileHeader, struct bmp_InfoHeader* infoHeader, char** image);
+int bmp_read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image);
 
 ///
 /// Reads a BMP file with a V4 header.
@@ -118,7 +124,7 @@ int bmp_read(const char* file, struct bmp_FileHeader* fileHeader, struct bmp_Inf
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_v4read(const char* file, struct bmp_FileHeader* fileHeader, struct bmp_V4Header* v4Header, char** image);
+int bmp_v4read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image);
 
 ///
 /// Write a BMP file with a V4 header.
@@ -128,4 +134,4 @@ int bmp_v4read(const char* file, struct bmp_FileHeader* fileHeader, struct bmp_V
 /// @param height Image height in pixels.
 /// @param file Path to the BMP file
 ///
-int bmp_v4write(const struct bmp_Pixel32* buffer, size_t width, size_t height, const char* file);
+int bmp_v4write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file);

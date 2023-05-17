@@ -13,15 +13,15 @@
 #include "prelude.h"
 
 int main(_unused_ int argc, _unused_ char* argv[]) {
-  struct bmp_FileHeader fileHeader;
-  struct bmp_V4Header v4Header;
+  bmp_FileHeader fileHeader;
+  bmp_V4Header v4Header;
   const char* const bmpFile = "./assets/test.bmp";
   _cleanup_str_ char* image = NULL;
 
   if (bmp_v4read(bmpFile, &fileHeader, &v4Header, &image) != 0)
     return EXIT_FAILURE;
 
-  struct bmp_Pixel32* pixel = (struct bmp_Pixel32*)image;
+  bmp_Pixel32* pixel = (bmp_Pixel32*)image;
   if (pixel->b != 255)
     return EXIT_FAILURE;
   if (pixel->g != 0)

@@ -14,6 +14,7 @@
   X(MUTEX_LOCK, -7, "Lock mutex failed ")          \
   X(MUTEX_UNLOCK, -8, "Unlock mutex failed")
 
+typedef enum MessageQueueFailure MessageQueueFailure;
 enum MessageQueueFailure {
 #define X(variant, i, str) MSGQ_FAILURE_##variant = i,
   MSGQ_FAILURE_VARIANTS
@@ -25,19 +26,21 @@ enum MessageQueueFailure {
   X(SOME, 1, "SOME")     \
   X(QUIT, 2, "QUIT")
 
+typedef enum MessageTag MessageTag;
 enum MessageTag {
 #define X(variant, i, str) MSG_TAG_##variant = i,
   MSG_TAG_VARIANTS
 #undef X
 };
 
+typedef struct Message Message;
 struct Message {
-  enum MessageTag tag;
+  MessageTag tag;
   intptr_t value;
 };
 
-/// A synchronous bounded message queue
-struct MessageQueue;
+/// A thread-safe bounded message queue
+typedef struct MessageQueue MessageQueue;
 
 ///
 /// Returns the error message associated with a return code.
@@ -53,7 +56,7 @@ const char* msgq_error(int rc);
 /// @param tag A message tag.
 /// @return The tag string associated with the given tag, or NULL if the tag is invalid.
 ///
-const char* msgq_tag(enum MessageTag tag);
+const char* msgq_tag(MessageTag tag);
 
 ///
 /// Creates a new bounded queue with the given capacity.
@@ -63,7 +66,7 @@ const char* msgq_tag(enum MessageTag tag);
 /// @param capacity The maximum number of messages the queue can hold.
 /// @return A pointer to a new MessageQueue, or NULL on error.
 ///
-struct MessageQueue* msgq_create(uint32_t capacity);
+MessageQueue* msgq_create(uint32_t capacity);
 
 ///
 /// Adds an message to the back of the queue.
@@ -72,7 +75,7 @@ struct MessageQueue* msgq_create(uint32_t capacity);
 /// @param in Message to add to the back of the queue.
 /// @return 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
 ///
-int msgq_put(struct MessageQueue* queue, struct Message* in);
+int msgq_put(MessageQueue* queue, Message* in);
 
 ///
 /// Removes and returns the message at the front of the queue, blocking if the queue is empty.
@@ -81,7 +84,7 @@ int msgq_put(struct MessageQueue* queue, struct Message* in);
 /// @param out The message at the front of the queue.
 /// @return 0 if a message was removed from the queue, or a negative value on error.
 ///
-int msgq_get(struct MessageQueue* queue, struct Message* out);
+int msgq_get(MessageQueue* queue, Message* out);
 
 ///
 /// Returns the number of messages in the queue.
@@ -89,7 +92,7 @@ int msgq_get(struct MessageQueue* queue, struct Message* out);
 /// @param queue A MessageQueue.
 /// @return The number of messages in the queue.
 ///
-uint32_t msgq_size(struct MessageQueue* queue);
+uint32_t msgq_size(MessageQueue* queue);
 
 ///
 /// Frees resources associated with the queue.
@@ -101,7 +104,7 @@ uint32_t msgq_size(struct MessageQueue* queue);
 /// @param queue A MessageQueue.
 /// @see msgq_create()
 ///
-void msgq_destroy(struct MessageQueue* queue);
+void msgq_destroy(MessageQueue* queue);
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct MessageQueue*, msgq_destroy)
+DEFINE_TRIVIAL_CLEANUP_FUNC(MessageQueue*, msgq_destroy)
 #define _cleanup_msgq_ _cleanup_(msgq_destroyp)

@@ -18,8 +18,8 @@ enum {
 static const char* const fontFile = "./assets/ucs-fonts/10x20.bdf";
 static const char* const bmpFile = "./assets/10x20.bmp";
 
-static const struct bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
-static const struct bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
+static const bmp_Pixel32 white = {0xFF, 0xFF, 0xFF, 0x00};
+static const bmp_Pixel32 black = {0x00, 0x00, 0x00, 0xFF};
 
 static char** allocImage(size_t height, size_t width);
 static void freeImage(char** image, size_t height);
@@ -82,13 +82,13 @@ static inline void drawImage(_unused_ char** image, _unused_ size_t width, _unus
 }
 #endif
 
-static void destroyBuffer(struct bmp_Pixel32* buffer) {
+static void destroyBuffer(bmp_Pixel32* buffer) {
   free(buffer);
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct bmp_Pixel32*, destroyBuffer)
+DEFINE_TRIVIAL_CLEANUP_FUNC(bmp_Pixel32*, destroyBuffer)
 #define _cleanup_FT_Library_ _cleanup_(FT_Done_FreeTypep)
 #define _cleanup_FT_Face_    _cleanup_(FT_Done_Facep)
 #define _cleanup_buffer_     _cleanup_(destroyBufferp)
@@ -96,8 +96,8 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(struct bmp_Pixel32*, destroyBuffer)
 int main(_unused_ int argc, _unused_ char* argv[]) {
   extern const char* const fontFile;
   extern const char* const bmpFile;
-  extern const struct bmp_Pixel32 white;
-  extern const struct bmp_Pixel32 black;
+  extern const bmp_Pixel32 white;
+  extern const bmp_Pixel32 black;
 
   char code[CODE_SIZE] = {0};
   for (int i = 0; i < CODE_SIZE; ++i)
@@ -166,7 +166,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
 
   drawImage(image, width, height);
 
-  _cleanup_buffer_ struct bmp_Pixel32* buffer = calloc(width * height, sizeof(struct bmp_Pixel32));
+  _cleanup_buffer_ bmp_Pixel32* buffer = calloc(width * height, sizeof(bmp_Pixel32));
   if (buffer == NULL) {
     freeImage(image, height);
     return EXIT_FAILURE;

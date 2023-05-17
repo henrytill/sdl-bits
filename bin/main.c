@@ -13,6 +13,7 @@ enum {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
+typedef struct Args Args;
 struct Args {
   char* configFile;
 };
@@ -22,14 +23,16 @@ struct Args {
   X(FULLSCREEN, 1, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN, "Fullscreen") \
   X(BORDERLESS, 2, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP, "Borderless Fullscreen")
 
+typedef enum WindowType WindowType;
 enum WindowType {
 #define X(variant, i, flags, str) variant = i,
   WINDOW_TYPE_VARIANTS
 #undef X
 };
 
+typedef struct Config Config;
 struct Config {
-  enum WindowType windowType;
+  WindowType windowType;
   int x;
   int y;
   int width;
@@ -38,6 +41,7 @@ struct Config {
   char* assetDir;
 };
 
+typedef struct AudioState AudioState;
 struct AudioState {
   const int sampleRate;
   const uint16_t bufferSize;
@@ -47,13 +51,15 @@ struct AudioState {
   uint64_t offset;
 };
 
+typedef struct State State;
 struct State {
   SDL_AudioDeviceID audioDevice;
-  struct AudioState audio;
+  AudioState audio;
   int loopStat;
   int toneStat;
 };
 
+typedef struct Window Window;
 struct Window {
   SDL_Window* window;
   SDL_Renderer* renderer;
@@ -75,9 +81,9 @@ static const char* const winTypeStr[] = {
 
 static uint64_t perfFreq = 0;
 
-static struct Args args = {.configFile = "config.lua"};
+static Args args = {.configFile = "config.lua"};
 
-static struct Config config = {
+static Config config = {
   .windowType = WINDOWED,
   .x = CENTERED,
   .y = CENTERED,
@@ -87,7 +93,7 @@ static struct Config config = {
   .assetDir = "./assets",
 };
 
-static struct State state = {
+static State state = {
   .audioDevice = 0,
   .audio = {
     .sampleRate = 48000,
@@ -102,13 +108,13 @@ static struct State state = {
 };
 
 ///
-/// Parse command line arguments and populate an Args struct with the results.
+/// Parse command line arguments and populate args with the results.
 ///
 /// @param argc The number of arguments
 /// @param argv The arguments
 /// @param args The Args struct to populate
 ///
-static void parseArgs(int argc, char* argv[], struct Args* args) {
+static void parseArgs(int argc, char* argv[], Args* args) {
   for (int i = 0; i < argc;) {
     char* arg = argv[i++];
     if (strcmp(arg, "-c") == 0)
@@ -131,13 +137,13 @@ static char* joinPath(const char* a, const char* b) {
 }
 
 ///
-/// Load and parse a config file and populate a Config struct with the results.
+/// Load and parse a config file and populate config with the results.
 ///
 /// @param file The config file to load
 /// @param config The Config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int loadConfig(const char* file, struct Config* config) {
+static int loadConfig(const char* file, Config* config) {
   _cleanup_lua_State_ lua_State* state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
@@ -178,7 +184,7 @@ static int loadConfig(const char* file, struct Config* config) {
 /// @param len The length of the stream
 ///
 static void calcSine(void* userData, uint8_t* stream, _unused_ int len) {
-  struct AudioState* as = (struct AudioState*)userData;
+  AudioState* as = (AudioState*)userData;
   float* fstream = (float*)stream;
 
   assert((len / (4 * 2)) == as->bufferSize);
@@ -245,7 +251,7 @@ static void delay(const double frameTime, const uint64_t begin) {
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int initWindow(struct Config* config, const char* title, struct Window* win) {
+static int initWindow(Config* config, const char* title, Window* win) {
   extern const uint32_t winTypeFlags[];
   extern const char* const winTypeStr[];
 
@@ -272,7 +278,7 @@ static int initWindow(struct Config* config, const char* title, struct Window* w
 ///
 /// @param win The window to destroy.
 ///
-static void finishWindow(struct Window* win) {
+static void finishWindow(Window* win) {
   if (win == NULL) return;
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
@@ -285,8 +291,8 @@ static void finishWindow(struct Window* win) {
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static struct Window* createWindow(struct Config* config, const char* title) {
-  struct Window* win = emalloc(sizeof(struct Window));
+static Window* createWindow(Config* config, const char* title) {
+  Window* win = emalloc(sizeof(Window));
   if (initWindow(config, title, win) != 0) {
     free(win);
     return NULL;
@@ -299,13 +305,13 @@ static struct Window* createWindow(struct Config* config, const char* title) {
 ///
 /// @param win The win to destroy.
 ///
-static void destroyWindow(struct Window* win) {
+static void destroyWindow(Window* win) {
   if (win == NULL) return;
   finishWindow(win);
   free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window*, destroyWindow)
+DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, destroyWindow)
 #define _cleanup_Window_ _cleanup_(destroyWindowp)
 
 ///
@@ -315,7 +321,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(struct Window*, destroyWindow)
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int getRect(struct Window* win, SDL_Rect* rect) {
+static int getRect(Window* win, SDL_Rect* rect) {
   if (win == NULL || win->renderer == NULL)
     return -1;
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
@@ -332,7 +338,7 @@ static int getRect(struct Window* win, SDL_Rect* rect) {
 /// @param key The keydown event.
 /// @param state The state.
 ///
-static void handleKeydown(SDL_KeyboardEvent* key, struct State* state) {
+static void handleKeydown(SDL_KeyboardEvent* key, State* state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
     state->loopStat = 0;
@@ -353,9 +359,9 @@ static void update(double delta) {
 
 int main(int argc, char* argv[]) {
   extern uint64_t perfFreq;
-  extern struct Args args;
-  extern struct Config config;
-  extern struct State state;
+  extern Args args;
+  extern Config config;
+  extern State state;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
   parseArgs(argc, argv, &args);
@@ -389,7 +395,7 @@ int main(int argc, char* argv[]) {
   }
 
   const char* const winTitle = "Hello, world!";
-  _cleanup_Window_ struct Window* win = createWindow(&config, winTitle);
+  _cleanup_Window_ Window* win = createWindow(&config, winTitle);
   if (win == NULL)
     return EXIT_FAILURE;
 

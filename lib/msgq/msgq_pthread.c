@@ -6,15 +6,14 @@
 
 #include "msgq.h"
 
-/// A thread-safe message queue
 struct MessageQueue {
-  struct Message* buffer; // Buffer to hold messages
-  uint32_t capacity;      // Maximum size of the buffer
-  size_t front;           // Index of the front message in the buffer
-  size_t rear;            // Index of the rear message in the buffer
-  sem_t* empty;           // Semaphore to track empty slots in the buffer
-  sem_t* full;            // Semaphore to track filled slots in the buffer
-  pthread_mutex_t* lock;  // Mutex lock to protect buffer access
+  Message* buffer;       // Buffer to hold messages
+  uint32_t capacity;     // Maximum size of the buffer
+  size_t front;          // Index of the front message in the buffer
+  size_t rear;           // Index of the rear message in the buffer
+  sem_t* empty;          // Semaphore to track empty slots in the buffer
+  sem_t* full;           // Semaphore to track filled slots in the buffer
+  pthread_mutex_t* lock; // Mutex lock to protect buffer access
 };
 
 static const char* const errorStr[] = {
@@ -37,7 +36,7 @@ static const char* const tagStr[] = {
 #undef X
 };
 
-const char* msgq_tag(enum MessageTag tag) {
+const char* msgq_tag(MessageTag tag) {
   extern const char* const tagStr[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
@@ -45,7 +44,7 @@ const char* msgq_tag(enum MessageTag tag) {
   return tagStr[tag];
 }
 
-static int msgq_init(struct MessageQueue* queue, uint32_t capacity) {
+static int msgq_init(MessageQueue* queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -92,8 +91,8 @@ static int msgq_init(struct MessageQueue* queue, uint32_t capacity) {
   return 0;
 }
 
-struct MessageQueue* msgq_create(uint32_t capacity) {
-  struct MessageQueue* queue = calloc(1, sizeof(*queue));
+MessageQueue* msgq_create(uint32_t capacity) {
+  MessageQueue* queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
@@ -105,7 +104,7 @@ struct MessageQueue* msgq_create(uint32_t capacity) {
   return queue;
 }
 
-int msgq_put(struct MessageQueue* queue, struct Message* in) {
+int msgq_put(MessageQueue* queue, Message* in) {
   int rc = sem_trywait(queue->empty);
   if (rc == -1 && errno == EAGAIN) {
     return 1;
@@ -129,7 +128,7 @@ int msgq_put(struct MessageQueue* queue, struct Message* in) {
   return 0;
 }
 
-int msgq_get(struct MessageQueue* queue, struct Message* out) {
+int msgq_get(MessageQueue* queue, Message* out) {
   int rc = sem_wait(queue->full);
   if (rc == -1) {
     return MSGQ_FAILURE_SEM_WAIT;
@@ -151,14 +150,14 @@ int msgq_get(struct MessageQueue* queue, struct Message* out) {
   return 0;
 }
 
-uint32_t msgq_size(struct MessageQueue* queue) {
+uint32_t msgq_size(MessageQueue* queue) {
   if (queue == NULL) return 0;
   int ret = 0;
   sem_getvalue(queue->full, &ret);
   return (uint32_t)ret;
 }
 
-static void msgq_finish(struct MessageQueue* queue) {
+static void msgq_finish(MessageQueue* queue) {
   if (queue == NULL) return;
   queue->capacity = 0;
   queue->front = 0;
@@ -184,7 +183,7 @@ static void msgq_finish(struct MessageQueue* queue) {
   }
 }
 
-void msgq_destroy(struct MessageQueue* queue) {
+void msgq_destroy(MessageQueue* queue) {
   if (queue == NULL) return;
   msgq_finish(queue);
   free(queue);
