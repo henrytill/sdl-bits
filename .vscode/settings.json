@@ -10,6 +10,8 @@
     "stdio.h": "c",
     "prelude.h": "c",
     "compare": "c",
-    "type_traits": "c"
+    "type_traits": "c",
+    "msgq.h": "c",
+    "semaphore.h": "c"
   }
 }
