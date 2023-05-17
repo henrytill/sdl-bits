@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+#include "compat.h"
 #include "msgq.h"
 
 struct MessageQueue {
@@ -49,42 +50,24 @@ static int msgq_Init(MessageQueue* queue, uint32_t capacity) {
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
   }
-  queue->empty = calloc(1, sizeof(*queue->empty));
-  if (queue->empty == NULL) {
-    free(queue->buffer);
-    return MSGQ_FAILURE_MALLOC;
-  }
-  queue->full = calloc(1, sizeof(*queue->full));
-  if (queue->full == NULL) {
-    free(queue->empty);
-    free(queue->buffer);
-    return MSGQ_FAILURE_MALLOC;
-  }
-  queue->lock = calloc(1, sizeof(*queue->lock));
-  if (queue->lock == NULL) {
-    free(queue->full);
-    free(queue->empty);
-    free(queue->buffer);
-    return MSGQ_FAILURE_MALLOC;
-  }
   queue->capacity = capacity;
   queue->front = 0;
   queue->rear = 0;
-  int rc = sem_init(queue->empty, 0, capacity);
-  if (rc == -1) {
+  queue->empty = CreateSemaphore(capacity);
+  if (queue->empty == NULL) {
     free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
-  rc = sem_init(queue->full, 0, 0);
-  if (rc == -1) {
-    sem_destroy(queue->empty);
+  queue->full = CreateSemaphore(0);
+  if (queue->full == NULL) {
+    DestroySemaphore(queue->empty);
     free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
-  }
-  rc = pthread_mutex_init(queue->lock, NULL);
-  if (rc != 0) {
-    sem_destroy(queue->full);
-    sem_destroy(queue->empty);
+  };
+  queue->lock = CreateMutex();
+  if (queue->lock == NULL) {
+    DestroySemaphore(queue->full);
+    DestroySemaphore(queue->empty);
     free(queue->buffer);
     return MSGQ_FAILURE_MUTEX_CREATE;
   }
@@ -101,18 +84,15 @@ static void msgq_Finish(MessageQueue* queue) {
     queue->buffer = NULL;
   }
   if (queue->empty != NULL) {
-    sem_destroy(queue->empty);
-    free(queue->empty);
+    DestroySemaphore(queue->empty);
     queue->empty = NULL;
   }
   if (queue->full != NULL) {
-    sem_destroy(queue->full);
-    free(queue->full);
+    DestroySemaphore(queue->full);
     queue->full = NULL;
   }
   if (queue->lock != NULL) {
-    pthread_mutex_destroy(queue->lock);
-    free(queue->lock);
+    DestroyMutex(queue->lock);
     queue->lock = NULL;
   }
 }
