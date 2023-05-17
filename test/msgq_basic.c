@@ -21,7 +21,7 @@
 static const int count = 100;
 
 /// Capacity of the MessageQueue.
-static const uint32_t queueCap = 4;
+static const uint32_t queueCap = 4U;
 
 /// Log an error message and exit.
 static void Fail(const char* msg) {
@@ -54,14 +54,14 @@ static void sdl_Fail(const char* msg) {
 static int Produce(void* data) {
   extern const int count;
 
-  Message msg = {0};
-  MessageTag tag = MSG_TAG_NONE;
-  const char* tagStr = NULL;
-
   if (data == NULL)
     Fail("Produce failed: data is NULL");
 
   MessageQueue* queue = (MessageQueue*)data;
+
+  Message msg = {0};
+  MessageTag tag = MSG_TAG_NONE;
+  const char* tagStr = NULL;
 
   for (intptr_t value = 0; value <= count;) {
     tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
