@@ -9,7 +9,7 @@
 
 #include "prelude.h"
 
-enum {
+enum WindowPos {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
@@ -26,6 +26,18 @@ struct Args {
 typedef enum WindowType WindowType;
 enum WindowType {
 #define X(variant, i, flags, str) variant = i,
+  WINDOW_TYPE_VARIANTS
+#undef X
+};
+
+static const uint32_t windowTypeFlags[] = {
+#define X(variant, i, flags, str) [variant] = flags,
+  WINDOW_TYPE_VARIANTS
+#undef X
+};
+
+static const char* const windowTypeStr[] = {
+#define X(variant, i, flags, str) [variant] = str,
   WINDOW_TYPE_VARIANTS
 #undef X
 };
@@ -67,18 +79,6 @@ struct Window {
 
 static const double second = 1000.0;
 
-static const uint32_t winTypeFlags[] = {
-#define X(variant, i, flags, str) [variant] = flags,
-  WINDOW_TYPE_VARIANTS
-#undef X
-};
-
-static const char* const winTypeStr[] = {
-#define X(variant, i, flags, str) [variant] = str,
-  WINDOW_TYPE_VARIANTS
-#undef X
-};
-
 static uint64_t perfFreq = 0;
 
 static Args args = {.configFile = "config.lua"};
@@ -117,7 +117,7 @@ static State state = {
 static void parseArgs(int argc, char* argv[], Args* args) {
   for (int i = 0; i < argc;) {
     char* arg = argv[i++];
-    if (strcmp(arg, "-c") == 0)
+    if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0)
       args->configFile = argv[i++];
   }
 }
@@ -252,14 +252,14 @@ static void delay(const double frameTime, const uint64_t begin) {
 /// @return 0 on success, -1 on failure.
 ///
 static int initWindow(Config* config, const char* title, Window* win) {
-  extern const uint32_t winTypeFlags[];
-  extern const char* const winTypeStr[];
+  extern const uint32_t windowTypeFlags[];
+  extern const char* const windowTypeStr[];
 
-  SDL_LogInfo(APP, "Window type: %s", winTypeStr[config->windowType]);
+  SDL_LogInfo(APP, "Window type: %s", windowTypeStr[config->windowType]);
   win->window = SDL_CreateWindow(title,
                                  config->x, config->y,
                                  config->width, config->height,
-                                 winTypeFlags[config->windowType]);
+                                 windowTypeFlags[config->windowType]);
   if (win->window == NULL) {
     sdl_error("SDL_CreateWindow failed");
     return -1;
@@ -386,7 +386,6 @@ int main(int argc, char* argv[]) {
     .userdata = (void*)&state.audio,
   };
   SDL_AudioSpec have = {0};
-
   _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   state.audioDevice = audioDevice;
   if (state.audioDevice < 2) {
