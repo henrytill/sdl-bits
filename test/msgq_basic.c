@@ -5,10 +5,10 @@
 /// The consumer consumes messages on the main thread until it receives a
 /// message with tag NONE.
 ///
-/// @see msgq_create()
-/// @see msgq_put()
-/// @see msgq_get()
-/// @see msgq_destroy()
+/// @see msgq_Create()
+/// @see msgq_Put()
+/// @see msgq_Get()
+/// @see msgq_Destroy()
 ///
 #include <inttypes.h>
 #include <stdint.h>
@@ -17,27 +17,27 @@
 #include "msgq.h"
 #include "prelude.h"
 
-/// Maximum value to produce.
+/// Maximum value to Produce.
 static const int count = 100;
 
 /// Capacity of the MessageQueue.
 static const uint32_t queueCap = 4;
 
 /// Log an error message and exit.
-static void fail(const char* msg) {
+static void Fail(const char* msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_fail(int err, const char* msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
+static void msgq_Fail(int err, const char* msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_Error(err));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_fail(const char* msg) {
-  sdl_error(msg);
+static void sdl_Fail(const char* msg) {
+  sdl_Error(msg);
   exit(EXIT_FAILURE);
 }
 
@@ -49,9 +49,9 @@ static void sdl_fail(const char* msg) {
 ///
 /// @param data Pointer to a MessageQueue.
 /// @return 0 on success
-/// @see consume()
+/// @see Consume()
 ///
-static int produce(void* data) {
+static int Produce(void* data) {
   extern const int count;
 
   Message msg = {0};
@@ -59,22 +59,22 @@ static int produce(void* data) {
   const char* tagStr = NULL;
 
   if (data == NULL)
-    fail("produce failed: data is NULL");
+    Fail("Produce failed: data is NULL");
 
   MessageQueue* queue = (MessageQueue*)data;
 
   for (intptr_t value = 0; value <= count;) {
     tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
-    tagStr = msgq_tag(tag);
+    tagStr = msgq_Tag(tag);
 
     msg.tag = tag;
     msg.value = value;
 
-    const int rc = msgq_put(queue, &msg);
+    const int rc = msgq_Put(queue, &msg);
     if (rc < 0) {
-      msgq_fail(rc, "msgq_put failed");
+      msgq_Fail(rc, "msgq_Put failed");
     } else if (rc == 1) {
-      SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
+      SDL_LogDebug(APP, "Produce {%s, %" PRIdPTR "} blocked: retrying",
                    tagStr, value);
       continue;
     } else {
@@ -94,23 +94,23 @@ static int produce(void* data) {
 ///
 /// @param queue Pointer to a MessageQueue.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 when a message with tag MSG_TAG_SOME is received,
-/// @see produce()
+/// @see Produce()
 ///
-static int consume(MessageQueue* queue) {
+static int Consume(MessageQueue* queue) {
   Message msg;
 
-  const int rc = msgq_get(queue, &msg);
+  const int rc = msgq_Get(queue, &msg);
   if (rc < 0)
-    msgq_fail(rc, "msgq_get failed");
+    msgq_Fail(rc, "msgq_Get failed");
 
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_tag(msg.tag), msg.value);
+              msgq_Tag(msg.tag), msg.value);
 
   return msg.tag != MSG_TAG_QUIT;
 }
 
 ///
-/// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
+/// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
 int main(_unused_ int argc, _unused_ char* argv[]) {
   extern const uint32_t queueCap;
@@ -119,20 +119,20 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc < 0)
-    sdl_fail("SDL_Init failed");
+    sdl_Fail("SDL_Init failed");
 
   AT_EXIT(SDL_Quit);
 
-  _cleanup_msgq_ MessageQueue* queue = msgq_create(queueCap);
+  _cleanup_msgq_ MessageQueue* queue = msgq_Create(queueCap);
   if (queue == NULL)
-    fail("msgq_create failed");
+    Fail("msgq_Create failed");
 
-  SDL_Thread* producer = SDL_CreateThread(produce, "producer", queue);
+  SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
   if (producer == NULL)
-    sdl_fail("SDL_CreateThread failed");
+    sdl_Fail("SDL_CreateThread failed");
 
   for (;;) {
-    rc = consume(queue);
+    rc = Consume(queue);
     if (rc == 0) {
       break;
     } else if (rc < 0) {

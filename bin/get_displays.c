@@ -2,7 +2,7 @@
 
 #include "macro.h"
 
-static int enumdisp(void) {
+static int EnumDisp(void) {
   const int numDisplays = SDL_GetNumVideoDisplays();
   if (numDisplays < 0) {
     const char* err = SDL_GetError();
@@ -31,7 +31,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
 
   AT_EXIT(SDL_Quit);
 
-  rc = enumdisp();
+  rc = EnumDisp();
   if (rc != 0)
     return EXIT_FAILURE;
 

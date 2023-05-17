@@ -114,7 +114,7 @@ static State state = {
 /// @param argv The arguments
 /// @param args The Args struct to populate
 ///
-static void parseArgs(int argc, char* argv[], Args* args) {
+static void ParseArgs(int argc, char* argv[], Args* args) {
   for (int i = 0; i < argc;) {
     char* arg = argv[i++];
     if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0)
@@ -129,7 +129,7 @@ static void parseArgs(int argc, char* argv[], Args* args) {
 /// @param b The second path
 /// @return A new path, or NULL on failure
 ///
-static char* joinPath(const char* a, const char* b) {
+static char* JoinPath(const char* a, const char* b) {
   size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
   char* ret = ecalloc(++len, sizeof(char)); // incr for terminator
   snprintf(ret, len, "%s/%s", a, b);
@@ -143,7 +143,7 @@ static char* joinPath(const char* a, const char* b) {
 /// @param config The Config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int loadConfig(const char* file, Config* config) {
+static int LoadConfig(const char* file, Config* config) {
   _cleanup_lua_State_ lua_State* state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
@@ -183,7 +183,7 @@ static int loadConfig(const char* file, Config* config) {
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void calcSine(void* userData, uint8_t* stream, _unused_ int len) {
+static void CalcSine(void* userData, uint8_t* stream, _unused_ int len) {
   AudioState* as = (AudioState*)userData;
   float* fstream = (float*)stream;
 
@@ -206,7 +206,7 @@ static void calcSine(void* userData, uint8_t* stream, _unused_ int len) {
 /// @param frameRate The frame rate
 /// @return The time in milliseconds for a frame
 ///
-static double calcFrameTime(const int frameRate) {
+static double CalcFrameTime(const int frameRate) {
   extern const double second;
   assert((double)frameRate > 0);
   assert((double)frameRate < DBL_MAX);
@@ -220,7 +220,7 @@ static double calcFrameTime(const int frameRate) {
 /// @param end A final timestamp in ticks
 /// @return The time in milliseconds between the two timestamps
 ///
-static double calcDelta(const uint64_t begin, const uint64_t end) {
+static double CalcDelta(const uint64_t begin, const uint64_t end) {
   extern const double second;
   extern uint64_t perfFreq;
   assert(begin <= end);
@@ -236,11 +236,11 @@ static double calcDelta(const uint64_t begin, const uint64_t end) {
 /// @param frameTime The desired time in milliseconds for a frame
 /// @param begin The timestamp in ticks when the frame started
 ///
-static void delay(const double frameTime, const uint64_t begin) {
-  if (calcDelta(begin, now()) >= frameTime) return;
-  const uint32_t time = (uint32_t)(frameTime - calcDelta(begin, now()) - 1.0);
+static void Delay(const double frameTime, const uint64_t begin) {
+  if (CalcDelta(begin, now()) >= frameTime) return;
+  const uint32_t time = (uint32_t)(frameTime - CalcDelta(begin, now()) - 1.0);
   if (time > 0) SDL_Delay(time);
-  while (calcDelta(begin, now()) < frameTime) continue;
+  while (CalcDelta(begin, now()) < frameTime) continue;
 }
 
 ///
@@ -251,7 +251,7 @@ static void delay(const double frameTime, const uint64_t begin) {
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int initWindow(Config* config, const char* title, Window* win) {
+static int InitWindow(Config* config, const char* title, Window* win) {
   extern const uint32_t windowTypeFlags[];
   extern const char* const windowTypeStr[];
 
@@ -261,13 +261,13 @@ static int initWindow(Config* config, const char* title, Window* win) {
                                  config->width, config->height,
                                  windowTypeFlags[config->windowType]);
   if (win->window == NULL) {
-    sdl_error("SDL_CreateWindow failed");
+    sdl_Error("SDL_CreateWindow failed");
     return -1;
   }
   win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
   if (win->renderer == NULL) {
     SDL_DestroyWindow(win->window);
-    sdl_error("SDL_CreateRenderer failed");
+    sdl_Error("SDL_CreateRenderer failed");
     return -1;
   }
   return SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
@@ -278,7 +278,7 @@ static int initWindow(Config* config, const char* title, Window* win) {
 ///
 /// @param win The window to destroy.
 ///
-static void finishWindow(Window* win) {
+static void FinishWindow(Window* win) {
   if (win == NULL) return;
   if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
   if (win->window != NULL) SDL_DestroyWindow(win->window);
@@ -291,9 +291,9 @@ static void finishWindow(Window* win) {
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static Window* createWindow(Config* config, const char* title) {
+static Window* CreateWindow(Config* config, const char* title) {
   Window* win = emalloc(sizeof(Window));
-  if (initWindow(config, title, win) != 0) {
+  if (InitWindow(config, title, win) != 0) {
     free(win);
     return NULL;
   }
@@ -305,14 +305,14 @@ static Window* createWindow(Config* config, const char* title) {
 ///
 /// @param win The win to destroy.
 ///
-static void destroyWindow(Window* win) {
+static void DestroyWindow(Window* win) {
   if (win == NULL) return;
-  finishWindow(win);
+  FinishWindow(win);
   free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, destroyWindow)
-#define _cleanup_Window_ _cleanup_(destroyWindowp)
+DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
+#define _cleanup_Window_ _cleanup_(DestroyWindowp)
 
 ///
 /// Get the window's rectangle.
@@ -321,12 +321,12 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, destroyWindow)
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int getRect(Window* win, SDL_Rect* rect) {
+static int GetRect(Window* win, SDL_Rect* rect) {
   if (win == NULL || win->renderer == NULL)
     return -1;
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
   if (rc != 0) {
-    sdl_error("SDL_GetRendererOutputSize failed");
+    sdl_Error("SDL_GetRendererOutputSize failed");
     return -1;
   }
   return 0;
@@ -338,7 +338,7 @@ static int getRect(Window* win, SDL_Rect* rect) {
 /// @param key The keydown event.
 /// @param state The state.
 ///
-static void handleKeydown(SDL_KeyboardEvent* key, State* state) {
+static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
     state->loopStat = 0;
@@ -353,7 +353,7 @@ static void handleKeydown(SDL_KeyboardEvent* key, State* state) {
   }
 }
 
-static void update(double delta) {
+static void Update(double delta) {
   (void)delta;
 }
 
@@ -364,12 +364,12 @@ int main(int argc, char* argv[]) {
   extern State state;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-  parseArgs(argc, argv, &args);
-  loadConfig(args.configFile, &config);
+  ParseArgs(argc, argv, &args);
+  LoadConfig(args.configFile, &config);
 
   int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != 0) {
-    sdl_error("init failed");
+    sdl_Error("init failed");
     return EXIT_FAILURE;
   }
 
@@ -382,48 +382,48 @@ int main(int argc, char* argv[]) {
     .format = AUDIO_F32,
     .channels = 2,
     .samples = state.audio.bufferSize,
-    .callback = calcSine,
+    .callback = CalcSine,
     .userdata = (void*)&state.audio,
   };
   SDL_AudioSpec have = {0};
   _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   state.audioDevice = audioDevice;
   if (state.audioDevice < 2) {
-    sdl_error("SDL_OpenAudio failed");
+    sdl_Error("SDL_OpenAudio failed");
     return EXIT_FAILURE;
   }
 
   const char* const winTitle = "Hello, world!";
-  _cleanup_Window_ Window* win = createWindow(&config, winTitle);
+  _cleanup_Window_ Window* win = CreateWindow(&config, winTitle);
   if (win == NULL)
     return EXIT_FAILURE;
 
   SDL_Rect winRect = {0, 0, 0, 0};
-  rc = getRect(win, &winRect);
+  rc = GetRect(win, &winRect);
   if (rc != 0)
     return EXIT_FAILURE;
 
   _cleanup_SDL_Texture_ SDL_Texture* texture = ({
     const char* const testBmp = "test.bmp";
-    _cleanup_str_ char* bmpFile = joinPath(config.assetDir, testBmp);
+    _cleanup_str_ char* bmpFile = JoinPath(config.assetDir, testBmp);
     if (bmpFile == NULL)
       return EXIT_FAILURE;
 
     _cleanup_SDL_Surface_ SDL_Surface* surface = SDL_LoadBMP(bmpFile);
     if (surface == NULL) {
-      sdl_error("SDL_LoadBMP failed");
+      sdl_Error("SDL_LoadBMP failed");
       return EXIT_FAILURE;
     }
 
     SDL_Texture* tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
     if (tmp == NULL) {
-      sdl_error("SDL_CreateTextureFromSurface failed");
+      sdl_Error("SDL_CreateTextureFromSurface failed");
       return EXIT_FAILURE;
     }
     tmp;
   });
 
-  const double frameTime = calcFrameTime(config.frameRate);
+  const double frameTime = CalcFrameTime(config.frameRate);
 
   SDL_PauseAudioDevice(state.audioDevice, 0);
 
@@ -439,28 +439,28 @@ int main(int argc, char* argv[]) {
         state.loopStat = 0;
         break;
       case SDL_KEYDOWN:
-        handleKeydown(&event.key, &state);
+        HandleKeydown(&event.key, &state);
         break;
       }
     }
 
-    update(delta);
+    Update(delta);
 
     rc = SDL_RenderClear(win->renderer);
     if (rc != 0) {
-      sdl_error("SDL_RenderClear failed");
+      sdl_Error("SDL_RenderClear failed");
       return EXIT_FAILURE;
     }
     rc = SDL_RenderCopy(win->renderer, texture, NULL, &winRect);
     if (rc != 0) {
-      sdl_error("SDL_RenderCopy failed");
+      sdl_Error("SDL_RenderCopy failed");
       return EXIT_FAILURE;
     }
     SDL_RenderPresent(win->renderer);
 
-    delay(frameTime, begin);
+    Delay(frameTime, begin);
     end = now();
-    delta = calcDelta(begin, end);
+    delta = CalcDelta(begin, end);
     begin = end;
   }
 

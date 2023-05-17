@@ -18,7 +18,7 @@ static const char* const errorStr[] = {
 #undef X
 };
 
-const char* msgq_error(int rc) {
+const char* msgq_Error(int rc) {
   extern const char* const errorStr[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
@@ -32,7 +32,7 @@ static const char* const tagStr[] = {
 #undef X
 };
 
-const char* msgq_tag(MessageTag tag) {
+const char* msgq_Tag(MessageTag tag) {
   extern const char* const tagStr[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
@@ -40,7 +40,7 @@ const char* msgq_tag(MessageTag tag) {
   return tagStr[tag];
 }
 
-static int msgq_init(MessageQueue* queue, uint32_t capacity) {
+static int msgq_Init(MessageQueue* queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -69,12 +69,12 @@ static int msgq_init(MessageQueue* queue, uint32_t capacity) {
   return 0;
 }
 
-MessageQueue* msgq_create(uint32_t capacity) {
+MessageQueue* msgq_Create(uint32_t capacity) {
   MessageQueue* queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
-  int rc = msgq_init(queue, capacity);
+  int rc = msgq_Init(queue, capacity);
   if (rc < 0) {
     free(queue);
     return NULL;
@@ -82,7 +82,7 @@ MessageQueue* msgq_create(uint32_t capacity) {
   return queue;
 }
 
-int msgq_put(MessageQueue* queue, Message* in) {
+int msgq_Put(MessageQueue* queue, Message* in) {
   int rc = SDL_SemTryWait(queue->empty);
   if (rc == SDL_MUTEX_TIMEDOUT) {
     return 1;
@@ -106,7 +106,7 @@ int msgq_put(MessageQueue* queue, Message* in) {
   return 0;
 }
 
-int msgq_get(MessageQueue* queue, Message* out) {
+int msgq_Get(MessageQueue* queue, Message* out) {
   int rc = SDL_SemWait(queue->full);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_WAIT;
@@ -128,12 +128,12 @@ int msgq_get(MessageQueue* queue, Message* out) {
   return 0;
 }
 
-uint32_t msgq_size(MessageQueue* queue) {
+uint32_t msgq_Size(MessageQueue* queue) {
   if (queue == NULL) return 0;
   return SDL_SemValue(queue->full);
 }
 
-static void msgq_finish(MessageQueue* queue) {
+static void msgq_Finish(MessageQueue* queue) {
   if (queue == NULL) return;
   queue->capacity = 0;
   queue->front = 0;
@@ -156,8 +156,8 @@ static void msgq_finish(MessageQueue* queue) {
   }
 }
 
-void msgq_destroy(MessageQueue* queue) {
+void msgq_Destroy(MessageQueue* queue) {
   if (queue == NULL) return;
-  msgq_finish(queue);
+  msgq_Finish(queue);
   free(queue);
 }

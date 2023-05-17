@@ -98,7 +98,7 @@ static inline void* ecalloc(size_t nmemb, size_t size) {
 ///
 /// @param msg The message to log
 ///
-static inline void sdl_error(const char* msg) {
+static inline void sdl_Error(const char* msg) {
   const char* err = SDL_GetError();
   if (strlen(err) != 0)
     SDL_LogError(ERR, "%s (%s)", msg, err);

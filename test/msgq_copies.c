@@ -5,10 +5,10 @@
 /// The consumer consumes messages on the main thread after a delay and checks
 /// their values.
 ///
-/// @see msgq_create()
-/// @see msgq_put()
-/// @see msgq_get()
-/// @see msgq_destroy()
+/// @see msgq_Create()
+/// @see msgq_Put()
+/// @see msgq_Get()
+/// @see msgq_Destroy()
 ///
 #include <inttypes.h>
 #include <stdint.h>
@@ -22,15 +22,15 @@
 #define LOG(msg) ({                            \
   SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}", \
               __func__, #msg,                  \
-              msgq_tag(msg.tag), msg.value);   \
+              msgq_Tag(msg.tag), msg.value);   \
 })
 
 #define CHECK(msg, exTag, exVal) ({                            \
   if (msg.tag != exTag || msg.value != exVal) {                \
     SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
                  __func__, #msg,                               \
-                 msgq_tag(msg.tag), msg.value,                 \
-                 msgq_tag(exTag), exVal);                      \
+                 msgq_Tag(msg.tag), msg.value,                 \
+                 msgq_Tag(exTag), exVal);                      \
     exit(EXIT_FAILURE);                                        \
   }                                                            \
 });
@@ -42,20 +42,20 @@ static const uint32_t delay = 2000U;
 static const uint32_t queueCap = 1U;
 
 /// Log an error message and exit.
-static void fail(const char* msg) {
+static void Fail(const char* msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_fail(int err, const char* msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_error(err));
+static void msgq_Fail(int err, const char* msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_Error(err));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_fail(const char* msg) {
-  sdl_error(msg);
+static void sdl_Fail(const char* msg) {
+  sdl_Error(msg);
   exit(EXIT_FAILURE);
 }
 
@@ -66,34 +66,34 @@ static void sdl_fail(const char* msg) {
 ///
 /// @param data Pointer to a MessageQueue.
 /// @return 0 on success, 1 on failure.
-/// @see consume()
+/// @see Consume()
 ///
-static int produce(void* data) {
+static int Produce(void* data) {
   MessageQueue* queue = (MessageQueue*)data;
   Message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &msg);
+    rc = msgq_Put(queue, &msg);
     if (rc < 0)
-      msgq_fail(rc, "msgq_put failed");
+      msgq_Fail(rc, "msgq_Put failed");
   }
   LOG(msg);
 
   msg.tag = MSG_TAG_SOME;
   msg.value = 0;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &msg);
+    rc = msgq_Put(queue, &msg);
     if (rc < 0)
-      msgq_fail(rc, "msgq_put failed");
+      msgq_Fail(rc, "msgq_Put failed");
   }
   LOG(msg);
 
   msg.tag = MSG_TAG_SOME;
   msg.value = 1;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_put(queue, &msg);
+    rc = msgq_Put(queue, &msg);
     if (rc < 0)
-      msgq_fail(rc, "msgq_put failed");
+      msgq_Fail(rc, "msgq_Put failed");
   }
   LOG(msg);
 
@@ -101,15 +101,15 @@ static int produce(void* data) {
 }
 
 ///
-/// Consume messages produced by produce() after a delay and check their values.
+/// Consume messages produced by Produce() after a delay and check their values.
 ///
 /// This function is meant to be run in the main thread.
 ///
 /// @param queue Pointer to a MessageQueue.
 /// @return 0 on success, 1 on failure.
-/// @see produce()
+/// @see Produce()
 ///
-static int consume(MessageQueue* queue) {
+static int Consume(MessageQueue* queue) {
   extern const uint32_t delay;
 
   Message a = {0};
@@ -119,16 +119,16 @@ static int consume(MessageQueue* queue) {
   SDL_LogInfo(APP, "%s: pausing for %d...", __func__, delay);
   SDL_Delay(delay);
 
-  msgq_get(queue, &a);
+  msgq_Get(queue, &a);
   LOG(a);
   CHECK(a, MSG_TAG_SOME, 42l);
 
-  msgq_get(queue, &b);
+  msgq_Get(queue, &b);
   LOG(b);
   CHECK(a, MSG_TAG_SOME, 42l);
   CHECK(b, MSG_TAG_SOME, 0l);
 
-  msgq_get(queue, &c);
+  msgq_Get(queue, &c);
   LOG(c);
   CHECK(a, MSG_TAG_SOME, 42l);
   CHECK(b, MSG_TAG_SOME, 0l);
@@ -138,7 +138,7 @@ static int consume(MessageQueue* queue) {
 }
 
 ///
-/// Initialize SDL and a MessageQueue, run the producer thread, consume, and clean up.
+/// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
 int main(_unused_ int argc, _unused_ char* argv[]) {
   extern const uint32_t queueCap;
@@ -147,19 +147,19 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc != 0)
-    sdl_fail("SDL_Init failed");
+    sdl_Fail("SDL_Init failed");
 
   AT_EXIT(SDL_Quit);
 
-  _cleanup_msgq_ MessageQueue* queue = msgq_create(queueCap);
+  _cleanup_msgq_ MessageQueue* queue = msgq_Create(queueCap);
   if (queue == NULL)
-    fail("msgq_create failed");
+    Fail("msgq_Create failed");
 
-  SDL_Thread* producer = SDL_CreateThread(produce, "producer", queue);
+  SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
   if (producer == NULL)
-    sdl_fail("SDL_CreateThread failed");
+    sdl_Fail("SDL_CreateThread failed");
 
-  if (consume(queue) != 0)
+  if (Consume(queue) != 0)
     return EXIT_FAILURE;
 
   SDL_WaitThread(producer, NULL);

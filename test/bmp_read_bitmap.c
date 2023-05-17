@@ -1,9 +1,9 @@
 ///
-/// Test for bmp_read() function.
+/// Test for bmp_Read() function.
 ///
 /// This test reads a 24-bit bitmap file and checks that the first pixel is black.
 ///
-/// @see bmp_read()
+/// @see bmp_Read()
 ///
 #include <stddef.h>
 #include <stdlib.h>
@@ -17,7 +17,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
   const char* const bmpFile = "./assets/sample_24bit.bmp";
   _cleanup_str_ char* image = NULL;
 
-  if (bmp_read(bmpFile, &fileHeader, &infoHeader, &image) != 0)
+  if (bmp_Read(bmpFile, &fileHeader, &infoHeader, &image) != 0)
     return EXIT_FAILURE;
 
   bmp_Pixel24* pixel = (bmp_Pixel24*)image;

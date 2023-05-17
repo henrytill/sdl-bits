@@ -17,12 +17,12 @@ const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 DEFINE_TRIVIAL_CLEANUP_FUNC(FILE*, fclose)
 #define _cleanup_FILE_ _cleanup_(fclosep)
 
-size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width) {
+size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width) {
   const double pixelBits = (double)bitsPerPixel * width;
   return (size_t)(ceil(pixelBits / DWORDBITS)) * DWORDBYTES;
 }
 
-int bmp_read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image) {
+int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image) {
   _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
@@ -65,7 +65,7 @@ int bmp_read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoH
   return 0;
 }
 
-int bmp_v4read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image) {
+int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image) {
   _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
   if (fileHandle == NULL)
     return -1;
@@ -108,7 +108,7 @@ int bmp_v4read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Hea
   return 0;
 }
 
-int bmp_v4write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file) {
+int bmp_V4Write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file) {
   if (buffer == NULL || file == NULL)
     return -1;
   if (width > INT32_MAX || height > INT32_MAX)

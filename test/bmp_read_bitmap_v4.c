@@ -18,7 +18,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
   const char* const bmpFile = "./assets/test.bmp";
   _cleanup_str_ char* image = NULL;
 
-  if (bmp_v4read(bmpFile, &fileHeader, &v4Header, &image) != 0)
+  if (bmp_V4Read(bmpFile, &fileHeader, &v4Header, &image) != 0)
     return EXIT_FAILURE;
 
   bmp_Pixel32* pixel = (bmp_Pixel32*)image;

@@ -10,7 +10,7 @@ typedef struct PersonOperations PersonOperations;
 typedef struct Person Person;
 
 struct PersonOperations {
-  void (*sayHello)(const Person* self);
+  void (*SayHello)(const Person* self);
 };
 
 struct Person {
@@ -19,13 +19,13 @@ struct Person {
   int age;
 };
 
-static void Person_sayHello(const Person* self) {
+static void Person_SayHello(const Person* self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
 /// Base class vtable.
 static const PersonOperations Person_ops = {
-  .sayHello = Person_sayHello,
+  .SayHello = Person_SayHello,
 };
 
 /// Base class constructor.
@@ -43,8 +43,8 @@ struct Student {
   char* school;
 };
 
-/// Derived class override of PersonOperations::sayHello
-static void Student_sayHello(const Person* self) {
+/// Derived class override of PersonOperations::SayHello
+static void Student_SayHello(const Person* self) {
   const Student* student = CONTAINER_OF(self, Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
@@ -52,7 +52,7 @@ static void Student_sayHello(const Person* self) {
 
 /// Derived class vtable.
 static const PersonOperations Student_ops = {
-  .sayHello = Student_sayHello,
+  .SayHello = Student_SayHello,
 };
 
 /// Derived class constructor.
@@ -74,7 +74,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
   Person* people[] = {&alice, &bob, &carol.person};
 
   for (size_t i = 0; i < ARRAY_SIZE(people); ++i)
-    SEND(people[i], ops->sayHello);
+    SEND(people[i], ops->SayHello);
 
   return EXIT_SUCCESS;
 }
