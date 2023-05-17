@@ -3,7 +3,7 @@
 ///
 /// The producer thread produces messages with values from 0 to count.
 /// The consumer consumes messages on the main thread until it receives a
-/// message with tag NONE.
+/// message with tag MSG_TAG_QUIT.
 ///
 /// @see msgq_Create()
 /// @see msgq_Put()
@@ -30,8 +30,8 @@ static void Fail(const char* msg) {
 }
 
 /// Log a msgq error message and exit.
-static void msgq_Fail(int err, const char* msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_Error(err));
+static void msgq_Fail(int rc, const char* msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_Failure(rc));
   exit(EXIT_FAILURE);
 }
 
@@ -42,8 +42,7 @@ static void sdl_Fail(const char* msg) {
 }
 
 ///
-/// Produce messages with values from 0 to count. The last message has
-/// tag MSG_TAG_QUIT.
+/// Produce messages with values from 0 to count. The last message has tag MSG_TAG_QUIT.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
 ///
@@ -65,7 +64,7 @@ static int Produce(void* data) {
 
   for (intptr_t value = 0; value <= count;) {
     tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
-    tagStr = msgq_Tag(tag);
+    tagStr = msgq_MessageTag(tag);
 
     msg.tag = tag;
     msg.value = value;
@@ -88,12 +87,12 @@ static int Produce(void* data) {
 }
 
 ///
-/// Consume messages until a message with tag NONE is received.
+/// Consume messages until a message with tag MSG_TAG_QUIT is received.
 ///
 /// This function is meant to be run on the main thread.
 ///
 /// @param queue Pointer to a MessageQueue.
-/// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 when a message with tag MSG_TAG_SOME is received,
+/// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see Produce()
 ///
 static int Consume(MessageQueue* queue) {
@@ -104,7 +103,7 @@ static int Consume(MessageQueue* queue) {
     msgq_Fail(rc, "msgq_Get failed");
 
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_Tag(msg.tag), msg.value);
+              msgq_MessageTag(msg.tag), msg.value);
 
   return msg.tag != MSG_TAG_QUIT;
 }

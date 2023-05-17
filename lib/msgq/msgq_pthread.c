@@ -16,32 +16,32 @@ struct MessageQueue {
   pthread_mutex_t* lock; // Mutex lock to protect buffer access
 };
 
-static const char* const errorStr[] = {
+static const char* const messageQueueFailureStr[] = {
 #define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = str,
   MSGQ_FAILURE_VARIANTS
 #undef X
 };
 
-const char* msgq_Error(int rc) {
-  extern const char* const errorStr[];
-  if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
-    return NULL;
-  }
-  return errorStr[-rc];
-}
-
-static const char* const tagStr[] = {
+static const char* const messageTagStr[] = {
 #define X(variant, i, str) [MSG_TAG_##variant] = str,
   MSG_TAG_VARIANTS
 #undef X
 };
 
-const char* msgq_Tag(MessageTag tag) {
-  extern const char* const tagStr[];
+const char* msgq_Failure(int rc) {
+  extern const char* const messageQueueFailureStr[];
+  if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
+    return NULL;
+  }
+  return messageQueueFailureStr[-rc];
+}
+
+const char* msgq_MessageTag(MessageTag tag) {
+  extern const char* const messageTagStr[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
   }
-  return tagStr[tag];
+  return messageTagStr[tag];
 }
 
 static int msgq_Init(MessageQueue* queue, uint32_t capacity) {
@@ -91,6 +91,32 @@ static int msgq_Init(MessageQueue* queue, uint32_t capacity) {
   return 0;
 }
 
+static void msgq_Finish(MessageQueue* queue) {
+  if (queue == NULL) return;
+  queue->capacity = 0;
+  queue->front = 0;
+  queue->rear = 0;
+  if (queue->buffer != NULL) {
+    free(queue->buffer);
+    queue->buffer = NULL;
+  }
+  if (queue->empty != NULL) {
+    sem_destroy(queue->empty);
+    free(queue->empty);
+    queue->empty = NULL;
+  }
+  if (queue->full != NULL) {
+    sem_destroy(queue->full);
+    free(queue->full);
+    queue->full = NULL;
+  }
+  if (queue->lock != NULL) {
+    pthread_mutex_destroy(queue->lock);
+    free(queue->lock);
+    queue->lock = NULL;
+  }
+}
+
 MessageQueue* msgq_Create(uint32_t capacity) {
   MessageQueue* queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
@@ -102,6 +128,12 @@ MessageQueue* msgq_Create(uint32_t capacity) {
     return NULL;
   }
   return queue;
+}
+
+void msgq_Destroy(MessageQueue* queue) {
+  if (queue == NULL) return;
+  msgq_Finish(queue);
+  free(queue);
 }
 
 int msgq_Put(MessageQueue* queue, Message* in) {
@@ -155,36 +187,4 @@ uint32_t msgq_Size(MessageQueue* queue) {
   int ret = 0;
   sem_getvalue(queue->full, &ret);
   return (uint32_t)ret;
-}
-
-static void msgq_Finish(MessageQueue* queue) {
-  if (queue == NULL) return;
-  queue->capacity = 0;
-  queue->front = 0;
-  queue->rear = 0;
-  if (queue->buffer != NULL) {
-    free(queue->buffer);
-    queue->buffer = NULL;
-  }
-  if (queue->empty != NULL) {
-    sem_destroy(queue->empty);
-    free(queue->empty);
-    queue->empty = NULL;
-  }
-  if (queue->full != NULL) {
-    sem_destroy(queue->full);
-    free(queue->full);
-    queue->full = NULL;
-  }
-  if (queue->lock != NULL) {
-    pthread_mutex_destroy(queue->lock);
-    free(queue->lock);
-    queue->lock = NULL;
-  }
-}
-
-void msgq_Destroy(MessageQueue* queue) {
-  if (queue == NULL) return;
-  msgq_Finish(queue);
-  free(queue);
 }

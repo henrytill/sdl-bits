@@ -48,7 +48,7 @@ typedef struct MessageQueue MessageQueue;
 /// @param rc A return code.
 /// @return The error message associated with the given return code, or NULL if the return code is invalid.
 ///
-const char* msgq_Error(int rc);
+const char* msgq_Failure(int rc);
 
 ///
 /// Return the tag string associated with a message tag.
@@ -56,7 +56,7 @@ const char* msgq_Error(int rc);
 /// @param tag A message tag.
 /// @return The tag string associated with the given tag, or NULL if the tag is invalid.
 ///
-const char* msgq_Tag(MessageTag tag);
+const char* msgq_MessageTag(MessageTag tag);
 
 ///
 /// Creates a new bounded queue with the given capacity.
@@ -67,6 +67,21 @@ const char* msgq_Tag(MessageTag tag);
 /// @return A pointer to a new MessageQueue, or NULL on error.
 ///
 MessageQueue* msgq_Create(uint32_t capacity);
+
+///
+/// Frees resources associated with the queue.
+///
+/// Also frees the queue itself.
+///
+/// Consider using _cleanup_msgq_ for scoped cleanup.
+///
+/// @param queue A MessageQueue.
+/// @see msgq_Create()
+///
+void msgq_Destroy(MessageQueue* queue);
+
+DEFINE_TRIVIAL_CLEANUP_FUNC(MessageQueue*, msgq_Destroy)
+#define _cleanup_msgq_ _cleanup_(msgq_Destroyp)
 
 ///
 /// Adds an message to the back of the queue.
@@ -93,18 +108,3 @@ int msgq_Get(MessageQueue* queue, Message* out);
 /// @return The number of messages in the queue.
 ///
 uint32_t msgq_Size(MessageQueue* queue);
-
-///
-/// Frees resources associated with the queue.
-///
-/// Also frees the queue itself.
-///
-/// Consider using _cleanup_msgq_ for scoped cleanup.
-///
-/// @param queue A MessageQueue.
-/// @see msgq_Create()
-///
-void msgq_Destroy(MessageQueue* queue);
-
-DEFINE_TRIVIAL_CLEANUP_FUNC(MessageQueue*, msgq_Destroy)
-#define _cleanup_msgq_ _cleanup_(msgq_Destroyp)
