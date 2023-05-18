@@ -14,30 +14,27 @@
   X(MUTEX_LOCK, -7, "Lock mutex failed ")          \
   X(MUTEX_UNLOCK, -8, "Unlock mutex failed")
 
-typedef enum MessageQueueFailure MessageQueueFailure;
-enum MessageQueueFailure {
+typedef enum MessageQueueFailure {
 #define X(variant, i, str) MSGQ_FAILURE_##variant = i,
   MSGQ_FAILURE_VARIANTS
 #undef X
-};
+} MessageQueueFailure;
 
 #define MSG_TAG_VARIANTS \
   X(NONE, 0, "NONE")     \
   X(SOME, 1, "SOME")     \
   X(QUIT, 2, "QUIT")
 
-typedef enum MessageTag MessageTag;
-enum MessageTag {
+typedef enum MessageTag {
 #define X(variant, i, str) MSG_TAG_##variant = i,
   MSG_TAG_VARIANTS
 #undef X
-};
+} MessageTag;
 
-typedef struct Message Message;
-struct Message {
+typedef struct Message {
   MessageTag tag;
   intptr_t value;
-};
+} Message;
 
 /// A thread-safe bounded message queue
 typedef struct MessageQueue MessageQueue;

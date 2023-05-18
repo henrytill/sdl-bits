@@ -9,26 +9,24 @@
 
 #include "prelude.h"
 
-enum WindowPos {
+typedef enum WindowPos {
   CENTERED = SDL_WINDOWPOS_CENTERED,
-};
+} WindowPos;
 
-typedef struct Args Args;
-struct Args {
+typedef struct Args {
   char* configFile;
-};
+} Args;
 
 #define WINDOW_TYPE_VARIANTS                                               \
   X(WINDOWED, 0, SDL_WINDOW_SHOWN, "Windowed")                             \
   X(FULLSCREEN, 1, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN, "Fullscreen") \
   X(BORDERLESS, 2, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP, "Borderless Fullscreen")
 
-typedef enum WindowType WindowType;
-enum WindowType {
+typedef enum WindowType {
 #define X(variant, i, flags, str) variant = i,
   WINDOW_TYPE_VARIANTS
 #undef X
-};
+} WindowType;
 
 static const uint32_t windowTypeFlags[] = {
 #define X(variant, i, flags, str) [variant] = flags,
@@ -42,8 +40,7 @@ static const char* const windowTypeStr[] = {
 #undef X
 };
 
-typedef struct Config Config;
-struct Config {
+typedef struct Config {
   WindowType windowType;
   int x;
   int y;
@@ -51,31 +48,28 @@ struct Config {
   int height;
   int frameRate;
   char* assetDir;
-};
+} Config;
 
-typedef struct AudioState AudioState;
-struct AudioState {
+typedef struct AudioState {
   const int sampleRate;
   const uint16_t bufferSize;
   const double frequency;
   const double maxVolume;
   double volume;
   uint64_t offset;
-};
+} AudioState;
 
-typedef struct State State;
-struct State {
+typedef struct State {
   SDL_AudioDeviceID audioDevice;
   AudioState audio;
   int loopStat;
   int toneStat;
-};
+} State;
 
-typedef struct Window Window;
-struct Window {
+typedef struct Window {
   SDL_Window* window;
   SDL_Renderer* renderer;
-};
+} Window;
 
 static const double second = 1000.0;
 

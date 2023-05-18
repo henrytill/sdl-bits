@@ -37,11 +37,10 @@ static const PersonOperations Person_ops = {
   })
 
 /// Derived class.
-typedef struct Student Student;
-struct Student {
+typedef struct Student {
   Person person;
   char* school;
-};
+} Student;
 
 /// Derived class override of PersonOperations::SayHello
 static void Student_SayHello(const Person* self) {

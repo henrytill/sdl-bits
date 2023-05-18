@@ -15,11 +15,10 @@
 #define now SDL_GetPerformanceCounter
 
 /// Log categories to use with SDL logging functions.
-typedef enum LogCategory LogCategory;
-enum LogCategory {
+typedef enum LogCategory {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,
-};
+} LogCategory;
 
 // General cleanup functions
 
