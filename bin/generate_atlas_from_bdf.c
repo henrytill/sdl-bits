@@ -26,14 +26,17 @@ static void FreeImage(char** image, size_t height);
 
 // pos = 0 is MSB
 static char GetBit(unsigned char c, size_t pos) {
-  if (pos >= CHAR_BIT) return 0;
-  return (c >> (CHAR_BIT + ~pos)) & 1; // Also: c & (1 << (CHAR_BIT + ~pos));
+  if (pos >= CHAR_BIT) {
+    return 0;
+  }
+  return (char)((c >> (CHAR_BIT + ~pos)) & 1); // Also: c & (1 << (CHAR_BIT + ~pos));
 }
 
 static char** AllocImage(size_t height, size_t width) {
   char** ret = calloc(height, sizeof(*ret));
-  if (ret == NULL)
+  if (ret == NULL) {
     return ret;
+  }
   for (size_t i = 0; i < height; ++i) {
     ret[i] = calloc(width, sizeof(**ret));
     if (ret[i] == NULL) {
@@ -45,9 +48,12 @@ static char** AllocImage(size_t height, size_t width) {
 }
 
 static void FreeImage(char** image, size_t height) {
-  if (image == NULL) return;
-  for (size_t i = 0; i < height; ++i)
+  if (image == NULL) {
+    return;
+  }
+  for (size_t i = 0; i < height; ++i) {
     free(image[i]);
+  }
   free(image);
 }
 
@@ -59,13 +65,17 @@ static void RenderChar(FT_GlyphSlot slot, char** target, size_t offset) {
   size_t pitch = (size_t)abs(slot->bitmap.pitch);
   char bit = 0;
 
-  for (size_t y = 0, p = 0; y < rows; ++y, p += pitch)
-    for (size_t i = 0; i < pitch; ++i)
+  for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
+    for (size_t i = 0; i < pitch; ++i) {
       for (size_t j = 0, x; j < CHAR_BIT; ++j) {
         bit = GetBit(buffer[p + i], j);
         x = j + (i * CHAR_BIT);
-        if (x < width) target[y][x + (offset * width)] = bit;
+        if (x < width) {
+          target[y][x + (offset * width)] = bit;
+        }
       }
+    }
+  }
 }
 
 #ifdef DRAW_IMAGE
@@ -78,7 +88,9 @@ static void DrawImage(char** image, size_t width, size_t height) {
   }
 }
 #else
-static inline void DrawImage(_unused_ char** image, _unused_ size_t width, _unused_ size_t height) {}
+static inline void DrawImage(__attribute__((unused)) char** image,
+                             __attribute__((unused)) size_t width,
+                             __attribute__((unused)) size_t height) {}
 #endif
 
 static void DestroyBuffer(bmp_Pixel32* buffer) { free(buffer); }
@@ -86,19 +98,20 @@ static void DestroyBuffer(bmp_Pixel32* buffer) { free(buffer); }
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)
 DEFINE_TRIVIAL_CLEANUP_FUNC(bmp_Pixel32*, DestroyBuffer)
-#define _cleanup_FT_Library_ _cleanup_(FT_Done_FreeTypep)
-#define _cleanup_FT_Face_    _cleanup_(FT_Done_Facep)
-#define _cleanup_buffer_     _cleanup_(DestroyBufferp)
+#define SCOPED_FT_Library  __attribute__((cleanup(FT_Done_FreeTypep))) FT_Library
+#define SCOPED_FT_Face     __attribute__((cleanup(FT_Done_Facep))) FT_Face
+#define SCOPED_bmp_Pixel32 __attribute__((cleanup(DestroyBufferp))) bmp_Pixel32*
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(void) {
   extern const char* const fontFile;
   extern const char* const bmpFile;
   extern const bmp_Pixel32 white;
   extern const bmp_Pixel32 black;
 
   char code[CODE_SIZE] = {0};
-  for (int i = 0; i < CODE_SIZE; ++i)
+  for (int i = 0; i < CODE_SIZE; ++i) {
     code[i] = (char)(i + '!');
+  }
 
   const size_t width = WIDTH * CODE_SIZE;
   const size_t height = HEIGHT;
@@ -108,7 +121,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  _cleanup_FT_Library_ FT_Library lib = NULL;
+  SCOPED_FT_Library lib = NULL;
   int rc = FT_Init_FreeType(&lib);
   if (rc != 0) {
     fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
@@ -116,7 +129,7 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  _cleanup_FT_Face_ FT_Face face = NULL;
+  SCOPED_FT_Face face = NULL;
   rc = FT_New_Face(lib, fontFile, 0, &face);
   if (rc != 0) {
     fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
@@ -163,15 +176,17 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
 
   DrawImage(image, width, height);
 
-  _cleanup_buffer_ bmp_Pixel32* buffer = calloc(width * height, sizeof(bmp_Pixel32));
+  SCOPED_bmp_Pixel32 buffer = calloc(width * height, sizeof(bmp_Pixel32));
   if (buffer == NULL) {
     FreeImage(image, height);
     return EXIT_FAILURE;
   }
 
-  for (size_t y = height, i = 0; y-- > 0;)
-    for (size_t x = 0; x < width; ++x, ++i)
+  for (size_t y = height, i = 0; y-- > 0;) {
+    for (size_t x = 0; x < width; ++x, ++i) {
       buffer[i] = image[y][x] ? black : white;
+    }
+  }
 
   rc = bmp_V4Write(buffer, width, height, bmpFile);
   if (rc != 0) {

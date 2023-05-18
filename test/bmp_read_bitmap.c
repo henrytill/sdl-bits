@@ -6,27 +6,30 @@
 /// @see bmp_Read()
 ///
 #include <stddef.h>
-#include <stdlib.h>
 
 #include "bmp.h"
 #include "prelude.h"
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
   bmp_FileHeader fileHeader;
   bmp_InfoHeader infoHeader;
   const char* const bmpFile = "./assets/sample_24bit.bmp";
-  _cleanup_str_ char* image = NULL;
+  SCOPED_char image = NULL;
 
-  if (bmp_Read(bmpFile, &fileHeader, &infoHeader, &image) != 0)
+  if (bmp_Read(bmpFile, &fileHeader, &infoHeader, &image) != 0) {
     return EXIT_FAILURE;
+  }
 
   bmp_Pixel24* pixel = (bmp_Pixel24*)image;
-  if (pixel->b != 0)
+  if (pixel->b != 0) {
     return EXIT_FAILURE;
-  if (pixel->g != 0)
+  }
+  if (pixel->g != 0) {
     return EXIT_FAILURE;
-  if (pixel->r != 255)
+  }
+  if (pixel->r != 255) {
     return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }

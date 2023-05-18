@@ -21,7 +21,7 @@ static const bmp_Pixel32 buf[] = {
 
 static const char* const bmpFile = "./assets/test.bmp";
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(void) {
   extern const bmp_Pixel32 buf[];
   extern const char* const bmpFile;
 

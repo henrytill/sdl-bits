@@ -1,0 +1,10 @@
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  readability-*,
+  -clang-analyzer-unix.Malloc,
+  -readability-magic-numbers,
+  -readability-redundant-declaration,
+
+HeaderFilterRegex: ".*"

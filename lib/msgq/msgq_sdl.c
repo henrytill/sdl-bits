@@ -13,13 +13,13 @@ struct MessageQueue {
 };
 
 static const char* const messageQueueFailureStr[] = {
-#define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = str,
+#define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = (str),
   MSGQ_FAILURE_VARIANTS
 #undef X
 };
 
 static const char* const messageTagStr[] = {
-#define X(variant, i, str) [MSG_TAG_##variant] = str,
+#define X(variant, i, str) [MSG_TAG_##variant] = (str),
   MSG_TAG_VARIANTS
 #undef X
 };
@@ -70,7 +70,9 @@ static int msgq_Init(MessageQueue* queue, uint32_t capacity) {
 }
 
 static void msgq_Finish(MessageQueue* queue) {
-  if (queue == NULL) return;
+  if (queue == NULL) {
+    return;
+  }
   queue->capacity = 0;
   queue->front = 0;
   queue->rear = 0;
@@ -106,7 +108,9 @@ MessageQueue* msgq_Create(uint32_t capacity) {
 }
 
 void msgq_Destroy(MessageQueue* queue) {
-  if (queue == NULL) return;
+  if (queue == NULL) {
+    return;
+  }
   msgq_Finish(queue);
   free(queue);
 }
@@ -159,6 +163,8 @@ int msgq_Get(MessageQueue* queue, Message* out) {
 }
 
 uint32_t msgq_Size(MessageQueue* queue) {
-  if (queue == NULL) return 0;
+  if (queue == NULL) {
+    return 0;
+  }
   return SDL_SemValue(queue->full);
 }

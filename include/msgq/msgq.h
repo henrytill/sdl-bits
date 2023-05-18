@@ -15,7 +15,7 @@
   X(MUTEX_UNLOCK, -8, "Unlock mutex failed")
 
 typedef enum MessageQueueFailure {
-#define X(variant, i, str) MSGQ_FAILURE_##variant = i,
+#define X(variant, i, str) MSGQ_FAILURE_##variant = (i),
   MSGQ_FAILURE_VARIANTS
 #undef X
 } MessageQueueFailure;
@@ -26,7 +26,7 @@ typedef enum MessageQueueFailure {
   X(QUIT, 2, "QUIT")
 
 typedef enum MessageTag {
-#define X(variant, i, str) MSG_TAG_##variant = i,
+#define X(variant, i, str) MSG_TAG_##variant = (i),
   MSG_TAG_VARIANTS
 #undef X
 } MessageTag;
@@ -70,7 +70,7 @@ MessageQueue* msgq_Create(uint32_t capacity);
 ///
 /// Also frees the queue itself.
 ///
-/// Consider using _cleanup_msgq_ for scoped cleanup.
+/// Consider using SCOPED_msgq for scoped cleanup.
 ///
 /// @param queue A MessageQueue.
 /// @see msgq_Create()
@@ -78,7 +78,7 @@ MessageQueue* msgq_Create(uint32_t capacity);
 void msgq_Destroy(MessageQueue* queue);
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(MessageQueue*, msgq_Destroy)
-#define _cleanup_msgq_ _cleanup_(msgq_Destroyp)
+#define SCOPED_msgq __attribute__((cleanup(msgq_Destroyp))) MessageQueue*
 
 ///
 /// Adds an message to the back of the queue.

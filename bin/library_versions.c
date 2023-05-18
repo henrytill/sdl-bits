@@ -51,7 +51,7 @@ static void Sdl(void) {
   SDL_LogInfo(APP, "... and linking against SDL %u.%u.%u.", linked.major, linked.minor, linked.patch);
 }
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
   FreeType();

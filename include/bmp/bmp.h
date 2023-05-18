@@ -25,7 +25,7 @@ typedef struct bmp_FileHeader {
   uint16_t reserved1;
   uint16_t reserved2;
   uint32_t offset;
-} _packed_ bmp_FileHeader;
+} __attribute__((packed)) bmp_FileHeader;
 
 typedef struct bmp_InfoHeader {
   uint32_t size;         // DIB Header size (bytes)
@@ -39,7 +39,7 @@ typedef struct bmp_InfoHeader {
   int32_t vRes;          // Vertical resolution (pixels per meter)
   uint32_t colors;       // Used colors
   uint32_t impColors;    // Important colors
-} _packed_ bmp_InfoHeader;
+} __attribute__((packed)) bmp_InfoHeader;
 
 typedef struct bmp_Colorspace {
   int32_t rx;
@@ -51,7 +51,7 @@ typedef struct bmp_Colorspace {
   int32_t bx;
   int32_t by;
   int32_t bz;
-} _packed_ bmp_Colorspace;
+} __attribute__((packed)) bmp_Colorspace;
 
 typedef struct bmp_V4Header {
   uint32_t size;         // DIB Header Size (bytes)
@@ -74,20 +74,20 @@ typedef struct bmp_V4Header {
   uint32_t rGamma;
   uint32_t gGamma;
   uint32_t bGamma;
-} _packed_ bmp_V4Header;
+} __attribute__((packed)) bmp_V4Header;
 
 typedef struct bmp_Pixel24 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
-} _packed_ bmp_Pixel24;
+} __attribute__((packed)) bmp_Pixel24;
 
 typedef struct bmp_Pixel32 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
   uint8_t a;
-} _packed_ bmp_Pixel32;
+} __attribute__((packed)) bmp_Pixel32;
 
 ///
 /// Calculate the number of bytes per row.

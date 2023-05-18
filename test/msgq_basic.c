@@ -53,8 +53,9 @@ static void sdl_Fail(const char* msg) {
 static int Produce(void* data) {
   extern const int count;
 
-  if (data == NULL)
+  if (data == NULL) {
     Fail("Produce failed: data is NULL");
+  }
 
   MessageQueue* queue = (MessageQueue*)data;
   Message msg = {0};
@@ -94,7 +95,9 @@ static int Produce(void* data) {
 ///
 static int Consume(MessageQueue* queue, Message* out) {
   const int rc = msgq_Get(queue, out);
-  if (rc < 0) msgq_Fail(rc, "msgq_Get failed");
+  if (rc < 0) {
+    msgq_Fail(rc, "msgq_Get failed");
+  }
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
               msgq_MessageTag(out->tag), out->value);
   return out->tag != MSG_TAG_QUIT;
@@ -103,31 +106,35 @@ static int Consume(MessageQueue* queue, Message* out) {
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
-  if (rc < 0)
+  if (rc < 0) {
     sdl_Fail("SDL_Init failed");
+  }
 
   AT_EXIT(SDL_Quit);
 
-  _cleanup_msgq_ MessageQueue* queue = msgq_Create(queueCap);
-  if (queue == NULL)
+  SCOPED_msgq queue = msgq_Create(queueCap);
+  if (queue == NULL) {
     Fail("msgq_Create failed");
+  }
 
   SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
-  if (producer == NULL)
+  if (producer == NULL) {
     sdl_Fail("SDL_CreateThread failed");
+  }
 
   Message msg;
   for (;;) {
     rc = Consume(queue, &msg);
     if (rc == 0) {
       break;
-    } else if (rc < 0) {
+    }
+    if (rc < 0) {
       return EXIT_FAILURE;
     }
   }

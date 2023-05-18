@@ -19,18 +19,22 @@
 #include "msgq.h"
 #include "prelude.h"
 
-#define LOG(msg) ({                                 \
-  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",      \
-              __func__, #msg,                       \
-              msgq_MessageTag(msg.tag), msg.value); \
+#define LOG(msg) ({                                     \
+  Message __msg = (msg);                                \
+  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",          \
+              __func__, #msg,                           \
+              msgq_MessageTag(__msg.tag), __msg.value); \
 })
 
-#define CHECK(msg, exTag, exVal) ({                            \
-  if (msg.tag != exTag || msg.value != exVal) {                \
+#define CHECK(msg, expectedTag, expectedValue) ({              \
+  Message __msg = (msg);                                       \
+  MessageTag __tag = (expectedTag);                            \
+  typeof(expectedValue) __value = (expectedValue);             \
+  if (__msg.tag != __tag || __msg.value != __value) {          \
     SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
                  __func__, #msg,                               \
-                 msgq_MessageTag(msg.tag), msg.value,          \
-                 msgq_MessageTag(exTag), exVal);               \
+                 msgq_MessageTag(__msg.tag), __msg.value,      \
+                 msgq_MessageTag(__tag), __value);             \
     exit(EXIT_FAILURE);                                        \
   }                                                            \
 });
@@ -74,8 +78,9 @@ static int Produce(void* data) {
 
   for (int rc = 1; rc == 1;) {
     rc = msgq_Put(queue, &msg);
-    if (rc < 0)
+    if (rc < 0) {
       msgq_Fail(rc, "msgq_Put failed");
+    }
   }
   LOG(msg);
 
@@ -83,8 +88,9 @@ static int Produce(void* data) {
   msg.value = 0;
   for (int rc = 1; rc == 1;) {
     rc = msgq_Put(queue, &msg);
-    if (rc < 0)
+    if (rc < 0) {
       msgq_Fail(rc, "msgq_Put failed");
+    }
   }
   LOG(msg);
 
@@ -92,8 +98,9 @@ static int Produce(void* data) {
   msg.value = 1;
   for (int rc = 1; rc == 1;) {
     rc = msgq_Put(queue, &msg);
-    if (rc < 0)
+    if (rc < 0) {
       msgq_Fail(rc, "msgq_Put failed");
+    }
   }
   LOG(msg);
 
@@ -121,18 +128,18 @@ static int Consume(MessageQueue* queue) {
 
   msgq_Get(queue, &a);
   LOG(a);
-  CHECK(a, MSG_TAG_SOME, 42l);
+  CHECK(a, MSG_TAG_SOME, 42L);
 
   msgq_Get(queue, &b);
   LOG(b);
-  CHECK(a, MSG_TAG_SOME, 42l);
-  CHECK(b, MSG_TAG_SOME, 0l);
+  CHECK(a, MSG_TAG_SOME, 42L);
+  CHECK(b, MSG_TAG_SOME, 0L);
 
   msgq_Get(queue, &c);
   LOG(c);
-  CHECK(a, MSG_TAG_SOME, 42l);
-  CHECK(b, MSG_TAG_SOME, 0l);
-  CHECK(c, MSG_TAG_SOME, 1l);
+  CHECK(a, MSG_TAG_SOME, 42L);
+  CHECK(b, MSG_TAG_SOME, 0L);
+  CHECK(c, MSG_TAG_SOME, 1L);
 
   return 0;
 }
@@ -140,27 +147,31 @@ static int Consume(MessageQueue* queue) {
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
-  if (rc != 0)
+  if (rc != 0) {
     sdl_Fail("SDL_Init failed");
+  }
 
   AT_EXIT(SDL_Quit);
 
-  _cleanup_msgq_ MessageQueue* queue = msgq_Create(queueCap);
-  if (queue == NULL)
+  SCOPED_msgq queue = msgq_Create(queueCap);
+  if (queue == NULL) {
     Fail("msgq_Create failed");
+  }
 
   SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
-  if (producer == NULL)
+  if (producer == NULL) {
     sdl_Fail("SDL_CreateThread failed");
+  }
 
-  if (Consume(queue) != 0)
+  if (Consume(queue) != 0) {
     return EXIT_FAILURE;
+  }
 
   SDL_WaitThread(producer, NULL);
   return EXIT_SUCCESS;

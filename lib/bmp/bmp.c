@@ -15,7 +15,7 @@ const uint32_t bmp_BI_BITFIELDS = 0x0003;
 const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FILE*, fclose)
-#define _cleanup_FILE_ _cleanup_(fclosep)
+#define SCOPED_FILE __attribute__((cleanup(fclosep))) FILE*
 
 size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width) {
   const double pixelBits = (double)bitsPerPixel * width;
@@ -23,38 +23,46 @@ size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width) {
 }
 
 int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image) {
-  _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
-  if (fileHandle == NULL)
+  SCOPED_FILE fileHandle = fopen(file, "r");
+  if (fileHandle == NULL) {
     return -1;
+  }
 
   size_t reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
+  }
 
   fpos_t pos;
   int rc = fgetpos(fileHandle, &pos);
-  if (rc != 0)
+  if (rc != 0) {
     return -1;
+  }
 
   uint32_t size = 0;
   reads = fread(&size, sizeof(size), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
-  if (size != BITMAPINFOHEADER)
+  }
+  if (size != BITMAPINFOHEADER) {
     return -1;
+  }
 
   rc = fsetpos(fileHandle, &pos);
-  if (rc != 0)
+  if (rc != 0) {
     return -1;
+  }
 
   reads = fread(infoHeader, sizeof(*infoHeader), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
+  }
 
   const uint32_t imageSize = infoHeader->imageSize;
   *image = calloc(imageSize, sizeof(**image));
-  if (*image == NULL)
+  if (*image == NULL) {
     return -1;
+  }
 
   reads = fread(*image, imageSize * sizeof(**image), 1, fileHandle);
   if (reads != 1) {
@@ -66,38 +74,46 @@ int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoH
 }
 
 int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image) {
-  _cleanup_FILE_ FILE* fileHandle = fopen(file, "r");
-  if (fileHandle == NULL)
+  SCOPED_FILE fileHandle = fopen(file, "r");
+  if (fileHandle == NULL) {
     return -1;
+  }
 
   size_t reads = fread(fileHeader, sizeof(*fileHeader), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
+  }
 
   fpos_t pos;
   int rc = fgetpos(fileHandle, &pos);
-  if (rc != 0)
+  if (rc != 0) {
     return -1;
+  }
 
   uint32_t size = 0;
   reads = fread(&size, sizeof(size), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
-  if (size != BITMAPV4HEADER)
+  }
+  if (size != BITMAPV4HEADER) {
     return -1;
+  }
 
   rc = fsetpos(fileHandle, &pos);
-  if (rc != 0)
+  if (rc != 0) {
     return -1;
+  }
 
   reads = fread(v4Header, sizeof(*v4Header), 1, fileHandle);
-  if (reads != 1)
+  if (reads != 1) {
     return -1;
+  }
 
   const uint32_t imageSize = v4Header->imageSize;
   *image = calloc(imageSize, sizeof(**image));
-  if (*image == NULL)
+  if (*image == NULL) {
     return -1;
+  }
 
   reads = fread(*image, imageSize * sizeof(**image), 1, fileHandle);
   if (reads != 1) {
@@ -109,20 +125,24 @@ int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Hea
 }
 
 int bmp_V4Write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file) {
-  if (buffer == NULL || file == NULL)
+  if (buffer == NULL || file == NULL) {
     return -1;
-  if (width > INT32_MAX || height > INT32_MAX)
+  }
+  if (width > INT32_MAX || height > INT32_MAX) {
     return -1;
+  }
 
   const size_t imageSize = (width * height) * sizeof(bmp_Pixel32);
-  if (imageSize > UINT32_MAX)
+  if (imageSize > UINT32_MAX) {
     return -1;
+  }
 
   const size_t offset = sizeof(bmp_FileHeader) + sizeof(bmp_V4Header);
 
   const size_t fileSize = offset + imageSize;
-  if (fileSize > UINT32_MAX)
+  if (fileSize > UINT32_MAX) {
     return -1;
+  }
 
   bmp_FileHeader fileHeader = {
     .fileType = bmp_FILETYPE,
@@ -155,21 +175,25 @@ int bmp_V4Write(const bmp_Pixel32* buffer, size_t width, size_t height, const ch
     .bGamma = 0,
   };
 
-  _cleanup_FILE_ FILE* fileHandle = fopen(file, "wb");
-  if (fileHandle == NULL)
+  SCOPED_FILE fileHandle = fopen(file, "wb");
+  if (fileHandle == NULL) {
     return -1;
+  }
 
   size_t writes = fwrite(&fileHeader, sizeof(bmp_FileHeader), 1, fileHandle);
-  if (writes != 1)
+  if (writes != 1) {
     return -1;
+  }
 
   writes = fwrite(&v4Header, sizeof(bmp_V4Header), 1, fileHandle);
-  if (writes != 1)
+  if (writes != 1) {
     return -1;
+  }
 
   writes = fwrite(buffer, imageSize, 1, fileHandle);
-  if (writes != 1)
+  if (writes != 1) {
     return -1;
+  }
 
   return 0;
 }

@@ -65,15 +65,16 @@ static const PersonOperations Student_ops = {
     .school = (_school),              \
   })
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(void) {
   Person alice = Person("Alice", 20);
   Person bob = Person("Bob", 21);
   Student carol = Student("Carol", 22, "MIT");
 
   Person* people[] = {&alice, &bob, &carol.person};
 
-  for (size_t i = 0; i < ARRAY_SIZE(people); ++i)
+  for (size_t i = 0; i < 3; ++i) {
     SEND(people[i], ops->SayHello);
+  }
 
   return EXIT_SUCCESS;
 }

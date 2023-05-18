@@ -23,19 +23,19 @@ typedef struct Args {
   X(BORDERLESS, 2, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP, "Borderless Fullscreen")
 
 typedef enum WindowType {
-#define X(variant, i, flags, str) variant = i,
+#define X(variant, i, flags, str) variant = (i),
   WINDOW_TYPE_VARIANTS
 #undef X
 } WindowType;
 
 static const uint32_t windowTypeFlags[] = {
-#define X(variant, i, flags, str) [variant] = flags,
+#define X(variant, i, flags, str) [variant] = (flags),
   WINDOW_TYPE_VARIANTS
 #undef X
 };
 
 static const char* const windowTypeStr[] = {
-#define X(variant, i, flags, str) [variant] = str,
+#define X(variant, i, flags, str) [variant] = (str),
   WINDOW_TYPE_VARIANTS
 #undef X
 };
@@ -111,8 +111,9 @@ static State state = {
 static void ParseArgs(int argc, char* argv[], Args* args) {
   for (int i = 0; i < argc;) {
     char* arg = argv[i++];
-    if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0)
+    if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
       args->configFile = argv[i++];
+    }
   }
 }
 
@@ -138,7 +139,7 @@ static char* JoinPath(const char* a, const char* b) {
 /// @return 0 on success, -1 on failure
 ///
 static int LoadConfig(const char* file, Config* config) {
-  _cleanup_lua_State_ lua_State* state = luaL_newstate();
+  SCOPED_lua_State state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
     return -1;
@@ -177,7 +178,7 @@ static int LoadConfig(const char* file, Config* config) {
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void CalcSine(void* userData, uint8_t* stream, _unused_ int len) {
+static void CalcSine(void* userData, uint8_t* stream, __attribute__((unused)) int len) {
   AudioState* as = (AudioState*)userData;
   float* fstream = (float*)stream;
 
@@ -233,10 +234,16 @@ static double CalcDelta(const uint64_t begin, const uint64_t end) {
 /// @param begin The timestamp in ticks when the frame started
 ///
 static void Delay(const double frameTime, const uint64_t begin) {
-  if (CalcDelta(begin, Now()) >= frameTime) return;
+  if (CalcDelta(begin, Now()) >= frameTime) {
+    return;
+  }
   const uint32_t time = (uint32_t)(frameTime - CalcDelta(begin, Now()) - 1.0);
-  if (time > 0) SDL_Delay(time);
-  while (CalcDelta(begin, Now()) < frameTime) continue;
+  if (time > 0) {
+    SDL_Delay(time);
+  }
+  while (CalcDelta(begin, Now()) < frameTime) {
+    // continue;
+  }
 }
 
 ///
@@ -275,9 +282,15 @@ static int InitWindow(Config* config, const char* title, Window* win) {
 /// @param win The window to destroy.
 ///
 static void FinishWindow(Window* win) {
-  if (win == NULL) return;
-  if (win->renderer != NULL) SDL_DestroyRenderer(win->renderer);
-  if (win->window != NULL) SDL_DestroyWindow(win->window);
+  if (win == NULL) {
+    return;
+  }
+  if (win->renderer != NULL) {
+    SDL_DestroyRenderer(win->renderer);
+  }
+  if (win->window != NULL) {
+    SDL_DestroyWindow(win->window);
+  }
 }
 
 ///
@@ -302,13 +315,15 @@ static Window* CreateWindow(Config* config, const char* title) {
 /// @param win The win to destroy.
 ///
 static void DestroyWindow(Window* win) {
-  if (win == NULL) return;
+  if (win == NULL) {
+    return;
+  }
   FinishWindow(win);
   free(win);
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
-#define _cleanup_Window_ _cleanup_(DestroyWindowp)
+#define SCOPED_Window __attribute__((cleanup(DestroyWindowp))) Window*
 
 ///
 /// Get the window's rectangle.
@@ -318,8 +333,9 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
 /// @return 0 on success, -1 on failure.
 ///
 static int GetRect(Window* win, SDL_Rect* rect) {
-  if (win == NULL || win->renderer == NULL)
+  if (win == NULL || win->renderer == NULL) {
     return -1;
+  }
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
   if (rc != 0) {
     sdl_Error("SDL_GetRendererOutputSize failed");
@@ -349,7 +365,7 @@ static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
   }
 }
 
-static void Update(_unused_ double delta) {}
+static void Update(__attribute__((unused)) double delta) {}
 
 int main(int argc, char* argv[]) {
   extern uint64_t perfFreq;
@@ -380,7 +396,7 @@ int main(int argc, char* argv[]) {
     .userdata = (void*)&state.audio,
   };
   SDL_AudioSpec have = {0};
-  _cleanup_SDL_AudioDeviceID_ SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+  SCOPED_SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   state.audioDevice = audioDevice;
   if (state.audioDevice < 2) {
     sdl_Error("SDL_OpenAudio failed");
@@ -388,22 +404,25 @@ int main(int argc, char* argv[]) {
   }
 
   const char* const winTitle = "Hello, world!";
-  _cleanup_Window_ Window* win = CreateWindow(&config, winTitle);
-  if (win == NULL)
+  SCOPED_Window win = CreateWindow(&config, winTitle);
+  if (win == NULL) {
     return EXIT_FAILURE;
+  }
 
   SDL_Rect winRect = {0, 0, 0, 0};
   rc = GetRect(win, &winRect);
-  if (rc != 0)
+  if (rc != 0) {
     return EXIT_FAILURE;
+  }
 
-  _cleanup_SDL_Texture_ SDL_Texture* texture = ({
+  SCOPED_SDL_Texture texture = ({
     const char* const testBmp = "test.bmp";
-    _cleanup_str_ char* bmpFile = JoinPath(config.assetDir, testBmp);
-    if (bmpFile == NULL)
+    SCOPED_char bmpFile = JoinPath(config.assetDir, testBmp);
+    if (bmpFile == NULL) {
       return EXIT_FAILURE;
+    }
 
-    _cleanup_SDL_Surface_ SDL_Surface* surface = SDL_LoadBMP(bmpFile);
+    SCOPED_SDL_Surface surface = SDL_LoadBMP(bmpFile);
     if (surface == NULL) {
       sdl_Error("SDL_LoadBMP failed");
       return EXIT_FAILURE;

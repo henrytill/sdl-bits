@@ -24,16 +24,18 @@ static int EnumDisp(void) {
   return 0;
 }
 
-int main(_unused_ int argc, _unused_ char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
   int rc = SDL_Init(SDL_INIT_VIDEO);
-  if (rc != 0)
+  if (rc != 0) {
     return EXIT_FAILURE;
+  }
 
   AT_EXIT(SDL_Quit);
 
   rc = EnumDisp();
-  if (rc != 0)
+  if (rc != 0) {
     return EXIT_FAILURE;
+  }
 
   return 0;
 }
