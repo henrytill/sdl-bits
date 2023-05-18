@@ -57,17 +57,13 @@ static int Produce(void* data) {
     Fail("Produce failed: data is NULL");
 
   MessageQueue* queue = (MessageQueue*)data;
-
   Message msg = {0};
-  MessageTag tag = MSG_TAG_NONE;
   const char* tagStr = NULL;
 
   for (intptr_t value = 0; value <= count;) {
-    tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
-    tagStr = msgq_MessageTag(tag);
-
-    msg.tag = tag;
+    msg.tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
+    tagStr = msgq_MessageTag(msg.tag);
 
     const int rc = msgq_Put(queue, &msg);
     if (rc < 0) {
@@ -92,20 +88,16 @@ static int Produce(void* data) {
 /// This function is meant to be run on the main thread.
 ///
 /// @param queue Pointer to a MessageQueue.
+/// @param out Pointer to a Message.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see Produce()
 ///
-static int Consume(MessageQueue* queue) {
-  Message msg;
-
-  const int rc = msgq_Get(queue, &msg);
-  if (rc < 0)
-    msgq_Fail(rc, "msgq_Get failed");
-
+static int Consume(MessageQueue* queue, Message* out) {
+  const int rc = msgq_Get(queue, out);
+  if (rc < 0) msgq_Fail(rc, "msgq_Get failed");
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_MessageTag(msg.tag), msg.value);
-
-  return msg.tag != MSG_TAG_QUIT;
+              msgq_MessageTag(out->tag), out->value);
+  return out->tag != MSG_TAG_QUIT;
 }
 
 ///
@@ -130,8 +122,9 @@ int main(_unused_ int argc, _unused_ char* argv[]) {
   if (producer == NULL)
     sdl_Fail("SDL_CreateThread failed");
 
+  Message msg;
   for (;;) {
-    rc = Consume(queue);
+    rc = Consume(queue, &msg);
     if (rc == 0) {
       break;
     } else if (rc < 0) {
