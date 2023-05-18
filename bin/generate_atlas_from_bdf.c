@@ -78,13 +78,10 @@ static void DrawImage(char** image, size_t width, size_t height) {
   }
 }
 #else
-static inline void DrawImage(_unused_ char** image, _unused_ size_t width, _unused_ size_t height) {
-}
+static inline void DrawImage(_unused_ char** image, _unused_ size_t width, _unused_ size_t height) {}
 #endif
 
-static void DestroyBuffer(bmp_Pixel32* buffer) {
-  free(buffer);
-}
+static void DestroyBuffer(bmp_Pixel32* buffer) { free(buffer); }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)

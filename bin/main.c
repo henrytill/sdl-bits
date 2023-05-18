@@ -347,9 +347,7 @@ static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
   }
 }
 
-static void Update(double delta) {
-  (void)delta;
-}
+static void Update(_unused_ double delta) {}
 
 int main(int argc, char* argv[]) {
   extern uint64_t perfFreq;
