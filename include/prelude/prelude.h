@@ -12,7 +12,7 @@
 
 #include "macro.h"
 
-#define now SDL_GetPerformanceCounter
+#define Now SDL_GetPerformanceCounter
 
 /// Log categories to use with SDL logging functions.
 typedef enum LogCategory {

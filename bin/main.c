@@ -231,10 +231,10 @@ static double CalcDelta(const uint64_t begin, const uint64_t end) {
 /// @param begin The timestamp in ticks when the frame started
 ///
 static void Delay(const double frameTime, const uint64_t begin) {
-  if (CalcDelta(begin, now()) >= frameTime) return;
-  const uint32_t time = (uint32_t)(frameTime - CalcDelta(begin, now()) - 1.0);
+  if (CalcDelta(begin, Now()) >= frameTime) return;
+  const uint32_t time = (uint32_t)(frameTime - CalcDelta(begin, Now()) - 1.0);
   if (time > 0) SDL_Delay(time);
-  while (CalcDelta(begin, now()) < frameTime) continue;
+  while (CalcDelta(begin, Now()) < frameTime) continue;
 }
 
 ///
@@ -423,7 +423,7 @@ int main(int argc, char* argv[]) {
 
   SDL_Event event = {0};
   double delta = frameTime;
-  uint64_t begin = now();
+  uint64_t begin = Now();
   uint64_t end = 0;
 
   while (state.loopStat == 1) {
@@ -453,7 +453,7 @@ int main(int argc, char* argv[]) {
     SDL_RenderPresent(win->renderer);
 
     Delay(frameTime, begin);
-    end = now();
+    end = Now();
     delta = CalcDelta(begin, end);
     begin = end;
   }
