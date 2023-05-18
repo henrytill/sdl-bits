@@ -120,7 +120,8 @@ int msgq_Put(MessageQueue* queue, Message* in) {
   int rc = sem_trywait(queue->empty);
   if (rc == -1 && errno == EAGAIN) {
     return 1;
-  } else if (rc == -1) {
+  }
+  if (rc == -1) {
     return MSGQ_FAILURE_SEM_TRY_WAIT;
   }
   rc = pthread_mutex_lock(queue->lock);

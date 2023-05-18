@@ -115,7 +115,8 @@ int msgq_Put(MessageQueue* queue, Message* in) {
   int rc = SDL_SemTryWait(queue->empty);
   if (rc == SDL_MUTEX_TIMEDOUT) {
     return 1;
-  } else if (rc < 0) {
+  }
+  if (rc < 0) {
     return MSGQ_FAILURE_SEM_TRY_WAIT;
   }
   rc = SDL_LockMutex(queue->lock);
