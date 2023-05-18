@@ -51,12 +51,12 @@ typedef struct Config {
 } Config;
 
 typedef struct AudioState {
-  const int sampleRate;
-  const uint16_t bufferSize;
-  const double frequency;
-  const double maxVolume;
-  double volume;
-  uint64_t offset;
+  const int sampleRate;      // Samples per second
+  const uint16_t bufferSize; // Samples per buffer
+  const double frequency;    // Frequency of the sine wave
+  const double maxVolume;    // Maximum volume
+  double volume;             // Current volume, 0.0 to maxVolume
+  uint64_t elapsed;          // Number of buffer fills
 } AudioState;
 
 typedef struct State {
@@ -95,7 +95,7 @@ static State state = {
     .frequency = 440.0,
     .maxVolume = 0.25,
     .volume = 0.0,
-    .offset = 0,
+    .elapsed = 0,
   },
   .loopStat = 1,
   .toneStat = 0,
@@ -184,14 +184,16 @@ static void CalcSine(void* userData, uint8_t* stream, _unused_ int len) {
   assert((len / (4 * 2)) == as->bufferSize);
   const double sampleRate = (double)as->sampleRate;
   const uint64_t bufferSize = (uint64_t)as->bufferSize;
+  const uint64_t totalSamples = as->elapsed * bufferSize;
 
   for (uint64_t i = 0; i < bufferSize; ++i) {
-    const double time = (double)((as->offset * bufferSize) + i) / sampleRate;
+    const double time = (double)(totalSamples + i) / sampleRate;
     const double x = 2.0 * M_PI * time * as->frequency;
-    fstream[2 * i + 0] = (float)(as->volume * sin(x));
-    fstream[2 * i + 1] = (float)(as->volume * sin(x));
+    const double y = as->volume * sin(x);
+    fstream[2 * i + 0] = (float)y;
+    fstream[2 * i + 1] = (float)y;
   }
-  as->offset += 1;
+  as->elapsed += 1;
 }
 
 ///
@@ -341,7 +343,7 @@ static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
     state->toneStat = (state->toneStat == 1) ? 0 : 1;
     SDL_LockAudioDevice(state->audioDevice);
     state->audio.volume = state->toneStat * state->audio.maxVolume;
-    state->audio.offset = 0;
+    state->audio.elapsed = 0;
     SDL_UnlockAudioDevice(state->audioDevice);
     break;
   }
