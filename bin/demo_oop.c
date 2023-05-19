@@ -17,6 +17,7 @@ struct Person {
   const PersonOperations* ops;
   char* name;
   int age;
+  Person* next;
 };
 
 static void Person_SayHello(const Person* self) {
@@ -29,11 +30,12 @@ static const PersonOperations Person_ops = {
 };
 
 /// Base class constructor.
-#define Person(_name, _age) \
-  ((Person){                \
-    .ops = &Person_ops,     \
-    .name = (_name),        \
-    .age = (_age),          \
+#define Person(_name, _age, _next) \
+  ((Person){                       \
+    .ops = &Person_ops,            \
+    .name = (_name),               \
+    .age = (_age),                 \
+    .next = (_next),               \
   })
 
 /// Derived class.
@@ -55,25 +57,24 @@ static const PersonOperations Student_ops = {
 };
 
 /// Derived class constructor.
-#define Student(_name, _age, _school) \
-  ((Student){                         \
-    .person = {                       \
-      .ops = &Student_ops,            \
-      .name = (_name),                \
-      .age = (_age),                  \
-    },                                \
-    .school = (_school),              \
+#define Student(_name, _age, _next, _school) \
+  ((Student){                                \
+    .person = {                              \
+      .ops = &Student_ops,                   \
+      .name = (_name),                       \
+      .age = (_age),                         \
+      .next = (_next),                       \
+    },                                       \
+    .school = (_school),                     \
   })
 
 int main(void) {
-  Person alice = Person("Alice", 20);
-  Person bob = Person("Bob", 21);
-  Student carol = Student("Carol", 22, "MIT");
+  Person alice = Person("Alice", 20, NULL);
+  Person bob = Person("Bob", 21, &alice);
+  Student carol = Student("Carol", 22, &bob, "MIT");
 
-  Person* people[] = {&alice, &bob, &carol.person};
-
-  for (size_t i = 0; i < 3; ++i) {
-    SEND(people[i], ops->SayHello);
+  for (const Person* current = &carol.person; current != NULL; current = current->next) {
+    SEND(current, ops->SayHello);
   }
 
   return EXIT_SUCCESS;
