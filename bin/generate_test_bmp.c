@@ -19,11 +19,11 @@ static const bmp_Pixel32 buf[] = {
   {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static const char* const bmpFile = "./assets/test.bmp";
+static const char *const bmpFile = "./assets/test.bmp";
 
 int main(void) {
   extern const bmp_Pixel32 buf[];
-  extern const char* const bmpFile;
+  extern const char *const bmpFile;
 
   return (bmp_V4Write(buf, WIDTH, HEIGHT, bmpFile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

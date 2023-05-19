@@ -107,7 +107,7 @@ size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width);
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image);
+int bmp_Read(const char *file, bmp_FileHeader *fileHeader, bmp_InfoHeader *infoHeader, char **image);
 
 ///
 /// Reads a BMP file with a V4 header.
@@ -118,7 +118,7 @@ int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoH
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image);
+int bmp_V4Read(const char *file, bmp_FileHeader *fileHeader, bmp_V4Header *v4Header, char **image);
 
 ///
 /// Write a BMP file with a V4 header.
@@ -128,4 +128,4 @@ int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Hea
 /// @param height Image height in pixels.
 /// @param file Path to the BMP file
 ///
-int bmp_V4Write(const bmp_Pixel32* buffer, size_t width, size_t height, const char* file);
+int bmp_V4Write(const bmp_Pixel32 *buffer, size_t width, size_t height, const char *file);

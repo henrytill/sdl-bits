@@ -10,17 +10,17 @@ typedef struct PersonOperations PersonOperations;
 typedef struct Person Person;
 
 struct PersonOperations {
-  void (*SayHello)(const Person* self);
+  void (*SayHello)(const Person *self);
 };
 
 struct Person {
-  const PersonOperations* ops;
-  char* name;
+  const PersonOperations *ops;
+  char *name;
   int age;
-  Person* next;
+  Person *next;
 };
 
-static void Person_SayHello(const Person* self) {
+static void Person_SayHello(const Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
@@ -32,12 +32,12 @@ static const PersonOperations Person_ops = {
 /// Derived class.
 typedef struct Student {
   Person person;
-  char* school;
+  char *school;
 } Student;
 
 /// Derived class override of PersonOperations::SayHello
-static void Student_SayHello(const Person* self) {
-  const Student* student = CONTAINER_OF(self, Student, person);
+static void Student_SayHello(const Person *self) {
+  const Student *student = CONTAINER_OF(self, Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
 }
@@ -74,7 +74,7 @@ int main(void) {
     .school = "MIT",
   };
 
-  for (const Person* p = &alice; p != NULL; p = p->next) {
+  for (const Person *p = &alice; p != NULL; p = p->next) {
     SEND(p, ops->SayHello);
   }
 

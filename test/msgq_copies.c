@@ -46,19 +46,19 @@ static const uint32_t delay = 2000U;
 static const uint32_t queueCap = 1U;
 
 /// Log an error message and exit.
-static void Fail(const char* msg) {
+static void Fail(const char *msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_Fail(int rc, const char* msg) {
+static void msgq_Fail(int rc, const char *msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_Failure(rc));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_Fail(const char* msg) {
+static void sdl_Fail(const char *msg) {
   sdl_Error(msg);
   exit(EXIT_FAILURE);
 }
@@ -72,8 +72,8 @@ static void sdl_Fail(const char* msg) {
 /// @return 0 on success, 1 on failure.
 /// @see Consume()
 ///
-static int Produce(void* data) {
-  MessageQueue* queue = (MessageQueue*)data;
+static int Produce(void *data) {
+  MessageQueue *queue = (MessageQueue *)data;
   Message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
@@ -116,7 +116,7 @@ static int Produce(void* data) {
 /// @return 0 on success, 1 on failure.
 /// @see Produce()
 ///
-static int Consume(MessageQueue* queue) {
+static int Consume(MessageQueue *queue) {
   extern const uint32_t delay;
 
   Message a = {0};
@@ -147,7 +147,7 @@ static int Consume(MessageQueue* queue) {
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
@@ -164,7 +164,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[])
     Fail("msgq_Create failed");
   }
 
-  SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
+  SDL_Thread *producer = SDL_CreateThread(Produce, "producer", queue);
   if (producer == NULL) {
     sdl_Fail("SDL_CreateThread failed");
   }

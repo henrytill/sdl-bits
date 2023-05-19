@@ -6,5 +6,5 @@
 
 #include "macro.h"
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(lua_State*, lua_close)
-#define SCOPED_PTR_lua_State __attribute__((cleanup(lua_closep))) lua_State*
+DEFINE_TRIVIAL_CLEANUP_FUNC(lua_State *, lua_close)
+#define SCOPED_PTR_lua_State __attribute__((cleanup(lua_closep))) lua_State *

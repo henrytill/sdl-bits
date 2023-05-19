@@ -24,19 +24,19 @@ static const int count = 100;
 static const uint32_t queueCap = 4U;
 
 /// Log an error message and exit.
-static void Fail(const char* msg) {
+static void Fail(const char *msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_Fail(int rc, const char* msg) {
+static void msgq_Fail(int rc, const char *msg) {
   SDL_LogError(ERR, "%s: %s", msg, msgq_Failure(rc));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_Fail(const char* msg) {
+static void sdl_Fail(const char *msg) {
   sdl_Error(msg);
   exit(EXIT_FAILURE);
 }
@@ -50,16 +50,16 @@ static void sdl_Fail(const char* msg) {
 /// @return 0 on success
 /// @see Consume()
 ///
-static int Produce(void* data) {
+static int Produce(void *data) {
   extern const int count;
 
   if (data == NULL) {
     Fail("Produce failed: data is NULL");
   }
 
-  MessageQueue* queue = (MessageQueue*)data;
+  MessageQueue *queue = (MessageQueue *)data;
   Message msg = {0};
-  const char* tagStr = NULL;
+  const char *tagStr = NULL;
   int rc = 0;
 
   for (intptr_t value = 0; value <= count;) {
@@ -94,7 +94,7 @@ static int Produce(void* data) {
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see Produce()
 ///
-static int Consume(MessageQueue* queue, Message* out) {
+static int Consume(MessageQueue *queue, Message *out) {
   const int rc = msgq_Get(queue, out);
   if (rc < 0) {
     msgq_Fail(rc, "msgq_Get failed");
@@ -107,7 +107,7 @@ static int Consume(MessageQueue* queue, Message* out) {
 ///
 /// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
 ///
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
   extern const uint32_t queueCap;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
@@ -124,7 +124,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[])
     Fail("msgq_Create failed");
   }
 
-  SDL_Thread* producer = SDL_CreateThread(Produce, "producer", queue);
+  SDL_Thread *producer = SDL_CreateThread(Produce, "producer", queue);
   if (producer == NULL) {
     sdl_Fail("SDL_CreateThread failed");
   }

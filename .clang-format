@@ -16,7 +16,7 @@ ContinuationIndentWidth: 2
 DerivePointerAlignment: false
 IndentCaseLabels: false
 IndentWidth: 2
-PointerAlignment: Left
+PointerAlignment: Right
 ReflowComments: true
 SortIncludes: true
 SpacesBeforeTrailingComments: 1

@@ -14,7 +14,7 @@ typedef enum WindowPos {
 } WindowPos;
 
 typedef struct Args {
-  char* configFile;
+  char *configFile;
 } Args;
 
 #define WINDOW_TYPE_VARIANTS                                               \
@@ -34,7 +34,7 @@ static const uint32_t windowTypeFlags[] = {
 #undef X
 };
 
-static const char* const windowTypeStr[] = {
+static const char *const windowTypeStr[] = {
 #define X(variant, i, flags, str) [variant] = (str),
   WINDOW_TYPE_VARIANTS
 #undef X
@@ -47,7 +47,7 @@ typedef struct Config {
   int width;
   int height;
   int frameRate;
-  char* assetDir;
+  char *assetDir;
 } Config;
 
 typedef struct AudioState {
@@ -67,8 +67,8 @@ typedef struct State {
 } State;
 
 typedef struct Window {
-  SDL_Window* window;
-  SDL_Renderer* renderer;
+  SDL_Window *window;
+  SDL_Renderer *renderer;
 } Window;
 
 static const double second = 1000.0;
@@ -108,9 +108,9 @@ static State state = {
 /// @param argv The arguments
 /// @param args The Args struct to populate
 ///
-static void ParseArgs(int argc, char* argv[], Args* args) {
+static void ParseArgs(int argc, char *argv[], Args *args) {
   for (int i = 0; i < argc;) {
-    char* arg = argv[i++];
+    char *arg = argv[i++];
     if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
       args->configFile = argv[i++];
     }
@@ -124,9 +124,9 @@ static void ParseArgs(int argc, char* argv[], Args* args) {
 /// @param b The second path
 /// @return A new path, or NULL on failure
 ///
-static char* JoinPath(const char* a, const char* b) {
+static char *JoinPath(const char *a, const char *b) {
   size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
-  char* ret = ecalloc(++len, sizeof(char)); // incr for terminator
+  char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
   snprintf(ret, len, "%s/%s", a, b);
   return ret;
 }
@@ -138,7 +138,7 @@ static char* JoinPath(const char* a, const char* b) {
 /// @param config The Config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int LoadConfig(const char* file, Config* config) {
+static int LoadConfig(const char *file, Config *config) {
   SCOPED_PTR_lua_State state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
@@ -178,9 +178,9 @@ static int LoadConfig(const char* file, Config* config) {
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void CalcSine(void* userData, uint8_t* stream, __attribute__((unused)) int len) {
-  AudioState* as = (AudioState*)userData;
-  float* fstream = (float*)stream;
+static void CalcSine(void *userData, uint8_t *stream, __attribute__((unused)) int len) {
+  AudioState *as = (AudioState *)userData;
+  float *fstream = (float *)stream;
 
   assert((len / (4 * 2)) == as->bufferSize);
   const double sampleRate = (double)as->sampleRate;
@@ -254,9 +254,9 @@ static void DelayFrame(const double frameTime, const uint64_t begin) {
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int InitWindow(Config* config, const char* title, Window* win) {
+static int InitWindow(Config *config, const char *title, Window *win) {
   extern const uint32_t windowTypeFlags[];
-  extern const char* const windowTypeStr[];
+  extern const char *const windowTypeStr[];
 
   SDL_LogInfo(APP, "Window type: %s", windowTypeStr[config->windowType]);
   win->window = SDL_CreateWindow(title,
@@ -281,7 +281,7 @@ static int InitWindow(Config* config, const char* title, Window* win) {
 ///
 /// @param win The window to destroy.
 ///
-static void FinishWindow(Window* win) {
+static void FinishWindow(Window *win) {
   if (win == NULL) {
     return;
   }
@@ -300,8 +300,8 @@ static void FinishWindow(Window* win) {
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static Window* CreateWindow(Config* config, const char* title) {
-  Window* win = emalloc(sizeof(Window));
+static Window *CreateWindow(Config *config, const char *title) {
+  Window *win = emalloc(sizeof(Window));
   const int rc = InitWindow(config, title, win);
   if (rc != 0) {
     free(win);
@@ -315,7 +315,7 @@ static Window* CreateWindow(Config* config, const char* title) {
 ///
 /// @param win The win to destroy.
 ///
-static void DestroyWindow(Window* win) {
+static void DestroyWindow(Window *win) {
   if (win == NULL) {
     return;
   }
@@ -323,8 +323,8 @@ static void DestroyWindow(Window* win) {
   free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
-#define SCOPED_PTR_Window __attribute__((cleanup(DestroyWindowp))) Window*
+DEFINE_TRIVIAL_CLEANUP_FUNC(Window *, DestroyWindow)
+#define SCOPED_PTR_Window __attribute__((cleanup(DestroyWindowp))) Window *
 
 ///
 /// Get the window's rectangle.
@@ -333,7 +333,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int GetRect(Window* win, SDL_Rect* rect) {
+static int GetRect(Window *win, SDL_Rect *rect) {
   if (win == NULL || win->renderer == NULL) {
     return -1;
   }
@@ -351,7 +351,7 @@ static int GetRect(Window* win, SDL_Rect* rect) {
 /// @param key The keydown event.
 /// @param state The state.
 ///
-static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
+static void HandleKeydown(SDL_KeyboardEvent *key, State *state) {
   switch (key->keysym.sym) {
   case SDLK_ESCAPE:
     state->loopStat = 0;
@@ -368,7 +368,7 @@ static void HandleKeydown(SDL_KeyboardEvent* key, State* state) {
 
 static void Update(__attribute__((unused)) double delta) {}
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   extern uint64_t perfFreq;
   extern Args args;
   extern Config config;
@@ -394,7 +394,7 @@ int main(int argc, char* argv[]) {
     .channels = 2,
     .samples = state.audio.bufferSize,
     .callback = CalcSine,
-    .userdata = (void*)&state.audio,
+    .userdata = (void *)&state.audio,
   };
   SDL_AudioSpec have = {0};
   SCOPED_SDL_AudioDeviceID audioDevice = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
@@ -404,7 +404,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  const char* const winTitle = "Hello, world!";
+  const char *const winTitle = "Hello, world!";
   SCOPED_PTR_Window win = CreateWindow(&config, winTitle);
   if (win == NULL) {
     return EXIT_FAILURE;
@@ -417,7 +417,7 @@ int main(int argc, char* argv[]) {
   }
 
   SCOPED_PTR_SDL_Texture texture = ({
-    const char* const testBmp = "test.bmp";
+    const char *const testBmp = "test.bmp";
     SCOPED_PTR_char bmpFile = JoinPath(config.assetDir, testBmp);
     if (bmpFile == NULL) {
       return EXIT_FAILURE;
@@ -429,7 +429,7 @@ int main(int argc, char* argv[]) {
       return EXIT_FAILURE;
     }
 
-    SDL_Texture* tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
+    SDL_Texture *tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
     if (tmp == NULL) {
       sdl_Error("SDL_CreateTextureFromSurface failed");
       return EXIT_FAILURE;

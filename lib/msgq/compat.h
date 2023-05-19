@@ -12,8 +12,8 @@
 /// @param value The initial value of the semaphore.
 /// @return The semaphore, or NULL on failure.
 ///
-static inline sem_t* CreateSemaphore(uint32_t value) {
-  sem_t* sem = calloc(1, sizeof(sem_t));
+static inline sem_t *CreateSemaphore(uint32_t value) {
+  sem_t *sem = calloc(1, sizeof(sem_t));
   if (sem == NULL) {
     return NULL;
   }
@@ -30,8 +30,8 @@ static inline sem_t* CreateSemaphore(uint32_t value) {
 ///
 /// @return The mutex, or NULL on failure.
 ///
-static inline pthread_mutex_t* CreateMutex(void) {
-  pthread_mutex_t* mutex = calloc(1, sizeof(pthread_mutex_t));
+static inline pthread_mutex_t *CreateMutex(void) {
+  pthread_mutex_t *mutex = calloc(1, sizeof(pthread_mutex_t));
   if (mutex == NULL) {
     return NULL;
   }
@@ -48,7 +48,7 @@ static inline pthread_mutex_t* CreateMutex(void) {
 ///
 /// @param sem The semaphore to destroy.
 ///
-static inline void DestroySemaphore(sem_t* sem) {
+static inline void DestroySemaphore(sem_t *sem) {
   if (sem == NULL) {
     return;
   }
@@ -61,7 +61,7 @@ static inline void DestroySemaphore(sem_t* sem) {
 ///
 /// @param mutex The mutex to destroy.
 ///
-static inline void DestroyMutex(pthread_mutex_t* mutex) {
+static inline void DestroyMutex(pthread_mutex_t *mutex) {
   if (mutex == NULL) {
     return;
   }

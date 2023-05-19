@@ -5,14 +5,14 @@
 
 #include "macro.h"
 
-static inline void freeChar(char* str) {
+static inline void freeChar(char *str) {
   if (str != NULL) {
     free(str);
   }
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(char*, freeChar)
-#define SCOPED_PTR_char __attribute__((cleanup(freeCharp))) char*
+DEFINE_TRIVIAL_CLEANUP_FUNC(char *, freeChar)
+#define SCOPED_PTR_char __attribute__((cleanup(freeCharp))) char *
 
 #define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
 
@@ -22,8 +22,8 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(char*, freeChar)
 /// @param size The size in bytes to allocate.
 /// @return A pointer to the allocated memory.
 ///
-static inline void* emalloc(size_t size) {
-  void* ret = malloc(size);
+static inline void *emalloc(size_t size) {
+  void *ret = malloc(size);
   if (ret == NULL) {
     fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
@@ -38,8 +38,8 @@ static inline void* emalloc(size_t size) {
 /// @param size The size in bytes of each element.
 /// @return A pointer to the allocated memory.
 ///
-static inline void* ecalloc(size_t nmemb, size_t size) {
-  void* ret = calloc(nmemb, size);
+static inline void *ecalloc(size_t nmemb, size_t size) {
+  void *ret = calloc(nmemb, size);
   if (ret == NULL) {
     fprintf(stderr, ALLOCATION_FAILURE_MSG);
     exit(EXIT_FAILURE);
