@@ -19,11 +19,11 @@
 #include "msgq.h"
 #include "prelude.h"
 
-#define LOG(msg) ({                                     \
-  Message __msg = (msg);                                \
-  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",          \
-              __func__, #msg,                           \
-              msgq_messageTag(__msg.tag), __msg.value); \
+#define LOG(msg) ({                                 \
+  Message __msg = (msg);                            \
+  SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",      \
+              __func__, #msg,                       \
+              msgq_tagStr(__msg.tag), __msg.value); \
 })
 
 #define CHECK(msg, expectedTag, expectedValue) ({              \
@@ -33,8 +33,8 @@
   if (__msg.tag != __tag || __msg.value != __value) {          \
     SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
                  __func__, #msg,                               \
-                 msgq_messageTag(__msg.tag), __msg.value,      \
-                 msgq_messageTag(__tag), __value);             \
+                 msgq_tagStr(__msg.tag), __msg.value,          \
+                 msgq_tagStr(__tag), __value);                 \
     exit(EXIT_FAILURE);                                        \
   }                                                            \
 });
@@ -53,7 +53,7 @@ static void fail(const char *msg) {
 
 /// Log a msgq error message and exit.
 static void msgq_fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
+  SDL_LogError(ERR, "%s: %s", msg, msgq_failureStr(rc));
   exit(EXIT_FAILURE);
 }
 

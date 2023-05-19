@@ -31,7 +31,7 @@ static void fail(const char *msg) {
 
 /// Log a msgq error message and exit.
 static void msgq_fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
+  SDL_LogError(ERR, "%s: %s", msg, msgq_failureStr(rc));
   exit(EXIT_FAILURE);
 }
 
@@ -65,7 +65,7 @@ static int produce(void *data) {
   for (intptr_t value = 0; value <= count;) {
     msg.tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
-    tagStr = msgq_messageTag(msg.tag);
+    tagStr = msgq_tagStr(msg.tag);
 
     rc = msgq_put(queue, &msg);
     if (rc < 0) {
@@ -100,7 +100,7 @@ static int consume(MessageQueue *queue, Message *out) {
     msgq_fail(rc, "msgq_get failed");
   }
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_messageTag(out->tag), out->value);
+              msgq_tagStr(out->tag), out->value);
   return out->tag != MSG_TAG_QUIT;
 }
 

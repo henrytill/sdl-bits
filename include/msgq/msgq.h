@@ -45,7 +45,7 @@ typedef struct MessageQueue MessageQueue;
 /// @param rc A return code.
 /// @return The error message associated with the given return code, or NULL if the return code is invalid.
 ///
-const char *msgq_failure(int rc);
+const char *msgq_failureStr(int rc);
 
 ///
 /// Return the tag string associated with a message tag.
@@ -53,7 +53,7 @@ const char *msgq_failure(int rc);
 /// @param tag A message tag.
 /// @return The tag string associated with the given tag, or NULL if the tag is invalid.
 ///
-const char *msgq_messageTag(MessageTag tag);
+const char *msgq_tagStr(MessageTag tag);
 
 ///
 /// Creates a new bounded queue with the given capacity.
