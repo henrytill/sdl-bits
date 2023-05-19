@@ -15,7 +15,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[])
   const char* const bmpFile = "./assets/sample_24bit.bmp";
   bmp_FileHeader fileHeader = {0};
   bmp_InfoHeader infoHeader = {0};
-  SCOPED_char image = NULL;
+  SCOPED_PTR_char image = NULL;
 
   if (bmp_Read(bmpFile, &fileHeader, &infoHeader, &image) != 0) {
     return EXIT_FAILURE;

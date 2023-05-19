@@ -159,7 +159,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[])
 
   AT_EXIT(SDL_Quit);
 
-  SCOPED_msgq queue = msgq_Create(queueCap);
+  SCOPED_PTR_MessageQueue queue = msgq_Create(queueCap);
   if (queue == NULL) {
     Fail("msgq_Create failed");
   }

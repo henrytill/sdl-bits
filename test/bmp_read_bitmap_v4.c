@@ -16,7 +16,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char* argv[])
   const char* const bmpFile = "./assets/test.bmp";
   bmp_FileHeader fileHeader = {0};
   bmp_V4Header v4Header = {0};
-  SCOPED_char image = NULL;
+  SCOPED_PTR_char image = NULL;
 
   if (bmp_V4Read(bmpFile, &fileHeader, &v4Header, &image) != 0) {
     return EXIT_FAILURE;

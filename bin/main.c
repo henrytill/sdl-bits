@@ -139,7 +139,7 @@ static char* JoinPath(const char* a, const char* b) {
 /// @return 0 on success, -1 on failure
 ///
 static int LoadConfig(const char* file, Config* config) {
-  SCOPED_lua_State state = luaL_newstate();
+  SCOPED_PTR_lua_State state = luaL_newstate();
   if (state == NULL) {
     SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
     return -1;
@@ -323,7 +323,7 @@ static void DestroyWindow(Window* win) {
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(Window*, DestroyWindow)
-#define SCOPED_Window __attribute__((cleanup(DestroyWindowp))) Window*
+#define SCOPED_PTR_Window __attribute__((cleanup(DestroyWindowp))) Window*
 
 ///
 /// Get the window's rectangle.
@@ -404,7 +404,7 @@ int main(int argc, char* argv[]) {
   }
 
   const char* const winTitle = "Hello, world!";
-  SCOPED_Window win = CreateWindow(&config, winTitle);
+  SCOPED_PTR_Window win = CreateWindow(&config, winTitle);
   if (win == NULL) {
     return EXIT_FAILURE;
   }
@@ -415,14 +415,14 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  SCOPED_SDL_Texture texture = ({
+  SCOPED_PTR_SDL_Texture texture = ({
     const char* const testBmp = "test.bmp";
-    SCOPED_char bmpFile = JoinPath(config.assetDir, testBmp);
+    SCOPED_PTR_char bmpFile = JoinPath(config.assetDir, testBmp);
     if (bmpFile == NULL) {
       return EXIT_FAILURE;
     }
 
-    SCOPED_SDL_Surface surface = SDL_LoadBMP(bmpFile);
+    SCOPED_PTR_SDL_Surface surface = SDL_LoadBMP(bmpFile);
     if (surface == NULL) {
       sdl_Error("SDL_LoadBMP failed");
       return EXIT_FAILURE;

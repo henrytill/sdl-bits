@@ -15,7 +15,7 @@ const uint32_t bmp_BI_BITFIELDS = 0x0003;
 const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(FILE*, fclose)
-#define SCOPED_FILE __attribute__((cleanup(fclosep))) FILE*
+#define SCOPED_PTR_FILE __attribute__((cleanup(fclosep))) FILE*
 
 size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width) {
   const double pixelBits = (double)bitsPerPixel * width;
@@ -23,7 +23,7 @@ size_t bmp_RowSize(uint16_t bitsPerPixel, int32_t width) {
 }
 
 int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoHeader, char** image) {
-  SCOPED_FILE fileHandle = fopen(file, "r");
+  SCOPED_PTR_FILE fileHandle = fopen(file, "r");
   if (fileHandle == NULL) {
     return -1;
   }
@@ -74,7 +74,7 @@ int bmp_Read(const char* file, bmp_FileHeader* fileHeader, bmp_InfoHeader* infoH
 }
 
 int bmp_V4Read(const char* file, bmp_FileHeader* fileHeader, bmp_V4Header* v4Header, char** image) {
-  SCOPED_FILE fileHandle = fopen(file, "r");
+  SCOPED_PTR_FILE fileHandle = fopen(file, "r");
   if (fileHandle == NULL) {
     return -1;
   }
@@ -175,7 +175,7 @@ int bmp_V4Write(const bmp_Pixel32* buffer, size_t width, size_t height, const ch
     .bGamma = 0,
   };
 
-  SCOPED_FILE fileHandle = fopen(file, "wb");
+  SCOPED_PTR_FILE fileHandle = fopen(file, "wb");
   if (fileHandle == NULL) {
     return -1;
   }

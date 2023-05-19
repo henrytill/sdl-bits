@@ -98,9 +98,9 @@ static void DestroyBuffer(bmp_Pixel32* buffer) { free(buffer); }
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
 DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)
 DEFINE_TRIVIAL_CLEANUP_FUNC(bmp_Pixel32*, DestroyBuffer)
-#define SCOPED_FT_Library  __attribute__((cleanup(FT_Done_FreeTypep))) FT_Library
-#define SCOPED_FT_Face     __attribute__((cleanup(FT_Done_Facep))) FT_Face
-#define SCOPED_bmp_Pixel32 __attribute__((cleanup(DestroyBufferp))) bmp_Pixel32*
+#define SCOPED_FT_Library      __attribute__((cleanup(FT_Done_FreeTypep))) FT_Library
+#define SCOPED_FT_Face         __attribute__((cleanup(FT_Done_Facep))) FT_Face
+#define SCOPED_PTR_bmp_Pixel32 __attribute__((cleanup(DestroyBufferp))) bmp_Pixel32*
 
 int main(void) {
   extern const char* const fontFile;
@@ -176,7 +176,7 @@ int main(void) {
 
   DrawImage(image, width, height);
 
-  SCOPED_bmp_Pixel32 buffer = calloc(width * height, sizeof(bmp_Pixel32));
+  SCOPED_PTR_bmp_Pixel32 buffer = calloc(width * height, sizeof(bmp_Pixel32));
   if (buffer == NULL) {
     FreeImage(image, height);
     return EXIT_FAILURE;

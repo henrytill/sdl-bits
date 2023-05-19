@@ -70,7 +70,7 @@ MessageQueue* msgq_Create(uint32_t capacity);
 ///
 /// Also frees the queue itself.
 ///
-/// Consider using SCOPED_msgq for scoped cleanup.
+/// Consider using SCOPED_PTR_MessageQueue for scoped cleanup.
 ///
 /// @param queue A MessageQueue.
 /// @see msgq_Create()
@@ -78,7 +78,7 @@ MessageQueue* msgq_Create(uint32_t capacity);
 void msgq_Destroy(MessageQueue* queue);
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(MessageQueue*, msgq_Destroy)
-#define SCOPED_msgq __attribute__((cleanup(msgq_Destroyp))) MessageQueue*
+#define SCOPED_PTR_MessageQueue __attribute__((cleanup(msgq_Destroyp))) MessageQueue*
 
 ///
 /// Adds an message to the back of the queue.
