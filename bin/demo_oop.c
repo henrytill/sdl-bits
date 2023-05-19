@@ -29,15 +29,6 @@ static const PersonOperations Person_ops = {
   .SayHello = Person_SayHello,
 };
 
-/// Base class constructor.
-#define Person(_name, _age, _next) \
-  ((Person){                       \
-    .ops = &Person_ops,            \
-    .name = (_name),               \
-    .age = (_age),                 \
-    .next = (_next),               \
-  })
-
 /// Derived class.
 typedef struct Student {
   Person person;
@@ -56,25 +47,35 @@ static const PersonOperations Student_ops = {
   .SayHello = Student_SayHello,
 };
 
-/// Derived class constructor.
-#define Student(_name, _age, _next, _school) \
-  ((Student){                                \
-    .person = {                              \
-      .ops = &Student_ops,                   \
-      .name = (_name),                       \
-      .age = (_age),                         \
-      .next = (_next),                       \
-    },                                       \
-    .school = (_school),                     \
-  })
-
 int main(void) {
-  Person alice = Person("Alice", 20, NULL);
-  Person bob = Person("Bob", 21, &alice);
-  Student carol = Student("Carol", 22, &bob, "MIT");
+  Person alice;
+  Person bob;
+  Student carol;
 
-  for (const Person* current = &carol.person; current != NULL; current = current->next) {
-    SEND(current, ops->SayHello);
+  alice = (Person){
+    .ops = &Person_ops,
+    .name = "Alice",
+    .age = 20,
+    .next = &bob,
+  };
+  bob = (Person){
+    .ops = &Person_ops,
+    .name = "Bob",
+    .age = 21,
+    .next = &carol.person,
+  };
+  carol = (Student){
+    .person = {
+      .ops = &Student_ops,
+      .name = "Carol",
+      .age = 22,
+      .next = NULL,
+    },
+    .school = "MIT",
+  };
+
+  for (const Person* p = &alice; p != NULL; p = p->next) {
+    SEND(p, ops->SayHello);
   }
 
   return EXIT_SUCCESS;
