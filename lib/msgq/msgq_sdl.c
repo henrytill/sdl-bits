@@ -2,8 +2,8 @@
 
 #include "msgq.h"
 
-struct MessageQueue {
-  Message *buffer;   // Buffer to hold messages
+struct msgq_queue {
+  msgq_message *buffer;   // Buffer to hold messages
   uint32_t capacity; // Maximum size of the buffer
   size_t front;      // Index of the front message in the buffer
   size_t rear;       // Index of the rear message in the buffer
@@ -12,35 +12,35 @@ struct MessageQueue {
   SDL_mutex *lock;   // Mutex lock to protect buffer access
 };
 
-static const char *const messageQueueFailureStr[] = {
+static const char *const MESSAGE_QUEUE_FAILURE_STR[] = {
 #define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = (str),
   MSGQ_FAILURE_VARIANTS
 #undef X
 };
 
-static const char *const messageTagStr[] = {
+static const char *const MESSAGE_TAG_STR[] = {
 #define X(variant, i, str) [MSG_TAG_##variant] = (str),
   MSG_TAG_VARIANTS
 #undef X
 };
 
-const char *msgq_failureStr(int rc) {
-  extern const char *const messageQueueFailureStr[];
+const char *msgq_failure(int rc) {
+  extern const char *const MESSAGE_QUEUE_FAILURE_STR[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
   }
-  return messageQueueFailureStr[-rc];
+  return MESSAGE_QUEUE_FAILURE_STR[-rc];
 }
 
-const char *msgq_tagStr(MessageTag tag) {
-  extern const char *const messageTagStr[];
+const char *msgq_tag(int tag) {
+  extern const char *const MESSAGE_TAG_STR[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
   }
-  return messageTagStr[tag];
+  return MESSAGE_TAG_STR[tag];
 }
 
-static int msgq_init(MessageQueue *queue, uint32_t capacity) {
+static int msgq_init(msgq_queue *queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -69,7 +69,7 @@ static int msgq_init(MessageQueue *queue, uint32_t capacity) {
   return 0;
 }
 
-static void msgq_finish(MessageQueue *queue) {
+static void msgq_finish(msgq_queue *queue) {
   if (queue == NULL) {
     return;
   }
@@ -94,8 +94,8 @@ static void msgq_finish(MessageQueue *queue) {
   }
 }
 
-MessageQueue *msgq_create(uint32_t capacity) {
-  MessageQueue *queue = calloc(1, sizeof(*queue));
+msgq_queue *msgq_create(uint32_t capacity) {
+  msgq_queue *queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
@@ -107,7 +107,7 @@ MessageQueue *msgq_create(uint32_t capacity) {
   return queue;
 }
 
-void msgq_destroy(MessageQueue *queue) {
+void msgq_destroy(msgq_queue *queue) {
   if (queue == NULL) {
     return;
   }
@@ -115,7 +115,7 @@ void msgq_destroy(MessageQueue *queue) {
   free(queue);
 }
 
-int msgq_put(MessageQueue *queue, Message *in) {
+int msgq_put(msgq_queue *queue, msgq_message *in) {
   int rc = SDL_SemTryWait(queue->empty);
   if (rc == SDL_MUTEX_TIMEDOUT) {
     return 1;
@@ -140,7 +140,7 @@ int msgq_put(MessageQueue *queue, Message *in) {
   return 0;
 }
 
-int msgq_get(MessageQueue *queue, Message *out) {
+int msgq_get(msgq_queue *queue, msgq_message *out) {
   int rc = SDL_SemWait(queue->full);
   if (rc < 0) {
     return MSGQ_FAILURE_SEM_WAIT;
@@ -162,7 +162,7 @@ int msgq_get(MessageQueue *queue, Message *out) {
   return 0;
 }
 
-uint32_t msgq_size(MessageQueue *queue) {
+uint32_t msgq_size(msgq_queue *queue) {
   if (queue == NULL) {
     return 0;
   }

@@ -12,7 +12,7 @@ enum {
   APP = SDL_LOG_CATEGORY_CUSTOM
 };
 
-static void freeType(void) {
+static void free_type(void) {
   FT_Library lib = NULL;
   FT_Int major = 0;
   FT_Int minor = 0;
@@ -54,7 +54,7 @@ static void sdl(void) {
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 
-  freeType();
+  free_type();
   lua();
   sdl();
 

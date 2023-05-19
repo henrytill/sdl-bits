@@ -5,14 +5,14 @@
 
 #include "macro.h"
 
-static inline void freeChar(char *str) {
+static inline void free_char(char *str) {
   if (str != NULL) {
     free(str);
   }
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(char *, freeChar)
-#define SCOPED_PTR_char __attribute__((cleanup(freeCharp))) char *
+DEFINE_TRIVIAL_CLEANUP_FUNC(char *, free_char)
+#define SCOPED_PTR_char __attribute__((cleanup(free_charp))) char *
 
 #define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
 

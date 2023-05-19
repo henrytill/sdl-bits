@@ -5,11 +5,7 @@
 
 #include "macro.h"
 
-extern const uint16_t bmp_FILETYPE;
-extern const uint32_t bmp_BI_BITFIELDS;
-extern const uint32_t bmp_LCS_WINDOWS_COLOR_SPACE;
-
-enum bmp_HeaderSize {
+typedef enum bmp_header_size {
   BITMAPCOREHEADER = 12,
   OS22XBITMAPHEADER = 64,
   BITMAPINFOHEADER = 40,
@@ -17,31 +13,31 @@ enum bmp_HeaderSize {
   BITMAPV3INFOHEADER = 56,
   BITMAPV4HEADER = 108,
   BITMAPV5HEADER = 124
-};
+} bmp_header_size;
 
-typedef struct bmp_FileHeader {
-  uint16_t fileType;
-  uint32_t fileSize;
+typedef struct bmp_file_header {
+  uint16_t file_type;
+  uint32_t file_size;
   uint16_t reserved1;
   uint16_t reserved2;
   uint32_t offset;
-} __attribute__((packed)) bmp_FileHeader;
+} __attribute__((packed)) bmp_file_header;
 
-typedef struct bmp_InfoHeader {
-  uint32_t size;         // DIB Header size (bytes)
-  int32_t width;         // Image width (pixels)
-  int32_t height;        // Image height (pixels)
-  uint16_t planes;       // Number of planes
-  uint16_t bitsPerPixel; // Bits per pixel
-  uint32_t compression;  // Compression mode
-  uint32_t imageSize;    // Image size (bytes)
-  int32_t hRes;          // Horizontal resolution (pixels per meter)
-  int32_t vRes;          // Vertical resolution (pixels per meter)
-  uint32_t colors;       // Used colors
-  uint32_t impColors;    // Important colors
-} __attribute__((packed)) bmp_InfoHeader;
+typedef struct bmp_info_header {
+  uint32_t size;           // DIB Header size (bytes)
+  int32_t width;           // Image width (pixels)
+  int32_t height;          // Image height (pixels)
+  uint16_t planes;         // Number of planes
+  uint16_t bits_per_pixel; // Bits per pixel
+  uint32_t compression;    // Compression mode
+  uint32_t image_size;     // Image size (bytes)
+  int32_t h_res;           // Horizontal resolution (pixels per meter)
+  int32_t v_res;           // Vertical resolution (pixels per meter)
+  uint32_t colors;         // Used colors
+  uint32_t imp_colors;     // Important colors
+} __attribute__((packed)) bmp_info_header;
 
-typedef struct bmp_Colorspace {
+typedef struct bmp_colorspace {
   int32_t rx;
   int32_t ry;
   int32_t rz;
@@ -51,74 +47,74 @@ typedef struct bmp_Colorspace {
   int32_t bx;
   int32_t by;
   int32_t bz;
-} __attribute__((packed)) bmp_Colorspace;
+} __attribute__((packed)) bmp_colorspace;
 
-typedef struct bmp_V4Header {
-  uint32_t size;         // DIB Header Size (bytes)
-  int32_t width;         // Image width (pixels)
-  int32_t height;        // Image height (pixels)
-  uint16_t planes;       // Number of planes
-  uint16_t bitsPerPixel; // Bits per pixel
-  uint32_t compression;  // Compression mode
-  uint32_t imageSize;    // Image size (bytes)
-  int32_t hRes;          // Horizontal resolution (pixels per meter)
-  int32_t vRes;          // Vertical resolution (pixels per meter)
-  uint32_t colors;       // Used colors
-  uint32_t impColors;    // Important colors
-  uint32_t rMask;
-  uint32_t gMask;
-  uint32_t bMask;
-  uint32_t aMask;
-  uint32_t colorspaceType;
-  bmp_Colorspace colorspace;
-  uint32_t rGamma;
-  uint32_t gGamma;
-  uint32_t bGamma;
-} __attribute__((packed)) bmp_V4Header;
+typedef struct bmp_v4_header {
+  uint32_t size;           // DIB Header Size (bytes)
+  int32_t width;           // Image width (pixels)
+  int32_t height;          // Image height (pixels)
+  uint16_t planes;         // Number of planes
+  uint16_t bits_per_pixel; // Bits per pixel
+  uint32_t compression;    // Compression mode
+  uint32_t image_size;     // Image size (bytes)
+  int32_t h_res;           // Horizontal resolution (pixels per meter)
+  int32_t v_res;           // Vertical resolution (pixels per meter)
+  uint32_t colors;         // Used colors
+  uint32_t imp_colors;     // Important colors
+  uint32_t r_mask;
+  uint32_t g_mask;
+  uint32_t b_mask;
+  uint32_t a_mask;
+  uint32_t colorspace_type;
+  bmp_colorspace colorspace;
+  uint32_t r_gamma;
+  uint32_t g_gamma;
+  uint32_t b_gamma;
+} __attribute__((packed)) bmp_v4_header;
 
-typedef struct bmp_Pixel24 {
+typedef struct bmp_pixel24 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
-} __attribute__((packed)) bmp_Pixel24;
+} __attribute__((packed)) bmp_pixel24;
 
-typedef struct bmp_Pixel32 {
+typedef struct bmp_pixel32 {
   uint8_t b;
   uint8_t g;
   uint8_t r;
   uint8_t a;
-} __attribute__((packed)) bmp_Pixel32;
+} __attribute__((packed)) bmp_pixel32;
 
 ///
 /// Calculate the number of bytes per row.
 ///
-/// @param bitsPerPixel Bits per pixel.
+/// @param bits_per_pixel Bits per pixel.
 /// @param width Image width.
 /// @return Number of bytes per row.
 ///
-size_t bmp_rowSize(uint16_t bitsPerPixel, int32_t width);
+size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width);
 
 ///
 /// Read a BMP file.
 ///
 /// @param file Path to the BMP file.
-/// @param fileHeader The file header structure to be filled.
-/// @param infoHeader The info header structure to be filled.
+/// @param file_header The file header structure to be filled.
+/// @param info_header The info header structure to be filled.
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_read(const char *file, bmp_FileHeader *fileHeader, bmp_InfoHeader *infoHeader, char **image);
+int bmp_read(const char *file, bmp_file_header *file_header, bmp_info_header *info_header, char **image);
 
 ///
 /// Reads a BMP file with a V4 header.
 ///
 /// @param file Path to the BMP file.
-/// @param fileHeader The file header structure to be filled.
-/// @param v4Header The V4 header structure to be filled.
+/// @param file_header The file header structure to be filled.
+/// @param v4_header The V4 header structure to be filled.
 /// @param image The image data to be filled.
 /// @return 0 on success, -1 on error.
 ///
-int bmp_v4Read(const char *file, bmp_FileHeader *fileHeader, bmp_V4Header *v4Header, char **image);
+int bmp_v4_read(const char *file, bmp_file_header *file_header, bmp_v4_header *v4_header, char **image);
 
 ///
 /// Write a BMP file with a V4 header.
@@ -128,4 +124,4 @@ int bmp_v4Read(const char *file, bmp_FileHeader *fileHeader, bmp_V4Header *v4Hea
 /// @param height Image height in pixels.
 /// @param file Path to the BMP file
 ///
-int bmp_v4Write(const bmp_Pixel32 *buffer, size_t width, size_t height, const char *file);
+int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const char *file);

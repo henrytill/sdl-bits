@@ -4,7 +4,7 @@
 /// This test reads a 32-bit bitmap file and checks that the first pixel is
 /// semi-transparent red.
 ///
-/// @see bmp_v4Read()
+/// @see bmp_v4_read()
 ///
 #include <stddef.h>
 #include <string.h>
@@ -13,23 +13,23 @@
 #include "prelude.h"
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
-  const char *const bmpFile = "./assets/test.bmp";
-  bmp_FileHeader fileHeader = {0};
-  bmp_V4Header v4Header = {0};
+  const char *const bmp_file = "./assets/test.bmp";
+  bmp_file_header file_header = {0};
+  bmp_v4_header v4_header = {0};
   SCOPED_PTR_char image = NULL;
 
-  if (bmp_v4Read(bmpFile, &fileHeader, &v4Header, &image) != 0) {
+  if (bmp_v4_read(bmp_file, &file_header, &v4_header, &image) != 0) {
     return EXIT_FAILURE;
   }
 
-  bmp_Pixel32 expected = {
+  bmp_pixel32 expected = {
     .b = 255,
     .g = 0,
     .r = 0,
     .a = 127,
   };
 
-  if (memcmp(&expected, (bmp_Pixel32 *)image, sizeof(bmp_Pixel32)) != 0) {
+  if (memcmp(&expected, (bmp_pixel32 *)image, sizeof(bmp_pixel32)) != 0) {
     return EXIT_FAILURE;
   }
 

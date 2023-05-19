@@ -2,16 +2,16 @@
 
 #include "macro.h"
 
-static int enumDisp(void) {
-  const int numDisplays = SDL_GetNumVideoDisplays();
-  if (numDisplays < 0) {
+static int enum_displays(void) {
+  const int num_displays = SDL_GetNumVideoDisplays();
+  if (num_displays < 0) {
     const char *err = SDL_GetError();
     SDL_Log("Failed to get number of video displays: %s", err);
     return -1;
   }
 
   SDL_DisplayMode mode = {0};
-  for (int i = 0; i < numDisplays; ++i) {
+  for (int i = 0; i < num_displays; ++i) {
     const int rc = SDL_GetCurrentDisplayMode(i, &mode);
     if (rc != 0) {
       const char *err = SDL_GetError();
@@ -32,7 +32,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   AT_EXIT(SDL_Quit);
 
-  rc = enumDisp();
+  rc = enum_displays();
   if (rc != 0) {
     return EXIT_FAILURE;
   }

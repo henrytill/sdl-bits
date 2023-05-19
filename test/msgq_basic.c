@@ -1,7 +1,7 @@
 ///
 /// Test basic message queue functionality.
 ///
-/// The producer thread produces messages with values from 0 to count.
+/// The producer thread produces messages with values from 0 to COUNT.
 /// The consumer consumes messages on the main thread until it receives a
 /// message with tag MSG_TAG_QUIT.
 ///
@@ -18,10 +18,10 @@
 #include "prelude.h"
 
 /// Maximum value to Produce.
-static const int count = 100;
+static const int COUNT = 100;
 
-/// Capacity of the MessageQueue.
-static const uint32_t queueCap = 4U;
+/// Capacity of the msgq_queue.
+static const uint32_t QUEUE_CAP = 4U;
 
 /// Log an error message and exit.
 static void fail(const char *msg) {
@@ -29,9 +29,9 @@ static void fail(const char *msg) {
   exit(EXIT_FAILURE);
 }
 
-/// Log a msgq error message and exit.
+/// Log a msgq_queue error message and exit.
 static void msgq_fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_failureStr(rc));
+  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
   exit(EXIT_FAILURE);
 }
 
@@ -42,41 +42,41 @@ static void sdl_fail(const char *msg) {
 }
 
 ///
-/// Produce messages with values from 0 to count. The last message has tag MSG_TAG_QUIT.
+/// Produce messages with values from 0 to COUNT. The last message has tag MSG_TAG_QUIT.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
 ///
-/// @param data Pointer to a MessageQueue.
+/// @param data Pointer to a msgq_queue.
 /// @return 0 on success
 /// @see consume()
 ///
 static int produce(void *data) {
-  extern const int count;
+  extern const int COUNT;
 
   if (data == NULL) {
     fail("produce failed: data is NULL");
   }
 
-  MessageQueue *queue = (MessageQueue *)data;
-  Message msg = {0};
-  const char *tagStr = NULL;
+  msgq_queue *queue = (msgq_queue *)data;
+  msgq_message msg = {0};
+  const char *tag_str = NULL;
   int rc = 0;
 
-  for (intptr_t value = 0; value <= count;) {
-    msg.tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
+  for (intptr_t value = 0; value <= COUNT;) {
+    msg.tag = (value < COUNT) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
-    tagStr = msgq_tagStr(msg.tag);
+    tag_str = msgq_tag(msg.tag);
 
     rc = msgq_put(queue, &msg);
     if (rc < 0) {
       msgq_fail(rc, "msgq_put failed");
     } else if (rc == 1) {
       SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
-                   tagStr, value);
+                   tag_str, value);
       continue;
     } else {
       SDL_LogInfo(APP, "Produced {%s, %" PRIdPTR "}",
-                  tagStr, value);
+                  tag_str, value);
       value += 1;
     }
   }
@@ -89,26 +89,26 @@ static int produce(void *data) {
 ///
 /// This function is meant to be run on the main thread.
 ///
-/// @param queue Pointer to a MessageQueue.
-/// @param out Pointer to a Message.
+/// @param queue Pointer to a msgq_queue.
+/// @param out Pointer to a message.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see produce()
 ///
-static int consume(MessageQueue *queue, Message *out) {
+static int consume(msgq_queue *queue, msgq_message *out) {
   const int rc = msgq_get(queue, out);
   if (rc < 0) {
     msgq_fail(rc, "msgq_get failed");
   }
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_tagStr(out->tag), out->value);
+              msgq_tag(out->tag), out->value);
   return out->tag != MSG_TAG_QUIT;
 }
 
 ///
-/// Initialize SDL and a MessageQueue, run the producer thread, Consume, and clean up.
+/// Initialize SDL and a msgq_queue, run the producer thread, Consume, and clean up.
 ///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
-  extern const uint32_t queueCap;
+  extern const uint32_t QUEUE_CAP;
 
   SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
@@ -119,7 +119,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   AT_EXIT(SDL_Quit);
 
-  SCOPED_PTR_MessageQueue queue = msgq_create(queueCap);
+  SCOPED_PTR_msgq_queue queue = msgq_create(QUEUE_CAP);
   if (queue == NULL) {
     fail("msgq_create failed");
   }
@@ -129,7 +129,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     sdl_fail("SDL_CreateThread failed");
   }
 
-  Message msg;
+  msgq_message msg;
   for (;;) {
     rc = consume(queue, &msg);
     if (rc == 0) {

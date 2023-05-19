@@ -8,7 +8,7 @@ enum {
   HEIGHT = 2,
 };
 
-static const bmp_Pixel32 buf[] = {
+static const bmp_pixel32 BUF[] = {
   {0xFF, 0x00, 0x00, 0x7F},
   {0x00, 0xFF, 0x00, 0x7F},
   {0x00, 0x00, 0xFF, 0x7F},
@@ -19,11 +19,11 @@ static const bmp_Pixel32 buf[] = {
   {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-static const char *const bmpFile = "./assets/test.bmp";
+static const char *const BMP_FILE = "./assets/test.bmp";
 
 int main(void) {
-  extern const bmp_Pixel32 buf[];
-  extern const char *const bmpFile;
+  extern const bmp_pixel32 BUF[];
+  extern const char *const BMP_FILE;
 
-  return (bmp_v4Write(buf, WIDTH, HEIGHT, bmpFile) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return (bmp_v4_write(BUF, WIDTH, HEIGHT, BMP_FILE) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

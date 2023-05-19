@@ -7,10 +7,10 @@
 
 #define now SDL_GetPerformanceCounter
 
-typedef enum LogCategory {
+enum {
   APP = SDL_LOG_CATEGORY_CUSTOM,
   ERR,
-} LogCategory;
+};
 
 static_assert(__builtin_types_compatible_p(Uint16, uint16_t), "SDL-defined Uint16 is not uint16_t");
 static_assert(__builtin_types_compatible_p(Uint32, uint32_t), "SDL-defined Uint32 is not uint32_t");
