@@ -233,7 +233,7 @@ static double CalcDelta(const uint64_t begin, const uint64_t end) {
 /// @param frameTime The desired time in milliseconds for a frame
 /// @param begin The timestamp in ticks when the frame started
 ///
-static void Delay(const double frameTime, const uint64_t begin) {
+static void DelayFrame(const double frameTime, const uint64_t begin) {
   if (CalcDelta(begin, Now()) >= frameTime) {
     return;
   }
@@ -471,7 +471,7 @@ int main(int argc, char* argv[]) {
     }
     SDL_RenderPresent(win->renderer);
 
-    Delay(frameTime, begin);
+    DelayFrame(frameTime, begin);
     end = Now();
     delta = CalcDelta(begin, end);
     begin = end;
