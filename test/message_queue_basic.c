@@ -5,22 +5,22 @@
 /// The consumer consumes messages on the main thread until it receives a
 /// message with tag MSG_TAG_QUIT.
 ///
-/// @see msgq_create()
-/// @see msgq_put()
-/// @see msgq_get()
-/// @see msgq_destroy()
+/// @see message_queue_create()
+/// @see message_queue_put()
+/// @see message_queue_get()
+/// @see message_queue_destroy()
 ///
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#include "msgq.h"
+#include "message_queue.h"
 #include "prelude.h"
 
 /// Maximum value to Produce.
 static const int COUNT = 100;
 
-/// Capacity of the msgq_queue.
+/// Capacity of the message_queue.
 static const uint32_t QUEUE_CAP = 4U;
 
 /// Log an error message and exit.
@@ -29,9 +29,9 @@ static void fail(const char *msg) {
   exit(EXIT_FAILURE);
 }
 
-/// Log a msgq_queue error message and exit.
-static void msgq_fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
+/// Log a message_queue error message and exit.
+static void message_queue_fail(int rc, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
   exit(EXIT_FAILURE);
 }
 
@@ -46,7 +46,7 @@ static void sdl_fail(const char *msg) {
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
 ///
-/// @param data Pointer to a msgq_queue.
+/// @param data Pointer to a message_queue.
 /// @return 0 on success
 /// @see consume()
 ///
@@ -57,19 +57,19 @@ static int produce(void *data) {
     fail("produce failed: data is NULL");
   }
 
-  msgq_queue *queue = (msgq_queue *)data;
-  msgq_message msg = {0};
+  message_queue *queue = (message_queue *)data;
+  message msg = {0};
   const char *tag_str = NULL;
   int rc = 0;
 
   for (intptr_t value = 0; value <= COUNT;) {
     msg.tag = (value < COUNT) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
-    tag_str = msgq_tag(msg.tag);
+    tag_str = message_queue_tag(msg.tag);
 
-    rc = msgq_put(queue, &msg);
+    rc = message_queue_put(queue, &msg);
     if (rc < 0) {
-      msgq_fail(rc, "msgq_put failed");
+      message_queue_fail(rc, "message_queue_put failed");
     } else if (rc == 1) {
       SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
                    tag_str, value);
@@ -89,23 +89,23 @@ static int produce(void *data) {
 ///
 /// This function is meant to be run on the main thread.
 ///
-/// @param queue Pointer to a msgq_queue.
+/// @param queue Pointer to a message_queue.
 /// @param out Pointer to a message.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see produce()
 ///
-static int consume(msgq_queue *queue, msgq_message *out) {
-  const int rc = msgq_get(queue, out);
+static int consume(message_queue *queue, message *out) {
+  const int rc = message_queue_get(queue, out);
   if (rc < 0) {
-    msgq_fail(rc, "msgq_get failed");
+    message_queue_fail(rc, "message_queue_get failed");
   }
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_tag(out->tag), out->value);
+              message_queue_tag(out->tag), out->value);
   return out->tag != MSG_TAG_QUIT;
 }
 
 ///
-/// Initialize SDL and a msgq_queue, run the producer thread, Consume, and clean up.
+/// Initialize SDL and a message_queue, run the producer thread, Consume, and clean up.
 ///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
   extern const uint32_t QUEUE_CAP;
@@ -119,9 +119,9 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   AT_EXIT(SDL_Quit);
 
-  SCOPED_PTR_msgq_queue queue = msgq_create(QUEUE_CAP);
+  SCOPED_PTR_message_queue queue = message_queue_create(QUEUE_CAP);
   if (queue == NULL) {
-    fail("msgq_create failed");
+    fail("message_queue_create failed");
   }
 
   SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
@@ -129,7 +129,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
     sdl_fail("SDL_CreateThread failed");
   }
 
-  msgq_message msg;
+  message msg;
   for (;;) {
     rc = consume(queue, &msg);
     if (rc == 0) {

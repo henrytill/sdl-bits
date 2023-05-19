@@ -1,4 +1,4 @@
 add_subdirectory(bmp)
 add_subdirectory(macro)
-add_subdirectory(msgq)
+add_subdirectory(message_queue)
 add_subdirectory(prelude)

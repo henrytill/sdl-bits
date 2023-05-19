@@ -17,42 +17,42 @@ add_test(NAME bmp_read_bitmap_v4
          COMMAND bmp_read_bitmap_v4)
 add_dependencies(bmp_read_bitmap_v4 test_bmp)
 
-# msgq_basic
-add_executable(msgq_basic msgq_basic.c)
-target_compile_options_default(msgq_basic)
-target_link_libraries(msgq_basic PRIVATE msgq)
-target_link_libraries(msgq_basic PRIVATE prelude)
-target_link_SDL2(msgq_basic PRIVATE)
-add_test(NAME msgq_basic
+# message_queue_basic
+add_executable(message_queue_basic message_queue_basic.c)
+target_compile_options_default(message_queue_basic)
+target_link_libraries(message_queue_basic PRIVATE message_queue)
+target_link_libraries(message_queue_basic PRIVATE prelude)
+target_link_SDL2(message_queue_basic PRIVATE)
+add_test(NAME message_queue_basic
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-         COMMAND msgq_basic)
+         COMMAND message_queue_basic)
 
-# msgq_copies
-add_executable(msgq_copies msgq_copies.c)
-target_compile_options_default(msgq_copies)
-target_link_libraries(msgq_copies PRIVATE msgq)
-target_link_libraries(msgq_copies PRIVATE prelude)
-target_link_SDL2(msgq_copies PRIVATE)
-add_test(NAME msgq_copies
+# message_queue_copies
+add_executable(message_queue_copies message_queue_copies.c)
+target_compile_options_default(message_queue_copies)
+target_link_libraries(message_queue_copies PRIVATE message_queue)
+target_link_libraries(message_queue_copies PRIVATE prelude)
+target_link_SDL2(message_queue_copies PRIVATE)
+add_test(NAME message_queue_copies
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-         COMMAND msgq_copies)
+         COMMAND message_queue_copies)
 
-if (TARGET msgq_posix)
-  # msgq_basic_posix
-  add_executable(msgq_basic_posix msgq_basic.c)
-  target_compile_options_default(msgq_basic_posix)
-  target_link_libraries(msgq_basic_posix PRIVATE msgq_posix)
-  target_link_libraries(msgq_basic_posix PRIVATE prelude)
-  add_test(NAME msgq_basic_posix
+if (TARGET message_queue_posix)
+  # message_queue_basic_posix
+  add_executable(message_queue_basic_posix message_queue_basic.c)
+  target_compile_options_default(message_queue_basic_posix)
+  target_link_libraries(message_queue_basic_posix PRIVATE message_queue_posix)
+  target_link_libraries(message_queue_basic_posix PRIVATE prelude)
+  add_test(NAME message_queue_basic_posix
            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-           COMMAND msgq_basic_posix)
+           COMMAND message_queue_basic_posix)
 
-  # msgq_copies_posix
-  add_executable(msgq_copies_posix msgq_copies.c)
-  target_compile_options_default(msgq_copies_posix)
-  target_link_libraries(msgq_copies_posix PRIVATE msgq_posix)
-  target_link_libraries(msgq_copies_posix PRIVATE prelude)
-  add_test(NAME msgq_copies_posix
+  # message_queue_copies_posix
+  add_executable(message_queue_copies_posix message_queue_copies.c)
+  target_compile_options_default(message_queue_copies_posix)
+  target_link_libraries(message_queue_copies_posix PRIVATE message_queue_posix)
+  target_link_libraries(message_queue_copies_posix PRIVATE prelude)
+  add_test(NAME message_queue_copies_posix
            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-           COMMAND msgq_copies_posix)
+           COMMAND message_queue_copies_posix)
 endif()

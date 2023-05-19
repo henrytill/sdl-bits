@@ -31,13 +31,13 @@ enum {
 #undef X
 };
 
-typedef struct msgq_message {
+typedef struct message {
   int tag;
   intptr_t value;
-} msgq_message;
+} message;
 
 /// A thread-safe bounded message queue
-typedef struct msgq_queue msgq_queue;
+typedef struct message_queue message_queue;
 
 ///
 /// Returns the error message associated with a return code.
@@ -45,7 +45,7 @@ typedef struct msgq_queue msgq_queue;
 /// @param rc A return code.
 /// @return The error message associated with the given return code, or NULL if the return code is invalid.
 ///
-const char *msgq_failure(int rc);
+const char *message_queue_failure(int rc);
 
 ///
 /// Return the tag string associated with a message tag.
@@ -53,7 +53,7 @@ const char *msgq_failure(int rc);
 /// @param tag A message tag.
 /// @return The tag string associated with the given tag, or NULL if the tag is invalid.
 ///
-const char *msgq_tag(int tag);
+const char *message_queue_tag(int tag);
 
 ///
 /// Creates a new bounded queue with the given capacity.
@@ -61,9 +61,10 @@ const char *msgq_tag(int tag);
 /// Allocates memory for the queue and initializes it.
 ///
 /// @param capacity The maximum number of messages the queue can hold.
-/// @return A pointer to a new msgq_queue, or NULL on error.
+/// @return A pointer to a new message_queue, or NULL on error.
+/// @see message_queue_destroy()
 ///
-msgq_queue *msgq_create(uint32_t capacity);
+message_queue *message_queue_create(uint32_t capacity);
 
 ///
 /// Frees resources associated with the queue.
@@ -73,12 +74,12 @@ msgq_queue *msgq_create(uint32_t capacity);
 /// Consider using SCOPED_PTR_MessageQueue for scoped cleanup.
 ///
 /// @param queue Message queue.
-/// @see msgq_Create()
+/// @see message_queue_create()
 ///
-void msgq_destroy(msgq_queue *queue);
+void message_queue_destroy(message_queue *queue);
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(msgq_queue *, msgq_destroy)
-#define SCOPED_PTR_msgq_queue __attribute__((cleanup(msgq_destroyp))) msgq_queue *
+DEFINE_TRIVIAL_CLEANUP_FUNC(message_queue *, message_queue_destroy)
+#define SCOPED_PTR_message_queue __attribute__((cleanup(message_queue_destroyp))) message_queue *
 
 ///
 /// Adds an message to the back of the queue.
@@ -87,7 +88,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(msgq_queue *, msgq_destroy)
 /// @param in The message to add to the back of the queue.
 /// @return 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
 ///
-int msgq_put(msgq_queue *queue, msgq_message *in);
+int message_queue_put(message_queue *queue, message *in);
 
 ///
 /// Removes and returns the message at the front of the queue, blocking if the queue is empty.
@@ -96,7 +97,7 @@ int msgq_put(msgq_queue *queue, msgq_message *in);
 /// @param out The message at the front of the queue.
 /// @return 0 if a message was removed from the queue, or a negative value on error.
 ///
-int msgq_get(msgq_queue *queue, msgq_message *out);
+int message_queue_get(message_queue *queue, message *out);
 
 ///
 /// Returns the number of messages in the queue.
@@ -104,4 +105,4 @@ int msgq_get(msgq_queue *queue, msgq_message *out);
 /// @param queue Message queue.
 /// @return The number of messages in the queue.
 ///
-uint32_t msgq_size(msgq_queue *queue);
+uint32_t message_queue_size(message_queue *queue);

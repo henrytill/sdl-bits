@@ -5,10 +5,10 @@
 #include <semaphore.h>
 
 #include "compat.h"
-#include "msgq.h"
+#include "message_queue.h"
 
-struct msgq_queue {
-  msgq_message *buffer;  // Buffer to hold messages
+struct message_queue {
+  message *buffer;       // Buffer to hold messages
   uint32_t capacity;     // Maximum size of the buffer
   size_t front;          // Index of the front message in the buffer
   size_t rear;           // Index of the rear message in the buffer
@@ -29,7 +29,7 @@ static const char *const MSG_TAG_STR[] = {
 #undef X
 };
 
-const char *msgq_failure(int rc) {
+const char *message_queue_failure(int rc) {
   extern const char *const MSGQ_FAILURE_STR[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
@@ -37,7 +37,7 @@ const char *msgq_failure(int rc) {
   return MSGQ_FAILURE_STR[-rc];
 }
 
-const char *msgq_tag(int tag) {
+const char *message_queue_tag(int tag) {
   extern const char *const MSG_TAG_STR[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
@@ -45,7 +45,7 @@ const char *msgq_tag(int tag) {
   return MSG_TAG_STR[tag];
 }
 
-static int msgq_init(msgq_queue *queue, uint32_t capacity) {
+static int message_queue_init(message_queue *queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -74,7 +74,7 @@ static int msgq_init(msgq_queue *queue, uint32_t capacity) {
   return 0;
 }
 
-static void msgq_finish(msgq_queue *queue) {
+static void message_queue_finish(message_queue *queue) {
   if (queue == NULL) {
     return;
   }
@@ -99,12 +99,12 @@ static void msgq_finish(msgq_queue *queue) {
   }
 }
 
-msgq_queue *msgq_create(uint32_t capacity) {
-  msgq_queue *queue = calloc(1, sizeof(*queue));
+message_queue *message_queue_create(uint32_t capacity) {
+  message_queue *queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
-  int rc = msgq_init(queue, capacity);
+  int rc = message_queue_init(queue, capacity);
   if (rc < 0) {
     free(queue);
     return NULL;
@@ -112,15 +112,15 @@ msgq_queue *msgq_create(uint32_t capacity) {
   return queue;
 }
 
-void msgq_destroy(msgq_queue *queue) {
+void message_queue_destroy(message_queue *queue) {
   if (queue == NULL) {
     return;
   }
-  msgq_finish(queue);
+  message_queue_finish(queue);
   free(queue);
 }
 
-int msgq_put(msgq_queue *queue, msgq_message *in) {
+int message_queue_put(message_queue *queue, message *in) {
   int rc = sem_trywait(queue->empty);
   if (rc == -1 && errno == EAGAIN) {
     return 1;
@@ -145,7 +145,7 @@ int msgq_put(msgq_queue *queue, msgq_message *in) {
   return 0;
 }
 
-int msgq_get(msgq_queue *queue, msgq_message *out) {
+int message_queue_get(message_queue *queue, message *out) {
   int rc = sem_wait(queue->full);
   if (rc == -1) {
     return MSGQ_FAILURE_SEM_WAIT;
@@ -167,7 +167,7 @@ int msgq_get(msgq_queue *queue, msgq_message *out) {
   return 0;
 }
 
-uint32_t msgq_size(msgq_queue *queue) {
+uint32_t message_queue_size(message_queue *queue) {
   if (queue == NULL) {
     return 0;
   }
