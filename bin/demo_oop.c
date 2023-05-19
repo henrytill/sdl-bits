@@ -10,7 +10,7 @@ typedef struct PersonOperations PersonOperations;
 typedef struct Person Person;
 
 struct PersonOperations {
-  void (*SayHello)(const Person *self);
+  void (*sayHello)(const Person *self);
 };
 
 struct Person {
@@ -20,13 +20,13 @@ struct Person {
   Person *next;
 };
 
-static void Person_SayHello(const Person *self) {
+static void Person_sayHello(const Person *self) {
   printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
 }
 
 /// Base class vtable.
 static const PersonOperations Person_ops = {
-  .SayHello = Person_SayHello,
+  .sayHello = Person_sayHello,
 };
 
 /// Derived class.
@@ -35,8 +35,8 @@ typedef struct Student {
   char *school;
 } Student;
 
-/// Derived class override of PersonOperations::SayHello
-static void Student_SayHello(const Person *self) {
+/// Derived class override of PersonOperations::sayHello
+static void Student_sayHello(const Person *self) {
   const Student *student = CONTAINER_OF(self, Student, person);
   printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
          student->person.name, student->person.age, student->school);
@@ -44,7 +44,7 @@ static void Student_SayHello(const Person *self) {
 
 /// Derived class vtable.
 static const PersonOperations Student_ops = {
-  .SayHello = Student_SayHello,
+  .sayHello = Student_sayHello,
 };
 
 int main(void) {
@@ -75,7 +75,7 @@ int main(void) {
   };
 
   for (const Person *p = &alice; p != NULL; p = p->next) {
-    SEND(p, ops->SayHello);
+    SEND(p, ops->sayHello);
   }
 
   return EXIT_SUCCESS;

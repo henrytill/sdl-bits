@@ -29,7 +29,7 @@ static const char *const messageTagStr[] = {
 #undef X
 };
 
-const char *msgq_Failure(int rc) {
+const char *msgq_failure(int rc) {
   extern const char *const messageQueueFailureStr[];
   if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
     return NULL;
@@ -37,7 +37,7 @@ const char *msgq_Failure(int rc) {
   return messageQueueFailureStr[-rc];
 }
 
-const char *msgq_MessageTag(MessageTag tag) {
+const char *msgq_messageTag(MessageTag tag) {
   extern const char *const messageTagStr[];
   if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {
     return NULL;
@@ -45,7 +45,7 @@ const char *msgq_MessageTag(MessageTag tag) {
   return messageTagStr[tag];
 }
 
-static int msgq_Init(MessageQueue *queue, uint32_t capacity) {
+static int msgq_init(MessageQueue *queue, uint32_t capacity) {
   queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
   if (queue->buffer == NULL) {
     return MSGQ_FAILURE_MALLOC;
@@ -53,28 +53,28 @@ static int msgq_Init(MessageQueue *queue, uint32_t capacity) {
   queue->capacity = capacity;
   queue->front = 0;
   queue->rear = 0;
-  queue->empty = CreateSemaphore(capacity);
+  queue->empty = createSemaphore(capacity);
   if (queue->empty == NULL) {
     free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   }
-  queue->full = CreateSemaphore(0);
+  queue->full = createSemaphore(0);
   if (queue->full == NULL) {
-    DestroySemaphore(queue->empty);
+    destroySemaphore(queue->empty);
     free(queue->buffer);
     return MSGQ_FAILURE_SEM_CREATE;
   };
-  queue->lock = CreateMutex();
+  queue->lock = createMutex();
   if (queue->lock == NULL) {
-    DestroySemaphore(queue->full);
-    DestroySemaphore(queue->empty);
+    destroySemaphore(queue->full);
+    destroySemaphore(queue->empty);
     free(queue->buffer);
     return MSGQ_FAILURE_MUTEX_CREATE;
   }
   return 0;
 }
 
-static void msgq_Finish(MessageQueue *queue) {
+static void msgq_finish(MessageQueue *queue) {
   if (queue == NULL) {
     return;
   }
@@ -86,25 +86,25 @@ static void msgq_Finish(MessageQueue *queue) {
     queue->buffer = NULL;
   }
   if (queue->empty != NULL) {
-    DestroySemaphore(queue->empty);
+    destroySemaphore(queue->empty);
     queue->empty = NULL;
   }
   if (queue->full != NULL) {
-    DestroySemaphore(queue->full);
+    destroySemaphore(queue->full);
     queue->full = NULL;
   }
   if (queue->lock != NULL) {
-    DestroyMutex(queue->lock);
+    destroyMutex(queue->lock);
     queue->lock = NULL;
   }
 }
 
-MessageQueue *msgq_Create(uint32_t capacity) {
+MessageQueue *msgq_create(uint32_t capacity) {
   MessageQueue *queue = calloc(1, sizeof(*queue));
   if (queue == NULL) {
     return NULL;
   }
-  int rc = msgq_Init(queue, capacity);
+  int rc = msgq_init(queue, capacity);
   if (rc < 0) {
     free(queue);
     return NULL;
@@ -112,15 +112,15 @@ MessageQueue *msgq_Create(uint32_t capacity) {
   return queue;
 }
 
-void msgq_Destroy(MessageQueue *queue) {
+void msgq_destroy(MessageQueue *queue) {
   if (queue == NULL) {
     return;
   }
-  msgq_Finish(queue);
+  msgq_finish(queue);
   free(queue);
 }
 
-int msgq_Put(MessageQueue *queue, Message *in) {
+int msgq_put(MessageQueue *queue, Message *in) {
   int rc = sem_trywait(queue->empty);
   if (rc == -1 && errno == EAGAIN) {
     return 1;
@@ -145,7 +145,7 @@ int msgq_Put(MessageQueue *queue, Message *in) {
   return 0;
 }
 
-int msgq_Get(MessageQueue *queue, Message *out) {
+int msgq_get(MessageQueue *queue, Message *out) {
   int rc = sem_wait(queue->full);
   if (rc == -1) {
     return MSGQ_FAILURE_SEM_WAIT;
@@ -167,7 +167,7 @@ int msgq_Get(MessageQueue *queue, Message *out) {
   return 0;
 }
 
-uint32_t msgq_Size(MessageQueue *queue) {
+uint32_t msgq_size(MessageQueue *queue) {
   if (queue == NULL) {
     return 0;
   }

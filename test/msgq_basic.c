@@ -5,10 +5,10 @@
 /// The consumer consumes messages on the main thread until it receives a
 /// message with tag MSG_TAG_QUIT.
 ///
-/// @see msgq_Create()
-/// @see msgq_Put()
-/// @see msgq_Get()
-/// @see msgq_Destroy()
+/// @see msgq_create()
+/// @see msgq_put()
+/// @see msgq_get()
+/// @see msgq_destroy()
 ///
 #include <inttypes.h>
 #include <stdint.h>
@@ -24,20 +24,20 @@ static const int count = 100;
 static const uint32_t queueCap = 4U;
 
 /// Log an error message and exit.
-static void Fail(const char *msg) {
+static void fail(const char *msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_Fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_Failure(rc));
+static void msgq_fail(int rc, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_Fail(const char *msg) {
-  sdl_Error(msg);
+static void sdl_fail(const char *msg) {
+  sdl_error(msg);
   exit(EXIT_FAILURE);
 }
 
@@ -48,13 +48,13 @@ static void sdl_Fail(const char *msg) {
 ///
 /// @param data Pointer to a MessageQueue.
 /// @return 0 on success
-/// @see Consume()
+/// @see consume()
 ///
-static int Produce(void *data) {
+static int produce(void *data) {
   extern const int count;
 
   if (data == NULL) {
-    Fail("Produce failed: data is NULL");
+    fail("produce failed: data is NULL");
   }
 
   MessageQueue *queue = (MessageQueue *)data;
@@ -65,13 +65,13 @@ static int Produce(void *data) {
   for (intptr_t value = 0; value <= count;) {
     msg.tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
-    tagStr = msgq_MessageTag(msg.tag);
+    tagStr = msgq_messageTag(msg.tag);
 
-    rc = msgq_Put(queue, &msg);
+    rc = msgq_put(queue, &msg);
     if (rc < 0) {
-      msgq_Fail(rc, "msgq_Put failed");
+      msgq_fail(rc, "msgq_put failed");
     } else if (rc == 1) {
-      SDL_LogDebug(APP, "Produce {%s, %" PRIdPTR "} blocked: retrying",
+      SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
                    tagStr, value);
       continue;
     } else {
@@ -92,15 +92,15 @@ static int Produce(void *data) {
 /// @param queue Pointer to a MessageQueue.
 /// @param out Pointer to a Message.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
-/// @see Produce()
+/// @see produce()
 ///
-static int Consume(MessageQueue *queue, Message *out) {
-  const int rc = msgq_Get(queue, out);
+static int consume(MessageQueue *queue, Message *out) {
+  const int rc = msgq_get(queue, out);
   if (rc < 0) {
-    msgq_Fail(rc, "msgq_Get failed");
+    msgq_fail(rc, "msgq_get failed");
   }
   SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-              msgq_MessageTag(out->tag), out->value);
+              msgq_messageTag(out->tag), out->value);
   return out->tag != MSG_TAG_QUIT;
 }
 
@@ -114,24 +114,24 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc < 0) {
-    sdl_Fail("SDL_Init failed");
+    sdl_fail("SDL_Init failed");
   }
 
   AT_EXIT(SDL_Quit);
 
-  SCOPED_PTR_MessageQueue queue = msgq_Create(queueCap);
+  SCOPED_PTR_MessageQueue queue = msgq_create(queueCap);
   if (queue == NULL) {
-    Fail("msgq_Create failed");
+    fail("msgq_create failed");
   }
 
-  SDL_Thread *producer = SDL_CreateThread(Produce, "producer", queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
   if (producer == NULL) {
-    sdl_Fail("SDL_CreateThread failed");
+    sdl_fail("SDL_CreateThread failed");
   }
 
   Message msg;
   for (;;) {
-    rc = Consume(queue, &msg);
+    rc = consume(queue, &msg);
     if (rc == 0) {
       break;
     }

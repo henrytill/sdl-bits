@@ -5,10 +5,10 @@
 /// The consumer consumes messages on the main thread after a delay and checks
 /// their values.
 ///
-/// @see msgq_Create()
-/// @see msgq_Put()
-/// @see msgq_Get()
-/// @see msgq_Destroy()
+/// @see msgq_create()
+/// @see msgq_put()
+/// @see msgq_get()
+/// @see msgq_destroy()
 ///
 #include <inttypes.h>
 #include <stdint.h>
@@ -23,7 +23,7 @@
   Message __msg = (msg);                                \
   SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",          \
               __func__, #msg,                           \
-              msgq_MessageTag(__msg.tag), __msg.value); \
+              msgq_messageTag(__msg.tag), __msg.value); \
 })
 
 #define CHECK(msg, expectedTag, expectedValue) ({              \
@@ -33,8 +33,8 @@
   if (__msg.tag != __tag || __msg.value != __value) {          \
     SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
                  __func__, #msg,                               \
-                 msgq_MessageTag(__msg.tag), __msg.value,      \
-                 msgq_MessageTag(__tag), __value);             \
+                 msgq_messageTag(__msg.tag), __msg.value,      \
+                 msgq_messageTag(__tag), __value);             \
     exit(EXIT_FAILURE);                                        \
   }                                                            \
 });
@@ -46,20 +46,20 @@ static const uint32_t delay = 2000U;
 static const uint32_t queueCap = 1U;
 
 /// Log an error message and exit.
-static void Fail(const char *msg) {
+static void fail(const char *msg) {
   SDL_LogError(ERR, "%s", msg);
   exit(EXIT_FAILURE);
 }
 
 /// Log a msgq error message and exit.
-static void msgq_Fail(int rc, const char *msg) {
-  SDL_LogError(ERR, "%s: %s", msg, msgq_Failure(rc));
+static void msgq_fail(int rc, const char *msg) {
+  SDL_LogError(ERR, "%s: %s", msg, msgq_failure(rc));
   exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_Fail(const char *msg) {
-  sdl_Error(msg);
+static void sdl_fail(const char *msg) {
+  sdl_error(msg);
   exit(EXIT_FAILURE);
 }
 
@@ -70,16 +70,16 @@ static void sdl_Fail(const char *msg) {
 ///
 /// @param data Pointer to a MessageQueue.
 /// @return 0 on success, 1 on failure.
-/// @see Consume()
+/// @see consume()
 ///
-static int Produce(void *data) {
+static int produce(void *data) {
   MessageQueue *queue = (MessageQueue *)data;
   Message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
   for (int rc = 1; rc == 1;) {
-    rc = msgq_Put(queue, &msg);
+    rc = msgq_put(queue, &msg);
     if (rc < 0) {
-      msgq_Fail(rc, "msgq_Put failed");
+      msgq_fail(rc, "msgq_put failed");
     }
   }
   LOG(msg);
@@ -87,9 +87,9 @@ static int Produce(void *data) {
   msg.tag = MSG_TAG_SOME;
   msg.value = 0;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_Put(queue, &msg);
+    rc = msgq_put(queue, &msg);
     if (rc < 0) {
-      msgq_Fail(rc, "msgq_Put failed");
+      msgq_fail(rc, "msgq_put failed");
     }
   }
   LOG(msg);
@@ -97,9 +97,9 @@ static int Produce(void *data) {
   msg.tag = MSG_TAG_SOME;
   msg.value = 1;
   for (int rc = 1; rc == 1;) {
-    rc = msgq_Put(queue, &msg);
+    rc = msgq_put(queue, &msg);
     if (rc < 0) {
-      msgq_Fail(rc, "msgq_Put failed");
+      msgq_fail(rc, "msgq_put failed");
     }
   }
   LOG(msg);
@@ -108,15 +108,15 @@ static int Produce(void *data) {
 }
 
 ///
-/// Consume messages produced by Produce() after a delay and check their values.
+/// Consume messages produced by produce() after a delay and check their values.
 ///
 /// This function is meant to be run in the main thread.
 ///
 /// @param queue Pointer to a MessageQueue.
 /// @return 0 on success, 1 on failure.
-/// @see Produce()
+/// @see produce()
 ///
-static int Consume(MessageQueue *queue) {
+static int consume(MessageQueue *queue) {
   extern const uint32_t delay;
 
   Message a = {0};
@@ -126,16 +126,16 @@ static int Consume(MessageQueue *queue) {
   SDL_LogInfo(APP, "%s: pausing for %d...", __func__, delay);
   SDL_Delay(delay);
 
-  msgq_Get(queue, &a);
+  msgq_get(queue, &a);
   LOG(a);
   CHECK(a, MSG_TAG_SOME, 42L);
 
-  msgq_Get(queue, &b);
+  msgq_get(queue, &b);
   LOG(b);
   CHECK(a, MSG_TAG_SOME, 42L);
   CHECK(b, MSG_TAG_SOME, 0L);
 
-  msgq_Get(queue, &c);
+  msgq_get(queue, &c);
   LOG(c);
   CHECK(a, MSG_TAG_SOME, 42L);
   CHECK(b, MSG_TAG_SOME, 0L);
@@ -154,22 +154,22 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
   if (rc != 0) {
-    sdl_Fail("SDL_Init failed");
+    sdl_fail("SDL_Init failed");
   }
 
   AT_EXIT(SDL_Quit);
 
-  SCOPED_PTR_MessageQueue queue = msgq_Create(queueCap);
+  SCOPED_PTR_MessageQueue queue = msgq_create(queueCap);
   if (queue == NULL) {
-    Fail("msgq_Create failed");
+    fail("msgq_create failed");
   }
 
-  SDL_Thread *producer = SDL_CreateThread(Produce, "producer", queue);
+  SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
   if (producer == NULL) {
-    sdl_Fail("SDL_CreateThread failed");
+    sdl_fail("SDL_CreateThread failed");
   }
 
-  if (Consume(queue) != 0) {
+  if (consume(queue) != 0) {
     return EXIT_FAILURE;
   }
 

@@ -4,7 +4,7 @@
 /// This test reads a 32-bit bitmap file and checks that the first pixel is
 /// semi-transparent red.
 ///
-/// @see bmp_read_bitmap_v4()
+/// @see bmp_v4Read()
 ///
 #include <stddef.h>
 #include <string.h>
@@ -18,7 +18,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
   bmp_V4Header v4Header = {0};
   SCOPED_PTR_char image = NULL;
 
-  if (bmp_V4Read(bmpFile, &fileHeader, &v4Header, &image) != 0) {
+  if (bmp_v4Read(bmpFile, &fileHeader, &v4Header, &image) != 0) {
     return EXIT_FAILURE;
   }
 

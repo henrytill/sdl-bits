@@ -5,7 +5,7 @@
 
 #include "macro.h"
 
-#define Now SDL_GetPerformanceCounter
+#define now SDL_GetPerformanceCounter
 
 typedef enum LogCategory {
   APP = SDL_LOG_CATEGORY_CUSTOM,
@@ -33,7 +33,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_AudioDeviceID, SDL_CloseAudioDevice)
 ///
 /// @param msg The message to log
 ///
-static inline void sdl_Error(const char *msg) {
+static inline void sdl_error(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0) {
     SDL_LogError(ERR, "%s (%s)", msg, err);
