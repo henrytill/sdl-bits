@@ -19,9 +19,16 @@ include(FeatureTest)
 include(AddressSanitizer)
 include(UndefinedBehaviorSanitizer)
 
+test_has_gnuc()
 test_has_attribute_cleanup()
 test_has_builtin_types_compatible_p()
 test_has_generic()
+
+if(HAS_GNUC)
+  message(STATUS "Compiler is GCC-compatible")
+else()
+  message(FATAL_ERROR "Compiler is not GCC-compatible")
+endif()
 
 if(HAS_ATTRIBUTE_CLEANUP)
   message(STATUS "Compiler supports __attribute__((cleanup(f)))")
