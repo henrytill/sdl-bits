@@ -60,13 +60,14 @@ static int Produce(void* data) {
   MessageQueue* queue = (MessageQueue*)data;
   Message msg = {0};
   const char* tagStr = NULL;
+  int rc = 0;
 
   for (intptr_t value = 0; value <= count;) {
     msg.tag = (value < count) ? MSG_TAG_SOME : MSG_TAG_QUIT;
     msg.value = value;
     tagStr = msgq_MessageTag(msg.tag);
 
-    const int rc = msgq_Put(queue, &msg);
+    rc = msgq_Put(queue, &msg);
     if (rc < 0) {
       msgq_Fail(rc, "msgq_Put failed");
     } else if (rc == 1) {

@@ -302,7 +302,8 @@ static void FinishWindow(Window* win) {
 ///
 static Window* CreateWindow(Config* config, const char* title) {
   Window* win = emalloc(sizeof(Window));
-  if (InitWindow(config, title, win) != 0) {
+  const int rc = InitWindow(config, title, win);
+  if (rc != 0) {
     free(win);
     return NULL;
   }
