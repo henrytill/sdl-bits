@@ -77,7 +77,6 @@ static int produce(void *data)
         } else if (rc == 1) {
             SDL_LogDebug(APP, "produce {%s, %" PRIdPTR "} blocked: retrying",
                          tag_str, value);
-            continue;
         } else {
             SDL_LogInfo(APP, "Produced {%s, %" PRIdPTR "}",
                         tag_str, value);

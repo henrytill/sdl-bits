@@ -210,8 +210,8 @@ static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) i
 static double calc_frame_time(const int frame_rate)
 {
     extern const double SECOND;
+
     assert((double)frame_rate > 0);
-    assert((double)frame_rate < DBL_MAX);
     return SECOND / (double)frame_rate;
 }
 
@@ -226,9 +226,9 @@ static double calc_delta(const uint64_t begin, const uint64_t end)
 {
     extern const double SECOND;
     extern uint64_t perf_freq;
+
     assert(begin <= end);
     assert((double)perf_freq > 0);
-    assert((double)perf_freq < DBL_MAX);
     const double delta_ticks = (double)(end - begin);
     return (delta_ticks * SECOND) / (double)perf_freq;
 }
@@ -281,7 +281,14 @@ static int window_init(config *cfg, const char *title, window *win)
         sdl_error("SDL_CreateRenderer failed");
         return -1;
     }
-    return SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
+    int rc = SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
+    if (rc != 0) {
+        SDL_DestroyWindow(win->window);
+        SDL_DestroyRenderer(win->renderer);
+        sdl_error("SDL_SetRenderDrawColor failed");
+        return -1;
+    }
+    return 0;
 }
 
 ///
