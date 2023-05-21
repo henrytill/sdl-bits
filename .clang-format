@@ -11,11 +11,12 @@ AllowShortLoopsOnASingleLine: true
 BasedOnStyle: LLVM
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
+BreakBeforeBraces: Linux
 ColumnLimit: 0
-ContinuationIndentWidth: 2
+ContinuationIndentWidth: 4
 DerivePointerAlignment: false
 IndentCaseLabels: false
-IndentWidth: 2
+IndentWidth: 4
 PointerAlignment: Right
 ReflowComments: true
 SortIncludes: true
