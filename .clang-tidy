@@ -1,16 +1,18 @@
 Checks: >
   bugprone-*,
-  cert-*,
+  cert-*-c,
   clang-analyzer-*,
   readability-*,
+  -bugprone-easily-swappable-parameters,
   -clang-analyzer-unix.Malloc,
+  -readability-identifier-length,
   -readability-magic-numbers,
   -readability-redundant-declaration,
 
 CheckOptions:
-  - key: readability-identifier-naming.FunctionCase
-    value: lower_case
   - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.FunctionCase
     value: lower_case
   - key: readability-identifier-naming.ParameterCase
     value: lower_case
@@ -32,3 +34,6 @@ CheckOptions:
     value: lower_case
 
 HeaderFilterRegex: ".*"
+# Local Variables:
+# mode: yaml
+# End:
