@@ -109,14 +109,19 @@ static state st = {
 /// @param argv The arguments
 /// @param as The args struct to populate
 ///
-static void parse_args(int argc, char *argv[], args *as)
+static int parse_args(int argc, char *argv[], args *as)
 {
     for (int i = 0; i < argc;) {
         char *arg = argv[i++];
         if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
+            if (i + 1 >= argc) {
+                return -1;
+            }
             as->config_file = argv[i++];
         }
     }
+
+    return 0;
 }
 
 ///
@@ -399,7 +404,7 @@ int main(int argc, char *argv[])
     extern state st;
 
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
-    parse_args(argc, argv, &as);
+    (void)parse_args(argc, argv, &as);
     load_config(as.config_file, &cfg);
 
     int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
