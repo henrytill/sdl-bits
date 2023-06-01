@@ -10,6 +10,7 @@
 #include "prelude.h"
 
 enum {
+    AUDIO_CHANNELS = 2,
     CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
@@ -186,7 +187,9 @@ static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) i
     audio_state *as = (audio_state *)userdata;
     float *fstream = (float *)stream;
 
-    assert((len / (4 * 2)) == as->buffer_size);
+    static_assert(sizeof(*fstream) == 4, "sizeof(*fstream) != 4");
+    assert((len / ((int)sizeof(*fstream) * AUDIO_CHANNELS)) == as->buffer_size);
+
     const double sample_rate = (double)as->sample_rate;
     const uint64_t buffer_size = (uint64_t)as->buffer_size;
     const uint64_t total_samples = as->elapsed * buffer_size;
@@ -195,8 +198,8 @@ static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) i
         const double time = (double)(total_samples + i) / sample_rate;
         const double x = 2.0 * M_PI * time * as->frequency;
         const double y = as->volume * sin(x);
-        fstream[2 * i + 0] = (float)y;
-        fstream[2 * i + 1] = (float)y;
+        fstream[AUDIO_CHANNELS * i + 0] = (float)y;
+        fstream[AUDIO_CHANNELS * i + 1] = (float)y;
     }
     as->elapsed += 1;
 }
