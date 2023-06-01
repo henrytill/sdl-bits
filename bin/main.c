@@ -135,7 +135,10 @@ static char *join_path(const char *a, const char *b)
 {
     size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
     char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
-    snprintf(ret, len, "%s/%s", a, b);
+    if (ret == NULL) {
+        return NULL;
+    }
+    (void)snprintf(ret, len, "%s/%s", a, b);
     return ret;
 }
 
