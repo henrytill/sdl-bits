@@ -16,7 +16,7 @@
 // General
 
 #ifdef DEBUG
-#define debug_printf(fmt, ...) printf(fmt, ##__VA_ARGS__)
+#define debug_printf(fmt, ...) (void)printf(fmt, ##__VA_ARGS__)
 #else
 #define debug_printf(fmt, ...) ({})
 #endif
@@ -53,11 +53,11 @@
 
 // Cleanup
 
-#define AT_EXIT(func) ({                               \
-    if (atexit(func) != 0) {                           \
-        fprintf(stderr, "atexit(%s) failed\n", #func); \
-        exit(EXIT_FAILURE);                            \
-    }                                                  \
+#define AT_EXIT(func) ({                                     \
+    if (atexit(func) != 0) {                                 \
+        (void)fprintf(stderr, "atexit(%s) failed\n", #func); \
+        exit(EXIT_FAILURE);                                  \
+    }                                                        \
 })
 
 #define DEFINE_TRIVIAL_CLEANUP_FUNC(type, func)                                  \
