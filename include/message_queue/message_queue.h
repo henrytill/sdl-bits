@@ -15,13 +15,13 @@ enum {
 #undef X
 };
 
-typedef struct message {
+struct message {
 	int tag;
 	intptr_t value;
-} message;
+};
 
 /// A thread-safe bounded message queue
-typedef struct message_queue message_queue;
+struct message_queue;
 
 ///
 /// Returns the error message associated with a return code.
@@ -48,7 +48,7 @@ const char *message_queue_tag(int tag);
 /// @return A pointer to a new message_queue, or NULL on error.
 /// @see message_queue_destroy()
 ///
-message_queue *message_queue_create(uint32_t capacity);
+struct message_queue *message_queue_create(uint32_t capacity);
 
 ///
 /// Frees resources associated with the queue.
@@ -60,10 +60,10 @@ message_queue *message_queue_create(uint32_t capacity);
 /// @param queue Message queue.
 /// @see message_queue_create()
 ///
-void message_queue_destroy(message_queue *queue);
+void message_queue_destroy(struct message_queue *queue);
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(message_queue *, message_queue_destroy)
-#define SCOPED_PTR_message_queue __attribute__((cleanup(message_queue_destroyp))) message_queue *
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct message_queue *, message_queue_destroy)
+#define SCOPED_PTR_message_queue __attribute__((cleanup(message_queue_destroyp))) struct message_queue *
 
 ///
 /// Adds an message to the back of the queue.
@@ -72,7 +72,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(message_queue *, message_queue_destroy)
 /// @param in The message to add to the back of the queue.
 /// @return 0 if the message was added to the queue, 1 if the queue is full, or a negative value on error.
 ///
-int message_queue_put(message_queue *queue, message *in);
+int message_queue_put(struct message_queue *queue, struct message *in);
 
 ///
 /// Removes and returns the message at the front of the queue, blocking if the queue is empty.
@@ -81,7 +81,7 @@ int message_queue_put(message_queue *queue, message *in);
 /// @param out The message at the front of the queue.
 /// @return 0 if a message was removed from the queue, or a negative value on error.
 ///
-int message_queue_get(message_queue *queue, message *out);
+int message_queue_get(struct message_queue *queue, struct message *out);
 
 ///
 /// Returns the number of messages in the queue.
@@ -89,4 +89,4 @@ int message_queue_get(message_queue *queue, message *out);
 /// @param queue Message queue.
 /// @return The number of messages in the queue.
 ///
-uint32_t message_queue_size(message_queue *queue);
+uint32_t message_queue_size(struct message_queue *queue);

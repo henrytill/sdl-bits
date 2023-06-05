@@ -14,9 +14,9 @@ enum {
 	CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
-typedef struct args {
+struct args {
 	char *config_file;
-} args;
+};
 
 #define WINDOW_TYPE_VARIANTS                                                     \
 	X(WINDOWED, 0, SDL_WINDOW_SHOWN, "Windowed")                             \
@@ -41,7 +41,7 @@ static const char *const WINDOW_TYPE_STR[] = {
 #undef X
 };
 
-typedef struct config {
+struct config {
 	int window_type;
 	int x;
 	int y;
@@ -49,36 +49,36 @@ typedef struct config {
 	int height;
 	int frame_rate;
 	char *asset_dir;
-} config;
+};
 
-typedef struct audio_state {
+struct audio_state {
 	const int sample_rate;      // Samples per second
 	const uint16_t buffer_size; // Samples per buffer
 	const double frequency;     // Frequency of the sine wave
 	const double max_volume;    // Maximum volume
 	double volume;              // Current volume, 0.0 to max_volume
 	uint64_t elapsed;           // Number of buffer fills
-} audio_state;
+};
 
-typedef struct state {
+struct state {
 	SDL_AudioDeviceID audio_device;
-	audio_state audio;
+	struct audio_state audio;
 	int loop_stat;
 	int tone_stat;
-} state;
+};
 
-typedef struct window {
+struct window {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-} window;
+};
 
 static const double SECOND = 1000.0;
 
 static uint64_t perf_freq = 0;
 
-static args as = {.config_file = "config.lua"};
+static struct args as = {.config_file = "config.lua"};
 
-static config cfg = {
+static struct config cfg = {
 	.window_type = WINDOWED,
 	.x = CENTERED,
 	.y = CENTERED,
@@ -88,7 +88,7 @@ static config cfg = {
 	.asset_dir = "./assets",
 };
 
-static state st = {
+static struct state st = {
 	.audio_device = 0,
 	.audio = {
 		.sample_rate = 48000,
@@ -109,7 +109,7 @@ static state st = {
 /// @param argv The arguments
 /// @param as The args struct to populate
 ///
-static int parse_args(int argc, char *argv[], args *as)
+static int parse_args(int argc, char *argv[], struct args *as)
 {
 	for (int i = 0; i < argc;) {
 		char *arg = argv[i++];
@@ -149,7 +149,7 @@ static char *join_path(const char *a, const char *b)
 /// @param cfg The config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int load_config(const char *file, config *cfg)
+static int load_config(const char *file, struct config *cfg)
 {
 	SCOPED_PTR_lua_State state = luaL_newstate();
 	if (state == NULL) {
@@ -192,7 +192,7 @@ static int load_config(const char *file, config *cfg)
 ///
 static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) int len)
 {
-	audio_state *as = (audio_state *)userdata;
+	struct audio_state *as = (struct audio_state *)userdata;
 	float *fstream = (float *)stream;
 
 	static_assert(sizeof(*fstream) == 4, "sizeof(*fstream) != 4");
@@ -272,7 +272,7 @@ static void delay_frame(const double frame_time, const uint64_t begin)
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int window_init(config *cfg, const char *title, window *win)
+static int window_init(struct config *cfg, const char *title, struct window *win)
 {
 	extern const uint32_t WINDOW_TYPE_FLAGS[];
 	extern const char *const WINDOW_TYPE_STR[];
@@ -307,7 +307,7 @@ static int window_init(config *cfg, const char *title, window *win)
 ///
 /// @param win The window to destroy.
 ///
-static void window_finish(window *win)
+static void window_finish(struct window *win)
 {
 	if (win == NULL) {
 		return;
@@ -327,9 +327,9 @@ static void window_finish(window *win)
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static window *window_create(config *cfg, const char *title)
+static struct window *window_create(struct config *cfg, const char *title)
 {
-	window *win = emalloc(sizeof(window));
+	struct window *win = emalloc(sizeof(struct window));
 	const int rc = window_init(cfg, title, win);
 	if (rc != 0) {
 		free(win);
@@ -343,7 +343,7 @@ static window *window_create(config *cfg, const char *title)
 ///
 /// @param win The window to destroy.
 ///
-static void window_destroy(window *win)
+static void window_destroy(struct window *win)
 {
 	if (win == NULL) {
 		return;
@@ -352,8 +352,8 @@ static void window_destroy(window *win)
 	free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(window *, window_destroy)
-#define SCOPED_PTR_window __attribute__((cleanup(window_destroyp))) window *
+DEFINE_TRIVIAL_CLEANUP_FUNC(struct window *, window_destroy)
+#define SCOPED_PTR_window __attribute__((cleanup(window_destroyp))) struct window *
 
 ///
 /// Get the window's rectangle.
@@ -362,7 +362,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(window *, window_destroy)
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int get_rect(window *win, SDL_Rect *rect)
+static int get_rect(struct window *win, SDL_Rect *rect)
 {
 	if (win == NULL || win->renderer == NULL) {
 		return -1;
@@ -381,7 +381,7 @@ static int get_rect(window *win, SDL_Rect *rect)
 /// @param key The keydown event.
 /// @param st The state.
 ///
-static void handle_keydown(SDL_KeyboardEvent *key, state *st)
+static void handle_keydown(SDL_KeyboardEvent *key, struct state *st)
 {
 	switch (key->keysym.sym) {
 	case SDLK_ESCAPE:
@@ -402,9 +402,9 @@ static void update(__attribute__((unused)) double delta) {}
 int main(int argc, char *argv[])
 {
 	extern uint64_t perf_freq;
-	extern args as;
-	extern config cfg;
-	extern state st;
+	extern struct args as;
+	extern struct config cfg;
+	extern struct state st;
 
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 	(void)parse_args(argc, argv, &as);

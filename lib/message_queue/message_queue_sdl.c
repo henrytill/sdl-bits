@@ -4,16 +4,16 @@
 #include "shared.h"
 
 struct message_queue {
-	message *buffer;   // Buffer to hold messages
-	uint32_t capacity; // Maximum size of the buffer
-	size_t front;      // Index of the front message in the buffer
-	size_t rear;       // Index of the rear message in the buffer
-	SDL_sem *empty;    // Semaphore to track empty slots in the buffer
-	SDL_sem *full;     // Semaphore to track filled slots in the buffer
-	SDL_mutex *lock;   // Mutex lock to protect buffer access
+	struct message *buffer; // Buffer to hold messages
+	uint32_t capacity;      // Maximum size of the buffer
+	size_t front;           // Index of the front message in the buffer
+	size_t rear;            // Index of the rear message in the buffer
+	SDL_sem *empty;         // Semaphore to track empty slots in the buffer
+	SDL_sem *full;          // Semaphore to track filled slots in the buffer
+	SDL_mutex *lock;        // Mutex lock to protect buffer access
 };
 
-static int message_queue_init(message_queue *queue, uint32_t capacity)
+static int message_queue_init(struct message_queue *queue, uint32_t capacity)
 {
 	queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
 	if (queue->buffer == NULL) {
@@ -43,7 +43,7 @@ static int message_queue_init(message_queue *queue, uint32_t capacity)
 	return 0;
 }
 
-static void message_queue_finish(message_queue *queue)
+static void message_queue_finish(struct message_queue *queue)
 {
 	if (queue == NULL) {
 		return;
@@ -69,9 +69,9 @@ static void message_queue_finish(message_queue *queue)
 	}
 }
 
-message_queue *message_queue_create(uint32_t capacity)
+struct message_queue *message_queue_create(uint32_t capacity)
 {
-	message_queue *queue = calloc(1, sizeof(*queue));
+	struct message_queue *queue = calloc(1, sizeof(*queue));
 	if (queue == NULL) {
 		return NULL;
 	}
@@ -83,7 +83,7 @@ message_queue *message_queue_create(uint32_t capacity)
 	return queue;
 }
 
-void message_queue_destroy(message_queue *queue)
+void message_queue_destroy(struct message_queue *queue)
 {
 	if (queue == NULL) {
 		return;
@@ -92,7 +92,7 @@ void message_queue_destroy(message_queue *queue)
 	free(queue);
 }
 
-int message_queue_put(message_queue *queue, message *in)
+int message_queue_put(struct message_queue *queue, struct message *in)
 {
 	int rc = SDL_SemTryWait(queue->empty);
 	if (rc == SDL_MUTEX_TIMEDOUT) {
@@ -118,7 +118,7 @@ int message_queue_put(message_queue *queue, message *in)
 	return 0;
 }
 
-int message_queue_get(message_queue *queue, message *out)
+int message_queue_get(struct message_queue *queue, struct message *out)
 {
 	int rc = SDL_SemWait(queue->full);
 	if (rc < 0) {
@@ -141,7 +141,7 @@ int message_queue_get(message_queue *queue, message *out)
 	return 0;
 }
 
-uint32_t message_queue_size(message_queue *queue)
+uint32_t message_queue_size(struct message_queue *queue)
 {
 	if (queue == NULL) {
 		return 0;

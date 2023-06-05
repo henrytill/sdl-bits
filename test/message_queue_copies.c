@@ -77,8 +77,8 @@ static void sdl_fail(const char *msg)
 ///
 static int produce(void *data)
 {
-	message_queue *queue = (message_queue *)data;
-	message msg = {.tag = MSG_TAG_SOME, .value = 42};
+	struct message_queue *queue = (struct message_queue *)data;
+	struct message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
 	for (int rc = 1; rc == 1;) {
 		rc = message_queue_put(queue, &msg);
@@ -120,13 +120,13 @@ static int produce(void *data)
 /// @return 0 on success, 1 on failure.
 /// @see produce()
 ///
-static int consume(message_queue *queue)
+static int consume(struct message_queue *queue)
 {
 	extern const uint32_t DELAY;
 
-	message a = {0};
-	message b = {0};
-	message c = {0};
+	struct message a = {0};
+	struct message b = {0};
+	struct message c = {0};
 
 	SDL_LogInfo(APP, "%s: pausing for %d...", __func__, DELAY);
 	SDL_Delay(DELAY);

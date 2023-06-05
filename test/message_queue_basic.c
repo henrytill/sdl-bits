@@ -61,8 +61,8 @@ static int produce(void *data)
 		fail("produce failed: data is NULL");
 	}
 
-	message_queue *queue = (message_queue *)data;
-	message msg = {0};
+	struct message_queue *queue = (struct message_queue *)data;
+	struct message msg = {0};
 	const char *tag_str = NULL;
 	int rc = 0;
 
@@ -97,7 +97,7 @@ static int produce(void *data)
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see produce()
 ///
-static int consume(message_queue *queue, message *out)
+static int consume(struct message_queue *queue, struct message *out)
 {
 	const int rc = message_queue_get(queue, out);
 	if (rc < 0) {
@@ -134,7 +134,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 		sdl_fail("SDL_CreateThread failed");
 	}
 
-	message msg;
+	struct message msg;
 	for (;;) {
 		rc = consume(queue, &msg);
 		if (rc == 0) {
