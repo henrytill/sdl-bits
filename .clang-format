@@ -1,26 +1,29 @@
+AlignAfterOpenBracket: DontAlign
 AlignConsecutiveMacros: true
-AlignOperands: true
+AlignOperands: DontAlign
 AlignTrailingComments: true
-AllowAllArgumentsOnNextLine: false
+AllowAllArgumentsOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: Always
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 BasedOnStyle: LLVM
 BreakBeforeBinaryOperators: NonAssignment
-BreakBeforeTernaryOperators: true
 BreakBeforeBraces: Linux
+BreakBeforeTernaryOperators: true
 ColumnLimit: 0
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 8
 DerivePointerAlignment: false
 IndentCaseLabels: false
-IndentWidth: 4
+IndentWidth: 8
 PointerAlignment: Right
 ReflowComments: true
-SortIncludes: true
+SortIncludes: false
 SpacesBeforeTrailingComments: 1
+TabWidth: 8
+UseTab: ForContinuationAndIndentation
 
 # This does horrible things to nested designated initializers when set
 AlignArrayOfStructures: None

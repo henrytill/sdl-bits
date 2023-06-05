@@ -7,9 +7,9 @@
 
 static inline void free_char(char *str)
 {
-    if (str != NULL) {
-        free(str);
-    }
+	if (str != NULL) {
+		free(str);
+	}
 }
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(char *, free_char)
@@ -25,12 +25,12 @@ DEFINE_TRIVIAL_CLEANUP_FUNC(char *, free_char)
 ///
 static inline void *emalloc(size_t size)
 {
-    void *ret = malloc(size);
-    if (ret == NULL) {
-        (void)fprintf(stderr, ALLOCATION_FAILURE_MSG);
-        exit(EXIT_FAILURE);
-    }
-    return ret;
+	void *ret = malloc(size);
+	if (ret == NULL) {
+		(void)fprintf(stderr, ALLOCATION_FAILURE_MSG);
+		exit(EXIT_FAILURE);
+	}
+	return ret;
 }
 
 ///
@@ -42,10 +42,10 @@ static inline void *emalloc(size_t size)
 ///
 static inline void *ecalloc(size_t nmemb, size_t size)
 {
-    void *ret = calloc(nmemb, size);
-    if (ret == NULL) {
-        (void)fprintf(stderr, ALLOCATION_FAILURE_MSG);
-        exit(EXIT_FAILURE);
-    }
-    return ret;
+	void *ret = calloc(nmemb, size);
+	if (ret == NULL) {
+		(void)fprintf(stderr, ALLOCATION_FAILURE_MSG);
+		exit(EXIT_FAILURE);
+	}
+	return ret;
 }

@@ -20,23 +20,23 @@
 #include "prelude.h"
 
 #define LOG(_msg) ({                                        \
-    struct message __msg = (_msg);                          \
-    SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",            \
-                __func__, #_msg,                            \
-                message_queue_tag(__msg.tag), __msg.value); \
+	struct message __msg = (_msg);                      \
+	SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",        \
+		__func__, #_msg,                            \
+		message_queue_tag(__msg.tag), __msg.value); \
 })
 
-#define CHECK(_msg, _tag, _value) ({                               \
-    struct message __msg = (_msg);                                 \
-    int __tag = (_tag);                                            \
-    typeof(_value) __value = (_value);                             \
-    if (__msg.tag != __tag || __msg.value != __value) {            \
-        SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
-                     __func__, #_msg,                              \
-                     message_queue_tag(__msg.tag), __msg.value,    \
-                     message_queue_tag(__tag), __value);           \
-        exit(EXIT_FAILURE);                                        \
-    }                                                              \
+#define CHECK(_msg, _tag, _value) ({                                       \
+	struct message __msg = (_msg);                                     \
+	int __tag = (_tag);                                                \
+	typeof(_value) __value = (_value);                                 \
+	if (__msg.tag != __tag || __msg.value != __value) {                \
+		SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
+			__func__, #_msg,                                   \
+			message_queue_tag(__msg.tag), __msg.value,         \
+			message_queue_tag(__tag), __value);                \
+		exit(EXIT_FAILURE);                                        \
+	}                                                                  \
 });
 
 /// Delay before consuming messages.
@@ -48,22 +48,22 @@ static const uint32_t QUEUE_CAP = 1U;
 /// Log an error message and exit.
 static void fail(const char *msg)
 {
-    SDL_LogError(ERR, "%s", msg);
-    exit(EXIT_FAILURE);
+	SDL_LogError(ERR, "%s", msg);
+	exit(EXIT_FAILURE);
 }
 
 /// Log a message_queue error message and exit.
 static void message_queue_fail(int rc, const char *msg)
 {
-    SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
-    exit(EXIT_FAILURE);
+	SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
+	exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
 static void sdl_fail(const char *msg)
 {
-    sdl_error(msg);
-    exit(EXIT_FAILURE);
+	sdl_error(msg);
+	exit(EXIT_FAILURE);
 }
 
 ///
@@ -77,38 +77,38 @@ static void sdl_fail(const char *msg)
 ///
 static int produce(void *data)
 {
-    message_queue *queue = (message_queue *)data;
-    message msg = {.tag = MSG_TAG_SOME, .value = 42};
+	message_queue *queue = (message_queue *)data;
+	message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
-    for (int rc = 1; rc == 1;) {
-        rc = message_queue_put(queue, &msg);
-        if (rc < 0) {
-            message_queue_fail(rc, "message_queue_put failed");
-        }
-    }
-    LOG(msg);
+	for (int rc = 1; rc == 1;) {
+		rc = message_queue_put(queue, &msg);
+		if (rc < 0) {
+			message_queue_fail(rc, "message_queue_put failed");
+		}
+	}
+	LOG(msg);
 
-    msg.tag = MSG_TAG_SOME;
-    msg.value = 0;
-    for (int rc = 1; rc == 1;) {
-        rc = message_queue_put(queue, &msg);
-        if (rc < 0) {
-            message_queue_fail(rc, "message_queue_put failed");
-        }
-    }
-    LOG(msg);
+	msg.tag = MSG_TAG_SOME;
+	msg.value = 0;
+	for (int rc = 1; rc == 1;) {
+		rc = message_queue_put(queue, &msg);
+		if (rc < 0) {
+			message_queue_fail(rc, "message_queue_put failed");
+		}
+	}
+	LOG(msg);
 
-    msg.tag = MSG_TAG_SOME;
-    msg.value = 1;
-    for (int rc = 1; rc == 1;) {
-        rc = message_queue_put(queue, &msg);
-        if (rc < 0) {
-            message_queue_fail(rc, "message_queue_put failed");
-        }
-    }
-    LOG(msg);
+	msg.tag = MSG_TAG_SOME;
+	msg.value = 1;
+	for (int rc = 1; rc == 1;) {
+		rc = message_queue_put(queue, &msg);
+		if (rc < 0) {
+			message_queue_fail(rc, "message_queue_put failed");
+		}
+	}
+	LOG(msg);
 
-    return 0;
+	return 0;
 }
 
 ///
@@ -122,31 +122,31 @@ static int produce(void *data)
 ///
 static int consume(message_queue *queue)
 {
-    extern const uint32_t DELAY;
+	extern const uint32_t DELAY;
 
-    message a = {0};
-    message b = {0};
-    message c = {0};
+	message a = {0};
+	message b = {0};
+	message c = {0};
 
-    SDL_LogInfo(APP, "%s: pausing for %d...", __func__, DELAY);
-    SDL_Delay(DELAY);
+	SDL_LogInfo(APP, "%s: pausing for %d...", __func__, DELAY);
+	SDL_Delay(DELAY);
 
-    message_queue_get(queue, &a);
-    LOG(a);
-    CHECK(a, MSG_TAG_SOME, 42L);
+	message_queue_get(queue, &a);
+	LOG(a);
+	CHECK(a, MSG_TAG_SOME, 42L);
 
-    message_queue_get(queue, &b);
-    LOG(b);
-    CHECK(a, MSG_TAG_SOME, 42L);
-    CHECK(b, MSG_TAG_SOME, 0L);
+	message_queue_get(queue, &b);
+	LOG(b);
+	CHECK(a, MSG_TAG_SOME, 42L);
+	CHECK(b, MSG_TAG_SOME, 0L);
 
-    message_queue_get(queue, &c);
-    LOG(c);
-    CHECK(a, MSG_TAG_SOME, 42L);
-    CHECK(b, MSG_TAG_SOME, 0L);
-    CHECK(c, MSG_TAG_SOME, 1L);
+	message_queue_get(queue, &c);
+	LOG(c);
+	CHECK(a, MSG_TAG_SOME, 42L);
+	CHECK(b, MSG_TAG_SOME, 0L);
+	CHECK(c, MSG_TAG_SOME, 1L);
 
-    return 0;
+	return 0;
 }
 
 ///
@@ -154,31 +154,31 @@ static int consume(message_queue *queue)
 ///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
-    extern const uint32_t QUEUE_CAP;
+	extern const uint32_t QUEUE_CAP;
 
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
-    int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
-    if (rc != 0) {
-        sdl_fail("SDL_Init failed");
-    }
+	int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
+	if (rc != 0) {
+		sdl_fail("SDL_Init failed");
+	}
 
-    AT_EXIT(SDL_Quit);
+	AT_EXIT(SDL_Quit);
 
-    SCOPED_PTR_message_queue queue = message_queue_create(QUEUE_CAP);
-    if (queue == NULL) {
-        fail("message_queue_create failed");
-    }
+	SCOPED_PTR_message_queue queue = message_queue_create(QUEUE_CAP);
+	if (queue == NULL) {
+		fail("message_queue_create failed");
+	}
 
-    SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
-    if (producer == NULL) {
-        sdl_fail("SDL_CreateThread failed");
-    }
+	SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
+	if (producer == NULL) {
+		sdl_fail("SDL_CreateThread failed");
+	}
 
-    if (consume(queue) != 0) {
-        return EXIT_FAILURE;
-    }
+	if (consume(queue) != 0) {
+		return EXIT_FAILURE;
+	}
 
-    SDL_WaitThread(producer, NULL);
-    return EXIT_SUCCESS;
+	SDL_WaitThread(producer, NULL);
+	return EXIT_SUCCESS;
 }
