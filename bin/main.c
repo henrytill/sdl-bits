@@ -259,9 +259,7 @@ static void delay_frame(const double frame_time, const uint64_t begin)
 	if (time > 0) {
 		SDL_Delay(time);
 	}
-	while (calc_delta(begin, now()) < frame_time) {
-		// continue;
-	}
+	while (calc_delta(begin, now()) < frame_time) {}
 }
 
 ///
