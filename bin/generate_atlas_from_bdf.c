@@ -93,7 +93,8 @@ static void draw_image(char **image, size_t width, size_t height)
 	}
 }
 #else
-static inline void draw_image(__attribute__((unused)) char **image,
+static inline void draw_image(
+	__attribute__((unused)) char **image,
 	__attribute__((unused)) size_t width,
 	__attribute__((unused)) size_t height)
 {
