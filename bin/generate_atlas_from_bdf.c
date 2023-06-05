@@ -86,10 +86,10 @@ static void render_char(FT_GlyphSlot slot, char **target, size_t offset)
 static void draw_image(char **image, size_t width, size_t height)
 {
 	for (size_t y = 0; y < height; ++y) {
-		printf("%2zd|", y);
+		(void)printf("%2zd|", y);
 		for (size_t x = 0; x < width; ++x)
 			putchar(image[y][x] ? '*' : ' ');
-		printf("|\n");
+		(void)printf("|\n");
 	}
 }
 #else

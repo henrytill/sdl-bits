@@ -22,7 +22,8 @@ struct person {
 
 static void person_hello(const person *self)
 {
-	printf("Hello, my name is %s, I'm %d years old.\n", self->name, self->age);
+	(void)printf("Hello, my name is %s, I'm %d years old.\n",
+		self->name, self->age);
 }
 
 /// Base class vtable.
@@ -40,7 +41,7 @@ typedef struct student {
 static void student_hello(const person *self)
 {
 	const student *student = CONTAINER_OF(self, struct student, person);
-	printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
+	(void)printf("Hello, my name is %s, I'm %d years old, I'm a student of %s.\n",
 		student->person.name, student->person.age, student->school);
 }
 
