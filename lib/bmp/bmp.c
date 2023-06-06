@@ -14,9 +14,6 @@ static const uint16_t FILE_TYPE = 0x4D42;
 static const uint32_t BI_BITFIELDS = 0x0003;
 static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(FILE *, fclose)
-#define SCOPED_PTR_FILE __attribute__((cleanup(fclosep))) FILE *
-
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width)
 {
 	const double pixel_bits = (double)bits_per_pixel * width;
@@ -25,106 +22,118 @@ size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width)
 
 int bmp_read(const char *file, bmp_file_header *file_header, bmp_info_header *info_header, char **image)
 {
-	SCOPED_PTR_FILE file_handle = fopen(file, "r");
+	int ret = -1;
+
+	FILE *file_handle = fopen(file, "r");
 	if (file_handle == NULL) {
 		return -1;
 	}
 
 	size_t reads = fread(file_header, sizeof(*file_header), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	fpos_t pos;
 	int rc = fgetpos(file_handle, &pos);
 	if (rc != 0) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	uint32_t size = 0;
 	reads = fread(&size, sizeof(size), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 	if (size != BITMAPINFOHEADER) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	rc = fsetpos(file_handle, &pos);
 	if (rc != 0) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	reads = fread(info_header, sizeof(*info_header), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	const uint32_t image_size = info_header->image_size;
 	*image = calloc(image_size, sizeof(**image));
 	if (*image == NULL) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	reads = fread(*image, image_size * sizeof(**image), 1, file_handle);
 	if (reads != 1) {
 		free(*image);
-		return -1;
+		*image = NULL;
+		goto out_fclose_file_handle;
 	}
 
-	return 0;
+	ret = 0;
+out_fclose_file_handle:
+	fclose(file_handle);
+	return ret;
 }
 
 int bmp_v4_read(const char *file, bmp_file_header *file_header, bmp_v4_header *v4_header, char **image)
 {
-	SCOPED_PTR_FILE file_handle = fopen(file, "r");
+	int ret = -1;
+
+	FILE *file_handle = fopen(file, "r");
 	if (file_handle == NULL) {
 		return -1;
 	}
 
 	size_t reads = fread(file_header, sizeof(*file_header), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	fpos_t pos;
 	int rc = fgetpos(file_handle, &pos);
 	if (rc != 0) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	uint32_t size = 0;
 	reads = fread(&size, sizeof(size), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 	if (size != BITMAPV4HEADER) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	rc = fsetpos(file_handle, &pos);
 	if (rc != 0) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	reads = fread(v4_header, sizeof(*v4_header), 1, file_handle);
 	if (reads != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	const uint32_t image_size = v4_header->image_size;
 	*image = calloc(image_size, sizeof(**image));
 	if (*image == NULL) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	reads = fread(*image, image_size * sizeof(**image), 1, file_handle);
 	if (reads != 1) {
 		free(*image);
-		return -1;
+		*image = NULL;
+		goto out_fclose_file_handle;
 	}
 
-	return 0;
+	ret = 0;
+out_fclose_file_handle:
+	fclose(file_handle);
+	return ret;
 }
 
 int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const char *file)
@@ -179,25 +188,30 @@ int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const c
 		.b_gamma = 0,
 	};
 
-	SCOPED_PTR_FILE file_handle = fopen(file, "wb");
+	int ret = -1;
+
+	FILE *file_handle = fopen(file, "wb");
 	if (file_handle == NULL) {
 		return -1;
 	}
 
 	size_t writes = fwrite(&file_header, sizeof(bmp_file_header), 1, file_handle);
 	if (writes != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	writes = fwrite(&v4_header, sizeof(bmp_v4_header), 1, file_handle);
 	if (writes != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
 	writes = fwrite(buffer, image_size, 1, file_handle);
 	if (writes != 1) {
-		return -1;
+		goto out_fclose_file_handle;
 	}
 
-	return 0;
+	ret = 0;
+out_fclose_file_handle:
+	fclose(file_handle);
+	return ret;
 }

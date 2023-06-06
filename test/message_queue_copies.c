@@ -45,13 +45,6 @@ static const uint32_t DELAY = 2000U;
 /// Capacity of the message_queue.
 static const uint32_t QUEUE_CAP = 1U;
 
-/// Log an error message and exit.
-static void fail(const char *msg)
-{
-	SDL_LogError(ERR, "%s", msg);
-	exit(EXIT_FAILURE);
-}
-
 /// Log a message_queue error message and exit.
 static void message_queue_fail(int rc, const char *msg)
 {
@@ -156,6 +149,8 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
 	extern const uint32_t QUEUE_CAP;
 
+	int ret = EXIT_FAILURE;
+
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
 
 	int rc = SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER);
@@ -165,20 +160,25 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
 	AT_EXIT(SDL_Quit);
 
-	SCOPED_PTR_message_queue queue = message_queue_create(QUEUE_CAP);
+	struct message_queue *queue = message_queue_create(QUEUE_CAP);
 	if (queue == NULL) {
-		fail("message_queue_create failed");
+		sdl_error("message_queue_create failed");
 	}
 
 	SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
 	if (producer == NULL) {
-		sdl_fail("SDL_CreateThread failed");
+		sdl_error("SDL_CreateThread failed");
+		goto out_message_queue_destroy_queue;
 	}
 
 	if (consume(queue) != 0) {
-		return EXIT_FAILURE;
+		goto out_message_queue_destroy_queue;
 	}
 
 	SDL_WaitThread(producer, NULL);
-	return EXIT_SUCCESS;
+
+	ret = EXIT_SUCCESS;
+out_message_queue_destroy_queue:
+	message_queue_destroy(queue);
+	return ret;
 }

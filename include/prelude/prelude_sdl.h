@@ -21,13 +21,6 @@ static_assert(__builtin_types_compatible_p(Sint64, int64_t), "SDL-defined Sint64
 static_assert(__builtin_types_compatible_p(SDL_AudioFormat, uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
 static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Surface *, SDL_FreeSurface)
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_Texture *, SDL_DestroyTexture)
-DEFINE_TRIVIAL_CLEANUP_FUNC(SDL_AudioDeviceID, SDL_CloseAudioDevice)
-#define SCOPED_PTR_SDL_Surface   __attribute__((cleanup(SDL_FreeSurfacep))) SDL_Surface *
-#define SCOPED_PTR_SDL_Texture   __attribute__((cleanup(SDL_DestroyTexturep))) SDL_Texture *
-#define SCOPED_SDL_AudioDeviceID __attribute__((cleanup(SDL_CloseAudioDevicep))) SDL_AudioDeviceID
-
 ///
 /// Log a message and the contents of SDL_GetError().
 ///

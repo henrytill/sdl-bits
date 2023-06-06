@@ -16,7 +16,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	const char *const bmp_file = "./assets/sample_24bit.bmp";
 	bmp_file_header file_header = {0};
 	bmp_info_header info_header = {0};
-	SCOPED_PTR_char image = NULL;
+	char *image = NULL;
 
 	if (bmp_read(bmp_file, &file_header, &info_header, &image) != 0) {
 		return EXIT_FAILURE;
@@ -29,8 +29,10 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	};
 
 	if (memcmp(&expected, (bmp_pixel24 *)image, sizeof(bmp_pixel24)) != 0) {
+		free(image);
 		return EXIT_FAILURE;
 	}
 
+	free(image);
 	return EXIT_SUCCESS;
 }

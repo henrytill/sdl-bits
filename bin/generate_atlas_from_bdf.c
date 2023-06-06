@@ -101,24 +101,14 @@ static inline void draw_image(
 }
 #endif
 
-static void destroy_buffer(bmp_pixel32 *buffer)
-{
-	free(buffer);
-}
-
-DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Library, FT_Done_FreeType)
-DEFINE_TRIVIAL_CLEANUP_FUNC(FT_Face, FT_Done_Face)
-DEFINE_TRIVIAL_CLEANUP_FUNC(bmp_pixel32 *, destroy_buffer)
-#define SCOPED_FT_Library      __attribute__((cleanup(FT_Done_FreeTypep))) FT_Library
-#define SCOPED_FT_Face         __attribute__((cleanup(FT_Done_Facep))) FT_Face
-#define SCOPED_PTR_bmp_pixel32 __attribute__((cleanup(destroy_bufferp))) bmp_pixel32 *
-
 int main(void)
 {
 	extern const char *const FONT_FILE;
 	extern const char *const BMP_FILE;
 	extern const bmp_pixel32 WHITE;
 	extern const bmp_pixel32 BLACK;
+
+	int ret = EXIT_FAILURE;
 
 	char code[CODE_SIZE] = {0};
 	for (int i = 0; i < CODE_SIZE; ++i) {
@@ -133,27 +123,24 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	SCOPED_FT_Library lib = NULL;
+	FT_Library lib = NULL;
 	int rc = FT_Init_FreeType(&lib);
 	if (rc != 0) {
 		fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
-		free_image(image, height);
-		return EXIT_FAILURE;
+		goto out_free_image;
 	}
 
-	SCOPED_FT_Face face = NULL;
+	FT_Face face = NULL;
 	rc = FT_New_Face(lib, FONT_FILE, 0, &face);
 	if (rc != 0) {
 		fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
-		free_image(image, height);
-		return EXIT_FAILURE;
+		goto out_FT_Done_FreeType_lib;
 	}
 
 	rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
 	if (rc != 0) {
 		fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
-		free_image(image, height);
-		return EXIT_FAILURE;
+		goto out_FT_Done_Face_face;
 	}
 
 	FT_GlyphSlot slot = NULL;
@@ -161,26 +148,22 @@ int main(void)
 		rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != 0) {
 			fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
-			free_image(image, height);
-			return EXIT_FAILURE;
+			goto out_FT_Done_Face_face;
 		}
 		slot = face->glyph;
 
 		rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
 		if (rc != 0) {
 			fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
-			free_image(image, height);
-			return EXIT_FAILURE;
+			goto out_FT_Done_Face_face;
 		}
 		if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
 			fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-			free_image(image, height);
-			return EXIT_FAILURE;
+			goto out_FT_Done_Face_face;
 		}
 		if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
 			fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-			free_image(image, height);
-			return EXIT_FAILURE;
+			goto out_FT_Done_Face_face;
 		}
 
 		render_char(slot, image, i);
@@ -188,10 +171,9 @@ int main(void)
 
 	draw_image(image, width, height);
 
-	SCOPED_PTR_bmp_pixel32 buffer = calloc(width * height, sizeof(bmp_pixel32));
+	bmp_pixel32 *buffer = calloc(width * height, sizeof(bmp_pixel32));
 	if (buffer == NULL) {
-		free_image(image, height);
-		return EXIT_FAILURE;
+		goto out_FT_Done_Face_face;
 	}
 
 	for (size_t y = height, i = 0; y-- > 0;) {
@@ -202,10 +184,18 @@ int main(void)
 
 	rc = bmp_v4_write(buffer, width, height, BMP_FILE);
 	if (rc != 0) {
-		free_image(image, height);
-		return EXIT_FAILURE;
+		fprintf(stderr, "bmp_v4_write failed.  Error code: %d", rc);
+		goto out_free_buffer;
 	}
 
+	ret = EXIT_SUCCESS;
+out_free_buffer:
+	free(buffer);
+out_FT_Done_Face_face:
+	FT_Done_Face(face);
+out_FT_Done_FreeType_lib:
+	FT_Done_FreeType(lib);
+out_free_image:
 	free_image(image, height);
-	return EXIT_SUCCESS;
+	return ret;
 }

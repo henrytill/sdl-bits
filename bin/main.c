@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lauxlib.h>
+#include <lua.h>
+#include <lualib.h>
+
 #include "prelude.h"
 
 enum {
@@ -151,7 +155,8 @@ static char *join_path(const char *a, const char *b)
 ///
 static int load_config(const char *file, struct config *cfg)
 {
-	SCOPED_PTR_lua_State state = luaL_newstate();
+	int ret = -1;
+	lua_State *state = luaL_newstate();
 	if (state == NULL) {
 		SDL_LogError(ERR, "%s: luaL_newstate failed", __func__);
 		return -1;
@@ -160,27 +165,30 @@ static int load_config(const char *file, struct config *cfg)
 	if (luaL_loadfile(state, file) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
 		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__,
 			file, lua_tostring(state, -1));
-		return -1;
+		goto out_lua_close_state;
 	}
 	lua_getglobal(state, "width");
 	lua_getglobal(state, "height");
 	lua_getglobal(state, "framerate");
 	if (!lua_isnumber(state, -3)) {
 		SDL_LogError(ERR, "%s: width is not a number", __func__);
-		return -1;
+		goto out_lua_close_state;
 	}
 	if (!lua_isnumber(state, -2)) {
 		SDL_LogError(ERR, "%s: height is not a number", __func__);
-		return -1;
+		goto out_lua_close_state;
 	}
 	if (!lua_isnumber(state, -1)) {
 		SDL_LogError(ERR, "%s: framerate is not a number", __func__);
-		return -1;
+		goto out_lua_close_state;
 	}
 	cfg->width = (int)lua_tonumber(state, -3);
 	cfg->height = (int)lua_tonumber(state, -2);
 	cfg->frame_rate = (int)lua_tonumber(state, -1);
-	return 0;
+	ret = 0;
+out_lua_close_state:
+	lua_close(state);
+	return ret;
 }
 
 ///
@@ -350,9 +358,6 @@ static void window_destroy(struct window *win)
 	free(win);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct window *, window_destroy)
-#define SCOPED_PTR_window __attribute__((cleanup(window_destroyp))) struct window *
-
 ///
 /// Get the window's rectangle.
 ///
@@ -371,6 +376,29 @@ static int get_rect(struct window *win, SDL_Rect *rect)
 		return -1;
 	}
 	return 0;
+}
+
+///
+/// Create a tecture from a bitmap file.
+///
+/// @param win The window.
+/// @param path The path to the bitmap file.
+/// @return The texture on success, NULL on failure.
+///
+static SDL_Texture *create_texture(struct window *win, const char *path)
+{
+	SDL_Surface *surface = SDL_LoadBMP(path);
+	if (surface == NULL) {
+		sdl_error("SDL_LoadBMP failed");
+		return NULL;
+	}
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(win->renderer, surface);
+	SDL_FreeSurface(surface);
+	if (texture == NULL) {
+		sdl_error("SDL_CreateTextureFromSurface failed");
+		return NULL;
+	}
+	return texture;
 }
 
 ///
@@ -404,9 +432,11 @@ int main(int argc, char *argv[])
 	extern struct config cfg;
 	extern struct state st;
 
+	int ret = EXIT_FAILURE;
+
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
 	(void)parse_args(argc, argv, &as);
-	load_config(as.config_file, &cfg);
+	(void)load_config(as.config_file, &cfg);
 
 	int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (rc != 0) {
@@ -427,45 +457,35 @@ int main(int argc, char *argv[])
 		.userdata = (void *)&st.audio,
 	};
 	SDL_AudioSpec have = {0};
-	SCOPED_SDL_AudioDeviceID audio_device = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
-	st.audio_device = audio_device;
+	st.audio_device = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
 	if (st.audio_device < 2) {
 		sdl_error("SDL_OpenAudio failed");
 		return EXIT_FAILURE;
 	}
 
 	const char *const win_title = "Hello, world!";
-	SCOPED_PTR_window win = window_create(&cfg, win_title);
+	struct window *win = window_create(&cfg, win_title);
 	if (win == NULL) {
-		return EXIT_FAILURE;
+		goto out_close_audio_device;
 	}
 
 	SDL_Rect win_rect = {0, 0, 0, 0};
 	rc = get_rect(win, &win_rect);
 	if (rc != 0) {
-		return EXIT_FAILURE;
+		goto out_destroy_window;
 	}
 
-	SCOPED_PTR_SDL_Texture texture = ({
-		const char *const test_bmp = "test.bmp";
-		SCOPED_PTR_char bmp_file = join_path(cfg.asset_dir, test_bmp);
-		if (bmp_file == NULL) {
-			return EXIT_FAILURE;
-		}
+	const char *const test_bmp = "test.bmp";
+	char *bmp_file = join_path(cfg.asset_dir, test_bmp);
+	if (bmp_file == NULL) {
+		goto out_destroy_window;
+	}
 
-		SCOPED_PTR_SDL_Surface surface = SDL_LoadBMP(bmp_file);
-		if (surface == NULL) {
-			sdl_error("SDL_LoadBMP failed");
-			return EXIT_FAILURE;
-		}
-
-		SDL_Texture *tmp = SDL_CreateTextureFromSurface(win->renderer, surface);
-		if (tmp == NULL) {
-			sdl_error("SDL_CreateTextureFromSurface failed");
-			return EXIT_FAILURE;
-		}
-		tmp;
-	});
+	SDL_Texture *texture = create_texture(win, bmp_file);
+	free(bmp_file);
+	if (texture == NULL) {
+		goto out_destroy_window;
+	}
 
 	const double frame_time = calc_frame_time(cfg.frame_rate);
 
@@ -493,12 +513,12 @@ int main(int argc, char *argv[])
 		rc = SDL_RenderClear(win->renderer);
 		if (rc != 0) {
 			sdl_error("SDL_RenderClear failed");
-			return EXIT_FAILURE;
+			goto out_destroy_texture;
 		}
 		rc = SDL_RenderCopy(win->renderer, texture, NULL, &win_rect);
 		if (rc != 0) {
 			sdl_error("SDL_RenderCopy failed");
-			return EXIT_FAILURE;
+			goto out_destroy_texture;
 		}
 		SDL_RenderPresent(win->renderer);
 
@@ -510,5 +530,12 @@ int main(int argc, char *argv[])
 
 	SDL_PauseAudioDevice(st.audio_device, 1);
 
-	return EXIT_SUCCESS;
+	ret = EXIT_SUCCESS;
+out_destroy_texture:
+	SDL_DestroyTexture(texture);
+out_destroy_window:
+	window_destroy(win);
+out_close_audio_device:
+	SDL_CloseAudioDevice(st.audio_device);
+	return ret;
 }

@@ -12,9 +12,6 @@ static inline void free_char(char *str)
 	}
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(char *, free_char)
-#define SCOPED_PTR_char __attribute__((cleanup(free_charp))) char *
-
 #define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
 
 ///

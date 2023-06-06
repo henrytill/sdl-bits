@@ -17,7 +17,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	const char *const bmp_file = "./assets/test.bmp";
 	bmp_file_header file_header = {0};
 	bmp_v4_header v4_header = {0};
-	SCOPED_PTR_char image = NULL;
+	char *image = NULL;
 
 	if (bmp_v4_read(bmp_file, &file_header, &v4_header, &image) != 0) {
 		return EXIT_FAILURE;
@@ -31,8 +31,10 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	};
 
 	if (memcmp(&expected, (bmp_pixel32 *)image, sizeof(bmp_pixel32)) != 0) {
+		free(image);
 		return EXIT_FAILURE;
 	}
 
+	free(image);
 	return EXIT_SUCCESS;
 }

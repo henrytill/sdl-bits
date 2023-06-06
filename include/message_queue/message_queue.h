@@ -55,15 +55,10 @@ struct message_queue *message_queue_create(uint32_t capacity);
 ///
 /// Also frees the queue itself.
 ///
-/// Consider using SCOPED_PTR_MessageQueue for scoped cleanup.
-///
 /// @param queue Message queue.
 /// @see message_queue_create()
 ///
 void message_queue_destroy(struct message_queue *queue);
-
-DEFINE_TRIVIAL_CLEANUP_FUNC(struct message_queue *, message_queue_destroy)
-#define SCOPED_PTR_message_queue __attribute__((cleanup(message_queue_destroyp))) struct message_queue *
 
 ///
 /// Adds an message to the back of the queue.
