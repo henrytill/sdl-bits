@@ -77,7 +77,7 @@ static void sdl_fail(const char *msg)
 ///
 static int produce(void *data)
 {
-	struct message_queue *queue = (struct message_queue *)data;
+	struct message_queue *queue = data;
 	struct message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
 	for (int rc = 1; rc == 1;) {

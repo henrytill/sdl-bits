@@ -192,7 +192,7 @@ static int load_config(const char *file, struct config *cfg)
 ///
 static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) int len)
 {
-	struct audio_state *as = (struct audio_state *)userdata;
+	struct audio_state *as = userdata;
 	float *fstream = (float *)stream;
 
 	static_assert(sizeof(*fstream) == 4, "sizeof(*fstream) != 4");

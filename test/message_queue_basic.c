@@ -61,7 +61,7 @@ static int produce(void *data)
 		fail("produce failed: data is NULL");
 	}
 
-	struct message_queue *queue = (struct message_queue *)data;
+	struct message_queue *queue = data;
 	struct message msg = {0};
 	const char *tag_str = NULL;
 	int rc = 0;
