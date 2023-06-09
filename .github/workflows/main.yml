@@ -25,26 +25,26 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install -yyq --no-install-recommends \
-            build-essential cmake ninja-build \
+            build-essential cmake gcovr meson ninja-build \
             libdrm-dev libgbm-dev \
             libsdl2-dev libfreetype-dev
-      - name: Configure CMake
+      - name: Configure
         run: |
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=${{matrix.cc}} -GNinja \
-            -DBUILD_SHARED_LIBS=ON -DLUA_BUILD_OBJECTS=ON -DENABLE_COVERAGE=ON
+          meson setup -Db_coverage=true ${{github.workspace}}/build
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        working-directory: ${{github.workspace}}/build
+        run: ninja -j0
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{env.BUILD_TYPE}} -T Test --rerun-failed --output-on-failure
+        run: ninja test
       - name: Coverage
         working-directory: ${{github.workspace}}/build
-        run: ctest -T Coverage
+        run: ninja coverage-xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ${{github.workspace}}/build/Testing/CoverageInfo
+          directory: ${{github.workspace}}/build/meson-logs
           verbose: true
 
   docker:
@@ -91,18 +91,17 @@ jobs:
             mingw-w64-${{matrix.env}}-toolchain
             mingw-w64-${{matrix.env}}-ninja
             mingw-w64-${{matrix.env}}-cmake
+            mingw-w64-${{matrix.env}}-meson
             mingw-w64-${{matrix.env}}-SDL2
             mingw-w64-${{matrix.env}}-freetype
       - name: Check MSYSTEM
         run: echo $MSYSTEM
-      - name: Configure CMake
+      - name: Configure
         run: |
-          mkdir build
-          cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -GNinja \
-            -DBUILD_SHARED_LIBS=ON -DLUA_BUILD_OBJECTS=ON
+          meson setup build
       - name: Build
         working-directory: ${{github.workspace}}\build
         run: ninja -j0
       - name: Test
         working-directory: ${{github.workspace}}\build
-        run: ctest -C ${{env.BUILD_TYPE}}
+        run: ninja test

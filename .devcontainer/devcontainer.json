@@ -22,9 +22,9 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools",
-        "ms-vscode.cmake-tools",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "mesonbuild.mesonbuild",
+        "ms-vscode.cpptools"
       ]
     }
   },

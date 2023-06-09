@@ -1,6 +1,3 @@
-[submodule "cmake"]
-	path = cmake
-	url = https://github.com/henrytill/cmake-modules.git
-[submodule "third-party/lua"]
-	path = third-party/lua
+[submodule "subprojects/lua"]
+	path = subprojects/lua
 	url = https://github.com/henrytill/lua.git

@@ -12,12 +12,17 @@
 #include "bmp.h"
 #include "prelude.h"
 
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
+int main(int argc, char *argv[])
 {
-	const char *const bmp_file = "./assets/test.bmp";
 	bmp_file_header file_header = {0};
 	bmp_v4_header v4_header = {0};
 	char *image = NULL;
+
+	if (argc != 2) {
+		return EXIT_FAILURE;
+	}
+
+	const char *bmp_file = argv[1];
 
 	if (bmp_v4_read(bmp_file, &file_header, &v4_header, &image) != 0) {
 		return EXIT_FAILURE;

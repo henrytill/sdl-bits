@@ -1,5 +1,0 @@
-add_library(macro INTERFACE)
-if(HAS_GENERIC)
-  target_compile_definitions(macro INTERFACE "HAS_GENERIC")
-endif()
-target_include_directories(macro INTERFACE ${SDL_BITS_INCLUDE_DIR}/macro)

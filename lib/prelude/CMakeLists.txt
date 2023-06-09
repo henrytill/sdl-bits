@@ -1,5 +1,0 @@
-add_library(prelude INTERFACE)
-target_link_libraries(prelude INTERFACE macro)
-target_link_SDL2(prelude INTERFACE)
-target_link_lua(prelude INTERFACE)
-target_include_directories(prelude INTERFACE ${SDL_BITS_INCLUDE_DIR}/prelude)
