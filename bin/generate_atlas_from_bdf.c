@@ -134,13 +134,13 @@ int main(void)
 	rc = FT_New_Face(lib, FONT_FILE, 0, &face);
 	if (rc != 0) {
 		fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
-		goto out_FT_Done_FreeType_lib;
+		goto out_done_lib;
 	}
 
 	rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
 	if (rc != 0) {
 		fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
-		goto out_FT_Done_Face_face;
+		goto out_done_face;
 	}
 
 	FT_GlyphSlot slot = NULL;
@@ -148,22 +148,22 @@ int main(void)
 		rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != 0) {
 			fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
-			goto out_FT_Done_Face_face;
+			goto out_done_face;
 		}
 		slot = face->glyph;
 
 		rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
 		if (rc != 0) {
 			fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
-			goto out_FT_Done_Face_face;
+			goto out_done_face;
 		}
 		if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
 			fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-			goto out_FT_Done_Face_face;
+			goto out_done_face;
 		}
 		if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
 			fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-			goto out_FT_Done_Face_face;
+			goto out_done_face;
 		}
 
 		render_char(slot, image, i);
@@ -173,7 +173,7 @@ int main(void)
 
 	bmp_pixel32 *buffer = calloc(width * height, sizeof(bmp_pixel32));
 	if (buffer == NULL) {
-		goto out_FT_Done_Face_face;
+		goto out_done_face;
 	}
 
 	for (size_t y = height, i = 0; y-- > 0;) {
@@ -191,9 +191,9 @@ int main(void)
 	ret = EXIT_SUCCESS;
 out_free_buffer:
 	free(buffer);
-out_FT_Done_Face_face:
+out_done_face:
 	FT_Done_Face(face);
-out_FT_Done_FreeType_lib:
+out_done_lib:
 	FT_Done_FreeType(lib);
 out_free_image:
 	free_image(image, height);

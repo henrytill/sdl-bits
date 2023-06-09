@@ -168,17 +168,18 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 	SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
 	if (producer == NULL) {
 		sdl_error("SDL_CreateThread failed");
-		goto out_message_queue_destroy_queue;
+		goto out_destroy_queue;
 	}
 
 	if (consume(queue) != 0) {
-		goto out_message_queue_destroy_queue;
+		(void)fprintf(stderr, "consume failed");
+		goto out_destroy_queue;
 	}
 
 	SDL_WaitThread(producer, NULL);
 
 	ret = EXIT_SUCCESS;
-out_message_queue_destroy_queue:
+out_destroy_queue:
 	message_queue_destroy(queue);
 	return ret;
 }

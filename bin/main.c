@@ -165,28 +165,28 @@ static int load_config(const char *file, struct config *cfg)
 	if (luaL_loadfile(state, file) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
 		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__,
 			file, lua_tostring(state, -1));
-		goto out_lua_close_state;
+		goto out_close_state;
 	}
 	lua_getglobal(state, "width");
 	lua_getglobal(state, "height");
 	lua_getglobal(state, "framerate");
 	if (!lua_isnumber(state, -3)) {
 		SDL_LogError(ERR, "%s: width is not a number", __func__);
-		goto out_lua_close_state;
+		goto out_close_state;
 	}
 	if (!lua_isnumber(state, -2)) {
 		SDL_LogError(ERR, "%s: height is not a number", __func__);
-		goto out_lua_close_state;
+		goto out_close_state;
 	}
 	if (!lua_isnumber(state, -1)) {
 		SDL_LogError(ERR, "%s: framerate is not a number", __func__);
-		goto out_lua_close_state;
+		goto out_close_state;
 	}
 	cfg->width = (int)lua_tonumber(state, -3);
 	cfg->height = (int)lua_tonumber(state, -2);
 	cfg->frame_rate = (int)lua_tonumber(state, -1);
 	ret = 0;
-out_lua_close_state:
+out_close_state:
 	lua_close(state);
 	return ret;
 }
