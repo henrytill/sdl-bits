@@ -19,7 +19,8 @@ static int enum_displays(void)
 			SDL_Log("Failed to get mode for display #%d: %s", i, err);
 			return -1;
 		}
-		SDL_Log("Display #%d: mode is %dx%d @ %d hz.", i, mode.w, mode.h, mode.refresh_rate);
+		SDL_Log("Display #%d: mode is %dx%d @ %d hz.",
+			i, mode.w, mode.h, mode.refresh_rate);
 	}
 
 	return 0;

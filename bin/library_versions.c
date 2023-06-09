@@ -25,7 +25,8 @@ static void free_type(void)
 		return;
 	}
 	FT_Library_Version(lib, &major, &minor, &patch);
-	SDL_LogInfo(APP, "Linking against FreeType %u.%u.%u", major, minor, patch);
+	SDL_LogInfo(APP, "Linking against FreeType %u.%u.%u",
+		major, minor, patch);
 	FT_Done_FreeType(lib);
 }
 
@@ -50,8 +51,10 @@ static void sdl(void)
 
 	SDL_VERSION(&compiled);
 	SDL_GetVersion(&linked);
-	SDL_LogInfo(APP, "Compiled against SDL %u.%u.%u ...", compiled.major, compiled.minor, compiled.patch);
-	SDL_LogInfo(APP, "... and linking against SDL %u.%u.%u.", linked.major, linked.minor, linked.patch);
+	SDL_LogInfo(APP, "Compiled against SDL %u.%u.%u ...",
+		compiled.major, compiled.minor, compiled.patch);
+	SDL_LogInfo(APP, "... and linking against SDL %u.%u.%u.",
+		linked.major, linked.minor, linked.patch);
 }
 
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])

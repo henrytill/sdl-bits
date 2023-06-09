@@ -26,5 +26,7 @@ int main(void)
 	extern const bmp_pixel32 BUF[];
 	extern const char *const BMP_FILE;
 
-	return (bmp_v4_write(BUF, WIDTH, HEIGHT, BMP_FILE) == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+	return (bmp_v4_write(BUF, WIDTH, HEIGHT, BMP_FILE) == 0)
+		? EXIT_SUCCESS
+		: EXIT_FAILURE;
 }
