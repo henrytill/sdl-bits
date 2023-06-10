@@ -24,7 +24,8 @@
       "extensions": [
         "esbenp.prettier-vscode",
         "mesonbuild.mesonbuild",
-        "ms-vscode.cpptools"
+        "ms-vscode.cpptools",
+        "ryanluker.vscode-coverage-gutters"
       ]
     }
   },
