@@ -15,5 +15,9 @@
   "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
   "C_Cpp.codeAnalysis.exclude": {
     "third-party": true
-  }
+  },
+  "coverage-gutters.coverageFileNames": ["coverage.xml"],
+  "coverage-gutters.coverageBaseDir": "builddir/meson-logs",
+  "mesonbuild.configureOnOpen": true,
+  "mesonbuild.configureOptions": ["-Db_coverage=true", "--buildtype=debug"]
 }
