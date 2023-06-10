@@ -1,6 +1,7 @@
-project('sdl-bits', 'c',
-        version : '0.1',
-        default_options : ['warning_level=2', 'c_std=gnu11'])
+project(
+  'sdl-bits', 'c',
+  version : '0.1',
+  default_options : ['warning_level=2', 'c_std=gnu11'])
 
 cmake = import('cmake')
 
@@ -14,9 +15,7 @@ sdl_dep = dependency('sdl2', required : true)
 thread_dep = dependency('threads')
 
 # subprojects
-
 lua_sub_proj = cmake.subproject('lua')
-
 lua_dep = lua_sub_proj.dependency('lua')
 
 # libraries
@@ -117,11 +116,13 @@ message_queue_copies_posix = executable(
   dependencies : [sdl_dep],
   install : false)
 
-test('bmp_read_bitmap', bmp_read_bitmap,
-     args : ['../assets/sample_24bit.bmp'])
+test(
+  'bmp_read_bitmap', bmp_read_bitmap,
+  args : ['../assets/sample_24bit.bmp'])
 
-test('bmp_read_bitmap_v4', bmp_read_bitmap_v4,
-     args : ['test.bmp'], depends: test_bmp)
+test(
+  'bmp_read_bitmap_v4', bmp_read_bitmap_v4,
+  args : ['test.bmp'], depends: test_bmp)
 
 test('message_queue_basic', message_queue_basic)
 test('message_queue_copies', message_queue_copies)
