@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "bmp.h"
-#include "macro.h"
 
 enum {
 	DWORD_BITS = 32,

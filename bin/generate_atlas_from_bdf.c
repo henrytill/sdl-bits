@@ -7,7 +7,6 @@
 #include FT_FREETYPE_H
 
 #include "bmp.h"
-#include "macro.h"
 
 enum {
 	WIDTH = 10,

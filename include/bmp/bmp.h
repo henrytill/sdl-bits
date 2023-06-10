@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "macro.h"
-
 typedef enum bmp_header_size {
 	BITMAPCOREHEADER = 12,
 	OS22XBITMAPHEADER = 64,

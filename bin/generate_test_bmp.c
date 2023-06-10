@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "bmp.h"
-#include "macro.h"
 
 enum {
 	WIDTH = 4,

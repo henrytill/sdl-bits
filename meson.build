@@ -22,9 +22,9 @@ lua_dep = lua_sub_proj.dependency('lua')
 # libraries
 bmp = library(
   'bmp', 'lib/bmp/bmp.c',
-  include_directories : ['include/bmp', 'include/macro'],
-  install : false,
-  dependencies : m_dep)
+  include_directories : ['include/bmp'],
+  dependencies : [m_dep],
+  install : false)
 
 message_queue_sdl = library(
   'message_queue_sdl', 'lib/message_queue/message_queue_sdl.c',
@@ -41,14 +41,14 @@ message_queue_posix = library(
 # executables
 executable(
   'generate_atlas_from_bdf', 'bin/generate_atlas_from_bdf.c',
-  include_directories : ['include/bmp', 'include/macro'],
+  include_directories : ['include/bmp'],
   link_with : [bmp],
   dependencies : [freetype_dep],
   install : false)
 
 generate_test_bmp = executable(
   'generate_test_bmp', 'bin/generate_test_bmp.c',
-  include_directories : ['include/bmp', 'include/macro'],
+  include_directories : ['include/bmp'],
   link_with : [bmp],
   install : false)
 
@@ -79,16 +79,14 @@ test_bmp = custom_target(
 # tests
 bmp_read_bitmap = executable(
   'bmp_read_bitmap', 'test/bmp_read_bitmap.c',
-  include_directories : ['include/bmp', 'include/macro', 'include/prelude'],
+  include_directories : ['include/bmp'],
   link_with : [bmp],
-  dependencies : [sdl_dep],
   install : false)
 
 bmp_read_bitmap_v4 = executable(
   'bmp_read_bitmap_v4', 'test/bmp_read_bitmap_v4.c',
-  include_directories : ['include/bmp', 'include/macro', 'include/prelude'],
+  include_directories : ['include/bmp'],
   link_with : [bmp],
-  dependencies : [sdl_dep],
   install : false)
 
 message_queue_basic = executable(

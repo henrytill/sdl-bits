@@ -11,6 +11,7 @@
 #include <lua.h>
 #include <lualib.h>
 
+#include "macro.h"
 #include "prelude.h"
 
 enum {

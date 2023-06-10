@@ -3,8 +3,6 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 
-#include "macro.h"
-
 #define now SDL_GetPerformanceCounter
 
 enum {

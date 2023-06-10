@@ -7,10 +7,10 @@
 /// @see bmp_v4_read()
 ///
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "bmp.h"
-#include "prelude.h"
 
 int main(int argc, char *argv[])
 {

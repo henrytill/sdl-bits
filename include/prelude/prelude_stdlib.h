@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "macro.h"
-
 static inline void free_char(char *str)
 {
 	if (str != NULL) {
