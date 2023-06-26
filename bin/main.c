@@ -163,7 +163,7 @@ static int load_config(const char *file, struct config *cfg)
 		return -1;
 	}
 	luaL_openlibs(state);
-	if (luaL_loadfile(state, file) || lua_pcall(state, 0, 0, 0) != LUA_OK) {
+	if (luaL_loadfile(state, file) || lua_pcall(state, 0, 0, 0) != 0) {
 		SDL_LogError(ERR, "%s: failed to load %s, %s", __func__,
 			file, lua_tostring(state, -1));
 		goto out_close_state;
