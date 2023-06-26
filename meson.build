@@ -14,9 +14,7 @@ sdl_dep = dependency('sdl2', required : true)
 
 thread_dep = dependency('threads')
 
-# subprojects
-lua_sub_proj = cmake.subproject('lua')
-lua_dep = lua_sub_proj.dependency('lua')
+lua_dep = dependency('lua51')
 
 # libraries
 bmp = library(

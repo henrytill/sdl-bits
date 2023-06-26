@@ -38,9 +38,7 @@ static void lua(void)
 		return;
 	}
 
-	const lua_Number linked = lua_version(state);
-	SDL_LogInfo(APP, "Compiled against Lua %s ...", LUA_RELEASE);
-	SDL_LogInfo(APP, "... and linking against Lua %.2f", linked);
+	SDL_LogInfo(APP, "Compiled against %s ...", LUA_RELEASE);
 	lua_close(state);
 }
 
