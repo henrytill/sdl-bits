@@ -3,8 +3,7 @@ project(
   version : '0.1',
   default_options : ['warning_level=2', 'c_std=gnu11'])
 
-cmake = import('cmake')
-
+# dependencies
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required : true)
 
@@ -12,11 +11,12 @@ freetype_dep = dependency('freetype2', required : true)
 
 sdl_dep = dependency('sdl2', required : true)
 
-thread_dep = dependency('threads')
+thread_dep = dependency('threads', required : true)
 
-# subprojects
-lua_sub_proj = cmake.subproject('lua')
-lua_dep = lua_sub_proj.dependency('lua')
+# subproject dependencies
+cmake = import('cmake')
+lua_subproj = cmake.subproject('lua')
+lua_dep = lua_subproj.dependency('lua')
 
 # libraries
 bmp = library(
