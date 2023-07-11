@@ -3,6 +3,7 @@
 /.github/
 /.vscode/
 /build/
+/builddir/
 /misc/
 .dir-locals.el
 .dockerignore
