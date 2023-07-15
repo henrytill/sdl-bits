@@ -199,20 +199,21 @@ out_close_state:
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void calc_sine(void *userdata, uint8_t *stream, __attribute__((unused)) int len)
+static void calc_sine(void *userdata, uint8_t *stream, int len)
 {
 	struct audio_state *as = userdata;
 	float *fstream = (float *)stream;
 
 	static_assert(sizeof(*fstream) == 4, "sizeof(*fstream) != 4");
 	assert((len / ((int)sizeof(*fstream) * AUDIO_CHANNELS)) == as->buffer_size);
+	(void)len;
 
 	const double sample_rate = (double)as->sample_rate;
 	const uint64_t buffer_size = (uint64_t)as->buffer_size;
-	const uint64_t total_samples = as->elapsed * buffer_size;
+	const uint64_t offset = as->elapsed * buffer_size;
 
 	for (uint64_t i = 0; i < buffer_size; ++i) {
-		const double time = (double)(total_samples + i) / sample_rate;
+		const double time = (double)(offset + i) / sample_rate;
 		const double x = 2.0 * M_PI * time * as->frequency;
 		const double y = as->volume * sin(x);
 		fstream[AUDIO_CHANNELS * i + 0] = (float)y;
@@ -299,7 +300,7 @@ static int window_init(struct config *cfg, const char *title, struct window *win
 		sdl_error("SDL_CreateRenderer failed");
 		return -1;
 	}
-	int rc = SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
+	const int rc = SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
 	if (rc != 0) {
 		SDL_DestroyWindow(win->window);
 		SDL_DestroyRenderer(win->renderer);
