@@ -9,7 +9,7 @@
     ".clang-tidy": "yaml",
     "*.h": "c"
   },
-  "C_Cpp.default.compileCommands": "builddir/vscode_compile_commands.json",
+  "C_Cpp.default.compileCommands": "builddir/compile_commands.json",
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
   "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
