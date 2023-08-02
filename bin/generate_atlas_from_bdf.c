@@ -114,31 +114,31 @@ int main(void)
 		code[i] = (char)(i + '!');
 	}
 
-	const size_t width = WIDTH * CODE_SIZE;
+	const size_t width = (size_t)WIDTH * CODE_SIZE;
 	const size_t height = HEIGHT;
 	char **image = alloc_image(height, width);
 	if (image == NULL) {
-		fprintf(stderr, "alloc_image failed.");
+		(void)fprintf(stderr, "alloc_image failed.");
 		return EXIT_FAILURE;
 	}
 
 	FT_Library lib = NULL;
 	int rc = FT_Init_FreeType(&lib);
 	if (rc != 0) {
-		fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
+		(void)fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
 		goto out_free_image;
 	}
 
 	FT_Face face = NULL;
 	rc = FT_New_Face(lib, FONT_FILE, 0, &face);
 	if (rc != 0) {
-		fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
+		(void)fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
 		goto out_done_lib;
 	}
 
 	rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
 	if (rc != 0) {
-		fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
+		(void)fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
 		goto out_done_face;
 	}
 
@@ -146,22 +146,22 @@ int main(void)
 	for (size_t i = 0; i < CODE_SIZE; ++i) {
 		rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
 		if (rc != 0) {
-			fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
+			(void)fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
 			goto out_done_face;
 		}
 		slot = face->glyph;
 
 		rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
 		if (rc != 0) {
-			fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
+			(void)fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
 			goto out_done_face;
 		}
 		if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
-			fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
+			(void)fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
 			goto out_done_face;
 		}
 		if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
-			fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
+			(void)fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
 			goto out_done_face;
 		}
 
@@ -183,7 +183,7 @@ int main(void)
 
 	rc = bmp_v4_write(buffer, width, height, BMP_FILE);
 	if (rc != 0) {
-		fprintf(stderr, "bmp_v4_write failed.  Error code: %d", rc);
+		(void)fprintf(stderr, "bmp_v4_write failed.  Error code: %d", rc);
 		goto out_free_buffer;
 	}
 
