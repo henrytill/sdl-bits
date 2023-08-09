@@ -30,22 +30,13 @@ jobs:
             libsdl2-dev libfreetype-dev
       - name: Configure
         run: |
-          meson setup -Db_coverage=true ${{github.workspace}}/build
+          meson setup ${{github.workspace}}/build
       - name: Build
         working-directory: ${{github.workspace}}/build
         run: ninja -j0
       - name: Test
         working-directory: ${{github.workspace}}/build
         run: ninja test
-      - name: Coverage
-        working-directory: ${{github.workspace}}/build
-        run: ninja coverage-xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ${{github.workspace}}/build/meson-logs
-          verbose: true
 
   docker:
     runs-on: ubuntu-latest
