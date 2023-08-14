@@ -65,7 +65,8 @@ executable(
 
 executable(
   'main', 'bin/main.c',
-  include_directories : ['include/macro', 'include/prelude'],
+  include_directories : ['include/macro', 'include/message_queue', 'include/prelude'],
+  link_with : [message_queue_sdl],
   dependencies : [lua_dep, m_dep, sdl_dep],
   install : true)
 

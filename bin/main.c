@@ -12,6 +12,7 @@
 #include <lualib.h>
 
 #include "macro.h"
+#include "message_queue.h"
 #include "prelude.h"
 
 enum {
@@ -78,6 +79,8 @@ struct window {
 };
 
 static const double SECOND = 1000.0;
+
+static const uint32_t QUEUE_CAP = 4U;
 
 static uint64_t perf_freq = 0;
 
@@ -427,12 +430,21 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st)
 
 static void update(__attribute__((unused)) double delta) {}
 
+static int handle(void *data)
+{
+	struct message_queue *queue = data;
+	(void)queue;
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	extern uint64_t perf_freq;
 	extern struct args as;
 	extern struct config cfg;
 	extern struct state st;
+	extern const uint32_t QUEUE_CAP;
 
 	int ret = EXIT_FAILURE;
 
@@ -489,6 +501,16 @@ int main(int argc, char *argv[])
 		goto out_destroy_window;
 	}
 
+	struct message_queue *queue = message_queue_create(QUEUE_CAP);
+	if (queue == NULL) {
+		goto out_destroy_texture;
+	}
+
+	SDL_Thread *handler = SDL_CreateThread(handle, "handler", queue);
+	if (handler == NULL) {
+		goto out_destroy_texture;
+	}
+
 	const double frame_time = calc_frame_time(cfg.frame_rate);
 
 	SDL_PauseAudioDevice(st.audio_device, 0);
@@ -515,12 +537,12 @@ int main(int argc, char *argv[])
 		rc = SDL_RenderClear(win->renderer);
 		if (rc != 0) {
 			sdl_error("SDL_RenderClear failed");
-			goto out_destroy_texture;
+			goto out_wait_thread;
 		}
 		rc = SDL_RenderCopy(win->renderer, texture, NULL, &win_rect);
 		if (rc != 0) {
 			sdl_error("SDL_RenderCopy failed");
-			goto out_destroy_texture;
+			goto out_wait_thread;
 		}
 		SDL_RenderPresent(win->renderer);
 
@@ -533,6 +555,8 @@ int main(int argc, char *argv[])
 	SDL_PauseAudioDevice(st.audio_device, 1);
 
 	ret = EXIT_SUCCESS;
+out_wait_thread:
+	SDL_WaitThread(handler, NULL);
 out_destroy_texture:
 	SDL_DestroyTexture(texture);
 out_destroy_window:
