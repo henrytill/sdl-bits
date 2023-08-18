@@ -57,7 +57,9 @@ GET_BIT_TESTS
 enum {
   WIDTH = 10,
   HEIGHT = 20,
-  CODE_SIZE = ('~' - '!') + 1
+  LOW = '!',
+  HIGH = '~',
+  CODE_SIZE = (HIGH - LOW) + 1
 };
 
 static const char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
@@ -152,7 +154,7 @@ int main(void) {
 
   char code[CODE_SIZE] = {0};
   for (int i = 0; i < CODE_SIZE; ++i) {
-    code[i] = (char)(i + '!');
+    code[i] = (char)(i + LOW);
   }
 
   const size_t width = (size_t)WIDTH * CODE_SIZE;
