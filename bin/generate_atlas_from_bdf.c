@@ -69,12 +69,12 @@ static const bmp_pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
-static void render_char(FT_GlyphSlot slot, char *target, size_t offset) {
-  unsigned char *buffer = slot->bitmap.buffer;
-  size_t rows = (size_t)slot->bitmap.rows;
-  size_t width = (size_t)slot->bitmap.width;
-  size_t pitch = (size_t)abs(slot->bitmap.pitch);
-  size_t stride = width * CODE_SIZE;
+static void render_char(FT_GlyphSlot slot, char *target, const size_t offset) {
+  const unsigned char *buffer = slot->bitmap.buffer;
+  const size_t rows = (size_t)slot->bitmap.rows;
+  const size_t width = (size_t)slot->bitmap.width;
+  const size_t pitch = (size_t)abs(slot->bitmap.pitch);
+  const size_t stride = width * CODE_SIZE;
   char bit = 0;
 
   assert(width == WIDTH);
@@ -129,7 +129,7 @@ static int render_chars(FT_Face face, const char *code, char *image) {
 }
 
 #ifdef DRAW_IMAGE
-static void draw_image(const char *image, size_t width, size_t height) {
+static void draw_image(const char *image, const size_t width, const size_t height) {
   for (size_t y = 0; y < height; ++y) {
     (void)printf("%2zd|", y);
     for (size_t x = 0; x < width; ++x) {
@@ -140,8 +140,8 @@ static void draw_image(const char *image, size_t width, size_t height) {
 }
 #else
 static inline void draw_image(__attribute__((unused)) const char *image,
-                              __attribute__((unused)) size_t width,
-                              __attribute__((unused)) size_t height) {}
+                              __attribute__((unused)) const size_t width,
+                              __attribute__((unused)) const size_t height) {}
 #endif
 
 int main(void) {
