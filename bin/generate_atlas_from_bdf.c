@@ -8,6 +8,52 @@
 
 #include "bmp.h"
 
+#define STATIC_ASSERT(e) _Static_assert((e), #e)
+
+STATIC_ASSERT(CHAR_BIT == 8);
+
+#define SELECT_BIT(c, pos) (((pos) >= CHAR_BIT) ? 0 : ((c) & (1 << (CHAR_BIT + ~(pos)))))
+
+#define SELECT_BIT_TESTS       \
+  X(0b10000000, 0, 0b10000000) \
+  X(0b01000000, 1, 0b01000000) \
+  X(0b00100000, 2, 0b00100000) \
+  X(0b00010000, 3, 0b00010000) \
+  X(0b00001000, 4, 0b00001000) \
+  X(0b00000100, 5, 0b00000100) \
+  X(0b00000010, 6, 0b00000010) \
+  X(0b00000001, 7, 0b00000001) \
+  X(0b11111111, 0, 0b10000000) \
+  X(0b11111111, 7, 0b00000001) \
+  X(0b00000000, 0, 0b00000000) \
+  X(0b00000000, 7, 0b00000000) \
+  X(0b00000000, 8, 0b00000000)
+
+#define X(in, pos, out) STATIC_ASSERT(SELECT_BIT((in), (pos)) == (out));
+SELECT_BIT_TESTS
+#undef X
+
+#define GET_BIT(c, pos) (((pos) >= CHAR_BIT) ? 0 : (((c) >> (CHAR_BIT + ~(pos)) & 1)))
+
+#define GET_BIT_TESTS          \
+  X(0b10000000, 0, 0b00000001) \
+  X(0b01000000, 1, 0b00000001) \
+  X(0b00100000, 2, 0b00000001) \
+  X(0b00010000, 3, 0b00000001) \
+  X(0b00001000, 4, 0b00000001) \
+  X(0b00000100, 5, 0b00000001) \
+  X(0b00000010, 6, 0b00000001) \
+  X(0b00000001, 7, 0b00000001) \
+  X(0b11111111, 0, 0b00000001) \
+  X(0b11111111, 7, 0b00000001) \
+  X(0b00000000, 0, 0b00000000) \
+  X(0b00000000, 7, 0b00000000) \
+  X(0b00000000, 8, 0b00000000)
+
+#define X(in, pos, out) STATIC_ASSERT(GET_BIT((in), (pos)) == (out));
+GET_BIT_TESTS
+#undef X
+
 enum {
   WIDTH = 10,
   HEIGHT = 20,
@@ -19,14 +65,6 @@ static const char *const BMP_FILE = "./assets/10x20.bmp";
 
 static const bmp_pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
-
-// pos = 0 is MSB
-static char get_bit(unsigned char c, size_t pos) {
-  if (pos >= CHAR_BIT) {
-    return 0;
-  }
-  return (char)((c >> (CHAR_BIT + ~pos)) & 1); // Also: c & (1 << (CHAR_BIT + ~pos));
-}
 
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
 static void render_char(FT_GlyphSlot slot, char *target, size_t offset) {
@@ -42,7 +80,7 @@ static void render_char(FT_GlyphSlot slot, char *target, size_t offset) {
   for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
     for (size_t i = 0; i < pitch; ++i) {
       for (size_t j = 0, x; j < CHAR_BIT; ++j) {
-        bit = get_bit(buffer[p + i], j);
+        bit = GET_BIT(buffer[p + i], j);
         x = j + (i * CHAR_BIT);
         if (x < width) {
           target[(y * stride) + (x + (offset * width))] = bit;
