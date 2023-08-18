@@ -90,6 +90,42 @@ static void render_char(FT_GlyphSlot slot, char *target, size_t offset) {
   }
 }
 
+static int render_chars(FT_Face face, const char *code, char *image) {
+  int rc = -1;
+  FT_GlyphSlot slot = NULL;
+
+  rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
+  if (rc != 0) {
+    (void)fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
+    return -1;
+  }
+
+  for (size_t i = 0; i < CODE_SIZE; ++i) {
+    rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+    if (rc != 0) {
+      (void)fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
+      return -1;
+    }
+    slot = face->glyph;
+    rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
+    if (rc != 0) {
+      (void)fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
+      return -1;
+    }
+    if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
+      (void)fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
+      return -1;
+    }
+    if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
+      (void)fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
+      return -1;
+    }
+    render_char(slot, image, i);
+  }
+
+  return 0;
+}
+
 #ifdef DRAW_IMAGE
 static void draw_image(const char *image, size_t width, size_t height) {
   for (size_t y = 0; y < height; ++y) {
@@ -141,36 +177,9 @@ int main(void) {
     goto out_done_lib;
   }
 
-  rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
+  rc = render_chars(face, code, image);
   if (rc != 0) {
-    (void)fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     goto out_done_face;
-  }
-
-  FT_GlyphSlot slot = NULL;
-  for (size_t i = 0; i < CODE_SIZE; ++i) {
-    rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
-    if (rc != 0) {
-      (void)fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
-      goto out_done_face;
-    }
-    slot = face->glyph;
-
-    rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
-    if (rc != 0) {
-      (void)fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
-      goto out_done_face;
-    }
-    if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
-      (void)fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-      goto out_done_face;
-    }
-    if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
-      (void)fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-      goto out_done_face;
-    }
-
-    render_char(slot, image, i);
   }
 
   draw_image(image, width, height);
