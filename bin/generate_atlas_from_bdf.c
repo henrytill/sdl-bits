@@ -11,7 +11,7 @@
 enum {
   WIDTH = 10,
   HEIGHT = 20,
-  CODE_SIZE = 94, // ('~' - '!') + 1
+  CODE_SIZE = ('~' - '!') + 1
 };
 
 static const char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
@@ -19,9 +19,6 @@ static const char *const BMP_FILE = "./assets/10x20.bmp";
 
 static const bmp_pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
-
-static char **alloc_image(size_t height, size_t width);
-static void free_image(char **image, size_t height);
 
 // pos = 0 is MSB
 static char get_bit(unsigned char c, size_t pos) {
@@ -31,38 +28,16 @@ static char get_bit(unsigned char c, size_t pos) {
   return (char)((c >> (CHAR_BIT + ~pos)) & 1); // Also: c & (1 << (CHAR_BIT + ~pos));
 }
 
-static char **alloc_image(size_t height, size_t width) {
-  char **ret = calloc(height, sizeof(*ret));
-  if (ret == NULL) {
-    return ret;
-  }
-  for (size_t i = 0; i < height; ++i) {
-    ret[i] = calloc(width, sizeof(**ret));
-    if (ret[i] == NULL) {
-      free_image(ret, i);
-      return NULL;
-    }
-  }
-  return ret;
-}
-
-static void free_image(char **image, size_t height) {
-  if (image == NULL) {
-    return;
-  }
-  for (size_t i = 0; i < height; ++i) {
-    free(image[i]);
-  }
-  free(image);
-}
-
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
-static void render_char(FT_GlyphSlot slot, char **target, size_t offset) {
+static void render_char(FT_GlyphSlot slot, char *target, size_t offset) {
   unsigned char *buffer = slot->bitmap.buffer;
   size_t rows = (size_t)slot->bitmap.rows;
   size_t width = (size_t)slot->bitmap.width;
   size_t pitch = (size_t)abs(slot->bitmap.pitch);
+  size_t stride = width * CODE_SIZE;
   char bit = 0;
+
+  assert(width == WIDTH);
 
   for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
     for (size_t i = 0; i < pitch; ++i) {
@@ -70,7 +45,7 @@ static void render_char(FT_GlyphSlot slot, char **target, size_t offset) {
         bit = get_bit(buffer[p + i], j);
         x = j + (i * CHAR_BIT);
         if (x < width) {
-          target[y][x + (offset * width)] = bit;
+          target[(y * stride) + (x + (offset * width))] = bit;
         }
       }
     }
@@ -78,20 +53,19 @@ static void render_char(FT_GlyphSlot slot, char **target, size_t offset) {
 }
 
 #ifdef DRAW_IMAGE
-static void draw_image(char **image, size_t width, size_t height) {
+static void draw_image(const char *image, size_t width, size_t height) {
   for (size_t y = 0; y < height; ++y) {
     (void)printf("%2zd|", y);
-    for (size_t x = 0; x < width; ++x)
-      putchar(image[y][x] ? '*' : ' ');
+    for (size_t x = 0; x < width; ++x) {
+      putchar(image[(y * width) + x] ? '*' : ' ');
+    }
     (void)printf("|\n");
   }
 }
 #else
-static inline void draw_image(
-  __attribute__((unused)) char **image,
-  __attribute__((unused)) size_t width,
-  __attribute__((unused)) size_t height) {
-}
+static inline void draw_image(__attribute__((unused)) const char *image,
+                              __attribute__((unused)) size_t width,
+                              __attribute__((unused)) size_t height) {}
 #endif
 
 int main(void) {
@@ -109,7 +83,7 @@ int main(void) {
 
   const size_t width = (size_t)WIDTH * CODE_SIZE;
   const size_t height = HEIGHT;
-  char **image = alloc_image(height, width);
+  char *image = calloc(height * width, sizeof(char));
   if (image == NULL) {
     (void)fprintf(stderr, "alloc_image failed.");
     return EXIT_FAILURE;
@@ -170,7 +144,7 @@ int main(void) {
 
   for (size_t y = height, i = 0; y-- > 0;) {
     for (size_t x = 0; x < width; ++x, ++i) {
-      buffer[i] = image[y][x] ? BLACK : WHITE;
+      buffer[i] = image[(y * width) + x] ? BLACK : WHITE;
     }
   }
 
@@ -188,6 +162,6 @@ out_done_face:
 out_done_lib:
   FT_Done_FreeType(lib);
 out_free_image:
-  free_image(image, height);
+  free(image);
   return ret;
 }
