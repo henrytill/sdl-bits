@@ -37,7 +37,7 @@ static void message_queue_fail(int rc, const char *msg) {
 
 /// Log a SDL error message and exit.
 static void sdl_fail(const char *msg) {
-  sdl_error(msg);
+  log_sdl_error(msg);
   exit(EXIT_FAILURE);
 }
 
@@ -104,7 +104,8 @@ static int consume(struct message_queue *queue, struct message *out) {
 }
 
 ///
-/// Initialize SDL and a message_queue, run the producer thread, Consume, and clean up.
+/// Initialize SDL and a message_queue, run the producer thread, consume,
+/// and clean up.
 ///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
   extern const uint32_t QUEUE_CAP;
@@ -127,7 +128,7 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 
   SDL_Thread *producer = SDL_CreateThread(produce, "producer", queue);
   if (producer == NULL) {
-    sdl_error("SDL_CreateThread failed");
+    log_sdl_error("SDL_CreateThread failed");
     goto out_destroy_queue;
   }
 

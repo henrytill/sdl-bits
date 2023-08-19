@@ -286,20 +286,20 @@ static int window_init(struct config *cfg, const char *title, struct window *win
                                  cfg->width, cfg->height,
                                  WINDOW_TYPE_FLAGS[cfg->window_type]);
   if (win->window == NULL) {
-    sdl_error("SDL_CreateWindow failed");
+    log_sdl_error("SDL_CreateWindow failed");
     return -1;
   }
   win->renderer = SDL_CreateRenderer(win->window, -1, SDL_RENDERER_ACCELERATED);
   if (win->renderer == NULL) {
     SDL_DestroyWindow(win->window);
-    sdl_error("SDL_CreateRenderer failed");
+    log_sdl_error("SDL_CreateRenderer failed");
     return -1;
   }
   const int rc = SDL_SetRenderDrawColor(win->renderer, 0x00, 0x00, 0x00, 0xFF);
   if (rc != 0) {
     SDL_DestroyWindow(win->window);
     SDL_DestroyRenderer(win->renderer);
-    sdl_error("SDL_SetRenderDrawColor failed");
+    log_sdl_error("SDL_SetRenderDrawColor failed");
     return -1;
   }
   return 0;
@@ -365,7 +365,7 @@ static int get_rect(struct window *win, SDL_Rect *rect) {
   }
   const int rc = SDL_GetRendererOutputSize(win->renderer, &rect->w, &rect->h);
   if (rc != 0) {
-    sdl_error("SDL_GetRendererOutputSize failed");
+    log_sdl_error("SDL_GetRendererOutputSize failed");
     return -1;
   }
   return 0;
@@ -381,13 +381,13 @@ static int get_rect(struct window *win, SDL_Rect *rect) {
 static SDL_Texture *create_texture(struct window *win, const char *path) {
   SDL_Surface *surface = SDL_LoadBMP(path);
   if (surface == NULL) {
-    sdl_error("SDL_LoadBMP failed");
+    log_sdl_error("SDL_LoadBMP failed");
     return NULL;
   }
   SDL_Texture *texture = SDL_CreateTextureFromSurface(win->renderer, surface);
   SDL_FreeSurface(surface);
   if (texture == NULL) {
-    sdl_error("SDL_CreateTextureFromSurface failed");
+    log_sdl_error("SDL_CreateTextureFromSurface failed");
     return NULL;
   }
   return texture;
@@ -438,7 +438,7 @@ int main(int argc, char *argv[]) {
 
   int rc = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   if (rc != 0) {
-    sdl_error("init failed");
+    log_sdl_error("init failed");
     return EXIT_FAILURE;
   }
 
@@ -457,7 +457,7 @@ int main(int argc, char *argv[]) {
   SDL_AudioSpec have = {0};
   st.audio_device = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
   if (st.audio_device < 2) {
-    sdl_error("SDL_OpenAudio failed");
+    log_sdl_error("SDL_OpenAudio failed");
     return EXIT_FAILURE;
   }
 
@@ -520,12 +520,12 @@ int main(int argc, char *argv[]) {
 
     rc = SDL_RenderClear(win->renderer);
     if (rc != 0) {
-      sdl_error("SDL_RenderClear failed");
+      log_sdl_error("SDL_RenderClear failed");
       goto out_wait_thread;
     }
     rc = SDL_RenderCopy(win->renderer, texture, NULL, &win_rect);
     if (rc != 0) {
-      sdl_error("SDL_RenderCopy failed");
+      log_sdl_error("SDL_RenderCopy failed");
       goto out_wait_thread;
     }
     SDL_RenderPresent(win->renderer);

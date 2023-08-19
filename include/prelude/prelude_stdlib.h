@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void free_char(char *str) {
-  if (str != NULL) {
-    free(str);
-  }
-}
-
 #define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
 
 ///

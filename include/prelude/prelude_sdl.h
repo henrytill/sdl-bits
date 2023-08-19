@@ -3,6 +3,28 @@
 #include <SDL.h>
 #include <SDL_audio.h>
 
+#define ASSERT_TYPES_COMPATIBLE(a, b) \
+  _Static_assert(__builtin_types_compatible_p(a, b), #a " is not " #b);
+
+#define COMPATIBLE_TYPES       \
+  X(Uint8, uint8_t)            \
+  X(Uint16, uint16_t)          \
+  X(Uint32, uint32_t)          \
+  X(Uint64, uint64_t)          \
+  X(Sint8, int8_t)             \
+  X(Sint16, int16_t)           \
+  X(Sint32, int32_t)           \
+  X(Sint64, int64_t)           \
+  X(SDL_AudioFormat, uint16_t) \
+  X(SDL_AudioDeviceID, uint32_t)
+
+#define X(sdl_type, c_type) ASSERT_TYPES_COMPATIBLE(sdl_type, c_type);
+COMPATIBLE_TYPES
+#undef X
+
+#undef COMPATIBLE_TYPES
+#undef ASSERT_TYPES_COMPATIBLE
+
 #define now SDL_GetPerformanceCounter
 
 enum {
@@ -10,21 +32,12 @@ enum {
   ERR,
 };
 
-static_assert(__builtin_types_compatible_p(Uint16, uint16_t), "SDL-defined Uint16 is not uint16_t");
-static_assert(__builtin_types_compatible_p(Uint32, uint32_t), "SDL-defined Uint32 is not uint32_t");
-static_assert(__builtin_types_compatible_p(Uint64, uint64_t), "SDL-defined Uint64 is not uint64_t");
-static_assert(__builtin_types_compatible_p(Sint16, int16_t), "SDL-defined Sint16 is not int16_t");
-static_assert(__builtin_types_compatible_p(Sint32, int32_t), "SDL-defined Sint32 is not int32_t");
-static_assert(__builtin_types_compatible_p(Sint64, int64_t), "SDL-defined Sint64 is not int64_t");
-static_assert(__builtin_types_compatible_p(SDL_AudioFormat, uint16_t), "SDL-defined SDL_AudioFormat is not uint16_t");
-static_assert(__builtin_types_compatible_p(SDL_AudioDeviceID, uint32_t), "SDL-defined SDL_AudioDeviceID is not uint32_t");
-
 ///
 /// Log a message and the contents of SDL_GetError().
 ///
 /// @param msg The message to log
 ///
-static inline void sdl_error(const char *msg) {
+static inline void log_sdl_error(const char *msg) {
   const char *err = SDL_GetError();
   if (strlen(err) != 0) {
     SDL_LogError(ERR, "%s (%s)", msg, err);
