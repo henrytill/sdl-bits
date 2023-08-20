@@ -19,5 +19,5 @@
   "coverage-gutters.coverageFileNames": ["coverage.xml"],
   "coverage-gutters.coverageBaseDir": "builddir/meson-logs",
   "mesonbuild.configureOnOpen": true,
-  "mesonbuild.configureOptions": ["-Db_coverage=true", "--buildtype=debug"]
+  "mesonbuild.configureOptions": ["--buildtype=debug"]
 }
