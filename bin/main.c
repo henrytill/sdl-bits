@@ -20,6 +20,11 @@ enum {
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
+enum events {
+  EVENT_0 = SDL_USEREVENT,
+  EVENT_MAX
+};
+
 struct args {
   char *config_file;
 };
@@ -413,14 +418,40 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
   }
 }
 
-static void update(__attribute__((unused)) double delta) {}
+/// Handle user events.
+///
+/// @param event The user event.
+/// @param st The state.
+///
+static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct state *st) {
+  SDL_LogDebug(APP, "EVENT_UNIT: %d", event->timestamp);
+}
 
 static int handle(void *data) {
   struct message_queue *queue = data;
   (void)queue;
 
+  SDL_Event event = {
+    .user = {
+      .type = EVENT_0,
+      .code = 0,
+      .data1 = NULL,
+      .data2 = NULL,
+    },
+  };
+
+  int rc = SDL_PushEvent(&event);
+  if (rc == 0) {
+    SDL_LogDebug(APP, "SDL_PushEvent filtered");
+  } else if (rc < 0) {
+    log_sdl_error("SDL_PushEvent failed");
+    return -1;
+  }
+
   return 0;
 }
+
+static void update(__attribute__((unused)) double delta) {}
 
 int main(int argc, char *argv[]) {
   extern uint64_t perf_freq;
@@ -444,6 +475,13 @@ int main(int argc, char *argv[]) {
   AT_EXIT(SDL_Quit);
 
   perf_freq = SDL_GetPerformanceFrequency();
+
+  uint32_t event_start = SDL_RegisterEvents(EVENT_MAX - EVENT_0);
+  if (event_start == (uint32_t)-1) {
+    log_sdl_error("SDL_RegisterEvents failed");
+    return EXIT_FAILURE;
+  }
+  assert(event_start == EVENT_0);
 
   SDL_AudioSpec want = {
     .freq = st.audio.sample_rate,
@@ -511,6 +549,9 @@ int main(int argc, char *argv[]) {
         break;
       case SDL_KEYDOWN:
         handle_keydown(&event.key, &st);
+        break;
+      case EVENT_0:
+        handle_user(&event.user, &st);
         break;
       }
     }
