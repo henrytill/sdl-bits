@@ -127,7 +127,6 @@ static int parse_args(int argc, char *argv[], struct args *as) {
       as->config_file = argv[i++];
     }
   }
-
   return 0;
 }
 
