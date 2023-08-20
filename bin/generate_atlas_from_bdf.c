@@ -59,7 +59,7 @@ enum {
   HEIGHT = 20,
   LOW = '!',
   HIGH = '~',
-  CODE_SIZE = (HIGH - LOW) + 1
+  CODES_SIZE = (HIGH - LOW) + 1
 };
 
 static const char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";
@@ -69,12 +69,12 @@ static const bmp_pixel32 WHITE = {0xFF, 0xFF, 0xFF, 0x00};
 static const bmp_pixel32 BLACK = {0x00, 0x00, 0x00, 0xFF};
 
 // https://freetype.org/freetype2/docs/reference/ft2-basic_types.html#ft_bitmap
-static void render_char(FT_GlyphSlot slot, char *target, const size_t offset) {
+static void render_bitmap_char(FT_GlyphSlot slot, char *target, const size_t code_size, const size_t offset) {
   const unsigned char *buffer = slot->bitmap.buffer;
   const size_t rows = (size_t)slot->bitmap.rows;
   const size_t width = (size_t)slot->bitmap.width;
   const size_t pitch = (size_t)abs(slot->bitmap.pitch);
-  const size_t stride = width * CODE_SIZE;
+  const size_t stride = width * code_size;
   char bit = 0;
 
   assert(width == WIDTH);
@@ -92,18 +92,16 @@ static void render_char(FT_GlyphSlot slot, char *target, const size_t offset) {
   }
 }
 
-static int render_chars(FT_Face face, const char *code, char *image) {
-  int rc = -1;
-  FT_GlyphSlot slot = NULL;
-
-  rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
+static int render_bitmap_chars(FT_Face face, const char codes[CODES_SIZE], char *image) {
+  int rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
   if (rc != 0) {
     (void)fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     return -1;
   }
 
-  for (size_t i = 0; i < CODE_SIZE; ++i) {
-    rc = FT_Load_Char(face, (FT_ULong)code[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
+  FT_GlyphSlot slot = NULL;
+  for (size_t i = 0; i < CODES_SIZE; ++i) {
+    rc = FT_Load_Char(face, (FT_ULong)codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
     if (rc != 0) {
       (void)fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
       return -1;
@@ -114,18 +112,42 @@ static int render_chars(FT_Face face, const char *code, char *image) {
       (void)fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
       return -1;
     }
-    if (slot->format != FT_GLYPH_FORMAT_BITMAP) {
-      (void)fprintf(stderr, "format is not FL_GLYPH_FORMAT_BITMAP");
-      return -1;
-    }
-    if (slot->bitmap.pixel_mode != FT_PIXEL_MODE_MONO) {
-      (void)fprintf(stderr, "pixel_mode is not FL_PIXEL_MODE_MONO");
-      return -1;
-    }
-    render_char(slot, image, i);
+    assert(slot->format == FT_GLYPH_FORMAT_BITMAP);
+    assert(slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO);
+    render_bitmap_char(slot, image, CODES_SIZE, i);
   }
 
   return 0;
+}
+
+static int render_chars(const char codes[CODES_SIZE], char *image) {
+  int ret = -1;
+
+  FT_Library lib = NULL;
+  int rc = FT_Init_FreeType(&lib);
+  if (rc != 0) {
+    (void)fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
+    return -1;
+  }
+
+  FT_Face face = NULL;
+  rc = FT_New_Face(lib, FONT_FILE, 0, &face);
+  if (rc != 0) {
+    (void)fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
+    goto out_done_lib;
+  }
+
+  rc = render_bitmap_chars(face, codes, image);
+  if (rc != 0) {
+    goto out_done_face;
+  }
+
+  ret = 0;
+out_done_face:
+  FT_Done_Face(face);
+out_done_lib:
+  FT_Done_FreeType(lib);
+  return ret;
 }
 
 #ifdef DRAW_IMAGE
@@ -152,12 +174,12 @@ int main(void) {
 
   int ret = EXIT_FAILURE;
 
-  char code[CODE_SIZE] = {0};
-  for (int i = 0; i < CODE_SIZE; ++i) {
-    code[i] = (char)(i + LOW);
+  char codes[CODES_SIZE] = {0};
+  for (int i = 0; i < CODES_SIZE; ++i) {
+    codes[i] = (char)(i + LOW);
   }
 
-  const size_t width = (size_t)WIDTH * CODE_SIZE;
+  const size_t width = (size_t)WIDTH * CODES_SIZE;
   const size_t height = HEIGHT;
   char *image = calloc(height * width, sizeof(char));
   if (image == NULL) {
@@ -165,30 +187,16 @@ int main(void) {
     return EXIT_FAILURE;
   }
 
-  FT_Library lib = NULL;
-  int rc = FT_Init_FreeType(&lib);
+  int rc = render_chars(codes, image);
   if (rc != 0) {
-    (void)fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
     goto out_free_image;
-  }
-
-  FT_Face face = NULL;
-  rc = FT_New_Face(lib, FONT_FILE, 0, &face);
-  if (rc != 0) {
-    (void)fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
-    goto out_done_lib;
-  }
-
-  rc = render_chars(face, code, image);
-  if (rc != 0) {
-    goto out_done_face;
   }
 
   draw_image(image, width, height);
 
   bmp_pixel32 *buffer = calloc(width * height, sizeof(bmp_pixel32));
   if (buffer == NULL) {
-    goto out_done_face;
+    goto out_free_image;
   }
 
   for (size_t y = height, i = 0; y-- > 0;) {
@@ -206,10 +214,6 @@ int main(void) {
   ret = EXIT_SUCCESS;
 out_free_buffer:
   free(buffer);
-out_done_face:
-  FT_Done_Face(face);
-out_done_lib:
-  FT_Done_FreeType(lib);
 out_free_image:
   free(image);
   return ret;
