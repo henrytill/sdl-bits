@@ -16,7 +16,7 @@
 #include "prelude.h"
 
 enum {
-  AUDIO_CHANNELS = 2,
+  AUDIO_NUM_CHANNELS = 2,
   CENTERED = SDL_WINDOWPOS_CENTERED,
 };
 
@@ -208,7 +208,7 @@ static void calc_sine(void *userdata, uint8_t *stream, int len) {
   float *fstream = (float *)stream;
 
   static_assert(sizeof(*fstream) == 4, "sizeof(*fstream) != 4");
-  assert((len / ((int)sizeof(*fstream) * AUDIO_CHANNELS)) == as->buffer_size);
+  assert((len / ((int)sizeof(*fstream) * AUDIO_NUM_CHANNELS)) == as->buffer_size);
   (void)len;
 
   const double sample_rate = (double)as->sample_rate;
@@ -219,8 +219,8 @@ static void calc_sine(void *userdata, uint8_t *stream, int len) {
     const double time = (double)(offset + i) / sample_rate;
     const double x = 2.0 * M_PI * time * as->frequency;
     const double y = as->volume * sin(x);
-    fstream[AUDIO_CHANNELS * i + 0] = (float)y;
-    fstream[AUDIO_CHANNELS * i + 1] = (float)y;
+    fstream[AUDIO_NUM_CHANNELS * i + 0] = (float)y;
+    fstream[AUDIO_NUM_CHANNELS * i + 1] = (float)y;
   }
   as->elapsed += 1;
 }
@@ -476,7 +476,7 @@ int main(int argc, char *argv[]) {
 
   perf_freq = SDL_GetPerformanceFrequency();
 
-  uint32_t event_start = SDL_RegisterEvents(EVENT_MAX - EVENT_0);
+  const uint32_t event_start = SDL_RegisterEvents(EVENT_MAX - EVENT_0);
   if (event_start == (uint32_t)-1) {
     log_sdl_error("SDL_RegisterEvents failed");
     return EXIT_FAILURE;

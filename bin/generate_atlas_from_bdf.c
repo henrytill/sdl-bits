@@ -181,7 +181,7 @@ int main(void) {
 
   const size_t width = (size_t)WIDTH * CODES_SIZE;
   const size_t height = HEIGHT;
-  char *image = calloc(height * width, sizeof(char));
+  char *image = calloc(width * height, sizeof(char));
   if (image == NULL) {
     (void)fprintf(stderr, "alloc_image failed.");
     return EXIT_FAILURE;
