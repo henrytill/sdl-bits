@@ -136,7 +136,7 @@ static int parse_args(int argc, char *argv[], struct args *as) {
 }
 
 ///
-/// Join two paths together.  User is responsible for freeing the returned path.
+/// Join two paths together.  Caller is responsible for freeing the returned object.
 ///
 /// @param a The first path
 /// @param b The second path
@@ -440,7 +440,7 @@ static int handle(void *data) {
     },
   };
 
-  int rc = SDL_PushEvent(&event);
+  const int rc = SDL_PushEvent(&event);
   if (rc == 0) {
     SDL_LogDebug(APP, "SDL_PushEvent filtered");
   } else if (rc < 0) {
