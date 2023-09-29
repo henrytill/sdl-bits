@@ -153,11 +153,11 @@ out_done_lib:
 #ifdef DRAW_IMAGE
 static void draw_image(const char *image, const size_t width, const size_t height) {
   for (size_t y = 0; y < height; ++y) {
-    (void)printf("%2zd|", y);
+    printf("%2zd|", y);
     for (size_t x = 0; x < width; ++x) {
       putchar(image[(y * width) + x] ? '*' : ' ');
     }
-    (void)printf("|\n");
+    printf("|\n");
   }
 }
 #else
