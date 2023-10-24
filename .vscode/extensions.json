@@ -1,8 +1,0 @@
-{
-  "recommendations": [
-    "esbenp.prettier-vscode",
-    "mesonbuild.mesonbuild",
-    "ms-vscode.cpptools",
-    "ryanluker.vscode-coverage-gutters"
-  ]
-}
