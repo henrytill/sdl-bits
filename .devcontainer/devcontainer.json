@@ -26,7 +26,16 @@
         "mesonbuild.mesonbuild",
         "ms-vscode.cpptools",
         "ryanluker.vscode-coverage-gutters"
-      ]
+      ],
+      "settings": {
+        "files.associations": {
+          ".clang-tidy": "yaml",
+          "*.h": "c"
+        },
+        "mesonbuild.configureOnOpen": true,
+        "mesonbuild.configureOptions": ["--buildtype=debug"],
+        "python.formatting.provider": "black"
+      }
     }
   },
 
