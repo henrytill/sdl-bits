@@ -45,7 +45,7 @@ bmp_dep = declare_dependency(
 
 message_queue_include_dir = include_directories('include/message_queue')
 
-message_queue_sdl = library(
+message_queue_sdl = static_library(
   'message_queue_sdl', 'lib/message_queue/message_queue_sdl.c',
   include_directories : message_queue_include_dir,
   dependencies : [sdl_dep, macro_dep],
@@ -55,7 +55,7 @@ message_queue_sdl_dep = declare_dependency(
   link_with : [message_queue_sdl],
   include_directories : message_queue_include_dir)
 
-message_queue_posix = library(
+message_queue_posix = static_library(
   'message_queue_posix', 'lib/message_queue/message_queue_posix.c',
   include_directories : message_queue_include_dir,
   dependencies : [thread_dep, macro_dep],
