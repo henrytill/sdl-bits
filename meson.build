@@ -78,17 +78,17 @@ generate_test_bmp = executable(
 
 executable(
   'get_displays', 'bin/get_displays.c',
-  dependencies : [sdl_dep, macro_dep],
+  dependencies : [macro_dep, sdl_dep],
   install : false)
 
 executable(
   'library_versions', 'bin/library_versions.c',
-  dependencies : [freetype_dep, lua_dep, sdl_dep, macro_dep],
+  dependencies : [macro_dep, freetype_dep, lua_dep, sdl_dep],
   install : false)
 
 executable(
   'main', 'bin/main.c',
-  dependencies : [lua_dep, m_dep, prelude_dep, macro_dep, message_queue_sdl_dep],
+  dependencies : [prelude_dep, macro_dep, lua_dep, m_dep, message_queue_sdl_dep],
   install : true)
 
 # files
