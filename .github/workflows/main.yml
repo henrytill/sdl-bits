@@ -58,7 +58,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Test
-        run: docker run --rm --tty --workdir /home/build/sdl-bits/build ${{env.TEST_TAG}} ctest -j$(nproc)
+        run: docker run --rm --tty --workdir /home/build/sdl-bits/build ${{env.TEST_TAG}} meson test
 
   windows:
     runs-on: windows-latest
