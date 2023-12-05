@@ -397,6 +397,12 @@ static SDL_Texture *create_texture(struct window *win, const char *path) {
   return texture;
 }
 
+///
+/// Thread handler.
+///
+/// @param data The data passed to the thread.
+/// @return 0 on success, -1 on failure.
+///
 static int handle(void *data) {
   struct message_queue *queue = data;
   (void)queue;
@@ -451,6 +457,11 @@ static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct sta
   SDL_LogDebug(APP, "EVENT_0: %d", event->timestamp);
 }
 
+///
+/// Handle SDL events.
+///
+/// @param st The state.
+///
 static void handle_events(struct state *st) {
   SDL_Event event = {0};
   while (SDL_PollEvent(&event) != 0) {
@@ -470,6 +481,14 @@ static void handle_events(struct state *st) {
 
 static void update(__attribute__((unused)) double delta) {}
 
+///
+/// Render the texture to the window.
+///
+/// @param renderer The renderer
+/// @param texture The texture
+/// @param win_rect The window rectangle
+/// @return 0 on success, -1 on failure.
+///
 static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_rect) {
   int rc = SDL_RenderClear(renderer);
   if (rc != 0) {
