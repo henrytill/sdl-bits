@@ -6,7 +6,9 @@ project(
 )
 
 # dependencies
+
 cc = meson.get_compiler('c')
+
 m_dep = cc.find_library('m', required: true)
 
 freetype_dep = dependency('freetype2', required: true)
@@ -16,8 +18,11 @@ sdl_dep = dependency('sdl2', required: true)
 thread_dep = dependency('threads', required: true)
 
 # subproject dependencies
+
 cmake = import('cmake')
+
 lua_subproj = cmake.subproject('lua')
+
 lua_dep = lua_subproj.dependency('lua')
 
 # libraries
@@ -38,14 +43,14 @@ bmp_include_dir = include_directories('include/bmp')
 bmp = static_library(
   'bmp',
   'lib/bmp/bmp.c',
-  include_directories: [bmp_include_dir],
+  include_directories: bmp_include_dir,
   dependencies: [m_dep],
   install: false,
 )
 
 bmp_dep = declare_dependency(
   link_with: [bmp],
-  include_directories: [bmp_include_dir],
+  include_directories: bmp_include_dir,
 )
 
 message_queue_include_dir = include_directories('include/message_queue')
@@ -77,6 +82,7 @@ message_queue_posix_dep = declare_dependency(
 )
 
 # executables
+
 executable(
   'generate_atlas_from_bdf',
   'bin/generate_atlas_from_bdf.c',
@@ -113,6 +119,7 @@ executable(
 )
 
 # files
+
 test_bmp = custom_target(
   'test_bmp',
   output: 'test.bmp',
@@ -120,6 +127,7 @@ test_bmp = custom_target(
 )
 
 # tests
+
 bmp_read_bitmap = executable(
   'bmp_read_bitmap',
   'test/bmp_read_bitmap.c',
@@ -162,7 +170,11 @@ message_queue_copies_posix = executable(
   install: false,
 )
 
-test('bmp_read_bitmap', bmp_read_bitmap, args: ['../assets/sample_24bit.bmp'])
+test(
+  'bmp_read_bitmap',
+  bmp_read_bitmap,
+  args: ['../assets/sample_24bit.bmp'],
+)
 
 test(
   'bmp_read_bitmap_v4',
