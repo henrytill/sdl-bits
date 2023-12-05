@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 
-#include "macro.h"
-
 #define MSG_TAG_VARIANTS \
   X(NONE, 0, "NONE")     \
   X(SOME, 1, "SOME")     \

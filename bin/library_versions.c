@@ -7,8 +7,6 @@
 #include <lauxlib.h>
 #include <lua.h>
 
-#include "macro.h"
-
 enum {
   APP = SDL_LOG_CATEGORY_CUSTOM
 };

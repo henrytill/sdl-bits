@@ -14,8 +14,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "macro.h"
 #include "message_queue.h"
-#include "prelude.h"
+#include "prelude_sdl.h"
 
 /// Maximum value to Produce.
 static const int COUNT = 100;

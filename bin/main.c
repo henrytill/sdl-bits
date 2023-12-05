@@ -13,7 +13,8 @@
 
 #include "macro.h"
 #include "message_queue.h"
-#include "prelude.h"
+#include "prelude_sdl.h"
+#include "prelude_stdlib.h"
 
 enum {
   AUDIO_NUM_CHANNELS = 2,

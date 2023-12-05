@@ -107,7 +107,7 @@ executable(
 executable(
   'library_versions',
   'bin/library_versions.c',
-  dependencies: [macro_dep, freetype_dep, lua_dep, sdl_dep],
+  dependencies: [freetype_dep, lua_dep, sdl_dep],
   install: false,
 )
 

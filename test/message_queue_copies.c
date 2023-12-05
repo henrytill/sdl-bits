@@ -14,10 +14,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include <SDL.h>
-
+#include "macro.h"
 #include "message_queue.h"
-#include "prelude.h"
+#include "prelude_sdl.h"
 
 #define LOG(_msg) ({                                      \
   struct message __msg = (_msg);                          \
