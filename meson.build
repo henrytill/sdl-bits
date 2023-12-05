@@ -57,7 +57,7 @@ message_queue_include_dir = include_directories('include/message_queue')
 
 message_queue_sdl = static_library(
   'message_queue_sdl',
-  'lib/message_queue/message_queue_sdl.c',
+  sources: ['lib/message_queue/message_queue_sdl.c', 'lib/message_queue/shared.c'],
   include_directories: message_queue_include_dir,
   dependencies: [sdl_dep, macro_dep],
   install: false,
@@ -70,7 +70,7 @@ message_queue_sdl_dep = declare_dependency(
 
 message_queue_posix = static_library(
   'message_queue_posix',
-  'lib/message_queue/message_queue_posix.c',
+  sources: ['lib/message_queue/message_queue_posix.c', 'lib/message_queue/shared.c'],
   include_directories: message_queue_include_dir,
   dependencies: [thread_dep, macro_dep],
   install: false,
