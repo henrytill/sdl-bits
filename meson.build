@@ -19,55 +19,76 @@ lua_subproj = cmake.subproject('lua')
 lua_dep = lua_subproj.dependency('lua')
 
 # libraries
-bmp = library(
+
+macro_include_dir = include_directories('include/macro')
+
+macro_dep = declare_dependency(
+  include_directories : macro_include_dir)
+
+prelude_include_dir = include_directories('include/prelude')
+
+prelude_dep = declare_dependency(
+  include_directories : prelude_include_dir,
+  dependencies : [sdl_dep])
+
+bmp_include_dir = include_directories('include/bmp')
+
+bmp = static_library(
   'bmp', 'lib/bmp/bmp.c',
-  include_directories : ['include/bmp'],
+  include_directories : [bmp_include_dir],
   dependencies : [m_dep],
   install : false)
 
+bmp_dep = declare_dependency(
+  link_with : [bmp],
+  include_directories : [bmp_include_dir])
+
+message_queue_include_dir = include_directories('include/message_queue')
+
 message_queue_sdl = library(
   'message_queue_sdl', 'lib/message_queue/message_queue_sdl.c',
-  include_directories : ['include/message_queue', 'include/macro'],
-  dependencies : [sdl_dep],
+  include_directories : message_queue_include_dir,
+  dependencies : [sdl_dep, macro_dep],
   install : false)
+
+message_queue_sdl_dep = declare_dependency(
+  link_with : [message_queue_sdl],
+  include_directories : message_queue_include_dir)
 
 message_queue_posix = library(
   'message_queue_posix', 'lib/message_queue/message_queue_posix.c',
-  include_directories : ['include/message_queue', 'include/macro'],
-  dependencies : [thread_dep],
+  include_directories : message_queue_include_dir,
+  dependencies : [thread_dep, macro_dep],
   install : false)
+
+message_queue_posix_dep = declare_dependency(
+  link_with : [message_queue_posix],
+  include_directories : message_queue_include_dir)
 
 # executables
 executable(
   'generate_atlas_from_bdf', 'bin/generate_atlas_from_bdf.c',
-  include_directories : ['include/bmp'],
-  link_with : [bmp],
-  dependencies : [freetype_dep],
+  dependencies : [freetype_dep, bmp_dep],
   install : false)
 
 generate_test_bmp = executable(
   'generate_test_bmp', 'bin/generate_test_bmp.c',
-  include_directories : ['include/bmp'],
-  link_with : [bmp],
+  dependencies : [bmp_dep],
   install : false)
 
 executable(
   'get_displays', 'bin/get_displays.c',
-  include_directories : ['include/macro'],
-  dependencies : [sdl_dep],
+  dependencies : [sdl_dep, macro_dep],
   install : false)
 
 executable(
   'library_versions', 'bin/library_versions.c',
-  include_directories : ['include/macro'],
-  dependencies : [freetype_dep, lua_dep, sdl_dep],
+  dependencies : [freetype_dep, lua_dep, sdl_dep, macro_dep],
   install : false)
 
 executable(
   'main', 'bin/main.c',
-  include_directories : ['include/macro', 'include/message_queue', 'include/prelude'],
-  link_with : [message_queue_sdl],
-  dependencies : [lua_dep, m_dep, sdl_dep],
+  dependencies : [lua_dep, m_dep, prelude_dep, macro_dep, message_queue_sdl_dep],
   install : true)
 
 # files
@@ -79,42 +100,32 @@ test_bmp = custom_target(
 # tests
 bmp_read_bitmap = executable(
   'bmp_read_bitmap', 'test/bmp_read_bitmap.c',
-  include_directories : ['include/bmp'],
-  link_with : [bmp],
+  dependencies : [bmp_dep],
   install : false)
 
 bmp_read_bitmap_v4 = executable(
   'bmp_read_bitmap_v4', 'test/bmp_read_bitmap_v4.c',
-  include_directories : ['include/bmp'],
-  link_with : [bmp],
+  dependencies : [bmp_dep],
   install : false)
 
 message_queue_basic = executable(
   'message_queue_basic', 'test/message_queue_basic.c',
-  include_directories : ['include/message_queue', 'include/macro', 'include/prelude'],
-  link_with : [message_queue_sdl],
-  dependencies : [sdl_dep],
+  dependencies : [prelude_dep, macro_dep, message_queue_sdl_dep],
   install : false)
 
 message_queue_copies = executable(
   'message_queue_copies', 'test/message_queue_copies.c',
-  include_directories : ['include/message_queue', 'include/macro', 'include/prelude'],
-  link_with : [message_queue_sdl],
-  dependencies : [sdl_dep],
+  dependencies : [prelude_dep, macro_dep, message_queue_sdl_dep],
   install : false)
 
 message_queue_basic_posix = executable(
   'message_queue_basic_posix', 'test/message_queue_basic.c',
-  include_directories : ['include/message_queue', 'include/macro', 'include/prelude'],
-  link_with : [message_queue_posix],
-  dependencies : [sdl_dep],
+  dependencies : [prelude_dep, macro_dep, message_queue_posix_dep],
   install : false)
 
 message_queue_copies_posix = executable(
   'message_queue_copies_posix', 'test/message_queue_copies.c',
-  include_directories : ['include/message_queue', 'include/macro', 'include/prelude'],
-  link_with : [message_queue_posix],
-  dependencies : [sdl_dep],
+  dependencies : [prelude_dep, macro_dep, message_queue_posix_dep],
   install : false)
 
 test(
