@@ -397,6 +397,30 @@ static SDL_Texture *create_texture(struct window *win, const char *path) {
   return texture;
 }
 
+static int handle(void *data) {
+  struct message_queue *queue = data;
+  (void)queue;
+
+  SDL_Event event = {
+    .user = {
+      .type = EVENT_0,
+      .code = 0,
+      .data1 = NULL,
+      .data2 = NULL,
+    },
+  };
+
+  const int rc = SDL_PushEvent(&event);
+  if (rc == 0) {
+    SDL_LogDebug(APP, "SDL_PushEvent filtered");
+  } else if (rc < 0) {
+    log_sdl_error("SDL_PushEvent failed");
+    return -1;
+  }
+
+  return 0;
+}
+
 ///
 /// Handle keydown events.
 ///
@@ -424,34 +448,42 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
 /// @param st The state.
 ///
 static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct state *st) {
-  SDL_LogDebug(APP, "EVENT_UNIT: %d", event->timestamp);
+  SDL_LogDebug(APP, "EVENT_0: %d", event->timestamp);
 }
 
-static int handle(void *data) {
-  struct message_queue *queue = data;
-  (void)queue;
-
-  SDL_Event event = {
-    .user = {
-      .type = EVENT_0,
-      .code = 0,
-      .data1 = NULL,
-      .data2 = NULL,
-    },
-  };
-
-  const int rc = SDL_PushEvent(&event);
-  if (rc == 0) {
-    SDL_LogDebug(APP, "SDL_PushEvent filtered");
-  } else if (rc < 0) {
-    log_sdl_error("SDL_PushEvent failed");
-    return -1;
+static void handle_events(struct state *st) {
+  SDL_Event event = {0};
+  while (SDL_PollEvent(&event) != 0) {
+    switch (event.type) {
+    case SDL_QUIT:
+      st->loop_stat = 0;
+      break;
+    case SDL_KEYDOWN:
+      handle_keydown(&event.key, st);
+      break;
+    case EVENT_0:
+      handle_user(&event.user, st);
+      break;
+    }
   }
-
-  return 0;
 }
 
 static void update(__attribute__((unused)) double delta) {}
+
+static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_rect) {
+  int rc = SDL_RenderClear(renderer);
+  if (rc != 0) {
+    log_sdl_error("SDL_RenderClear failed");
+    return -1;
+  }
+  rc = SDL_RenderCopy(renderer, texture, NULL, win_rect);
+  if (rc != 0) {
+    log_sdl_error("SDL_RenderCopy failed");
+    return -1;
+  }
+  SDL_RenderPresent(renderer);
+  return 0;
+}
 
 int main(int argc, char *argv[]) {
   extern uint64_t perf_freq;
@@ -536,39 +568,19 @@ int main(int argc, char *argv[]) {
 
   SDL_PauseAudioDevice(st.audio_device, 0);
 
-  SDL_Event event = {0};
   double delta = frame_time;
   uint64_t begin = now();
   uint64_t end = 0;
 
   while (st.loop_stat == 1) {
-    while (SDL_PollEvent(&event) != 0) {
-      switch (event.type) {
-      case SDL_QUIT:
-        st.loop_stat = 0;
-        break;
-      case SDL_KEYDOWN:
-        handle_keydown(&event.key, &st);
-        break;
-      case EVENT_0:
-        handle_user(&event.user, &st);
-        break;
-      }
-    }
+    handle_events(&st);
 
     update(delta);
 
-    rc = SDL_RenderClear(win->renderer);
+    rc = render(win->renderer, texture, &win_rect);
     if (rc != 0) {
-      log_sdl_error("SDL_RenderClear failed");
       goto out_wait_thread;
     }
-    rc = SDL_RenderCopy(win->renderer, texture, NULL, &win_rect);
-    if (rc != 0) {
-      log_sdl_error("SDL_RenderCopy failed");
-      goto out_wait_thread;
-    }
-    SDL_RenderPresent(win->renderer);
 
     delay_frame(frame_time, begin);
     end = now();
