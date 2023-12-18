@@ -61,7 +61,7 @@ static int produce(void *data) {
   struct message_queue *queue = data;
   struct message msg = {0};
   const char *tag_str = NULL;
-  int rc = 0;
+  int rc = -1;
 
   for (intptr_t value = 0; value <= COUNT;) {
     msg.tag = (value < COUNT) ? MSG_TAG_SOME : MSG_TAG_QUIT;
