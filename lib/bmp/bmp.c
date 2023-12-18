@@ -13,6 +13,8 @@ static const uint16_t FILE_TYPE = 0x4D42;
 static const uint32_t BI_BITFIELDS = 0x0003;
 static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
+static const size_t V4_DATA_OFFSET = sizeof(bmp_file_header) + sizeof(bmp_v4_header);
+
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width) {
   const double pixel_bits = (double)bits_per_pixel * width;
   return (size_t)(ceil(pixel_bits / DWORD_BITS)) * DWORD_BYTES;
@@ -145,9 +147,7 @@ int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const c
     return -1;
   }
 
-  const size_t offset = sizeof(bmp_file_header) + sizeof(bmp_v4_header);
-
-  const size_t file_size = offset + image_size;
+  const size_t file_size = V4_DATA_OFFSET + image_size;
   if (file_size > UINT32_MAX) {
     return -1;
   }
@@ -157,7 +157,7 @@ int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const c
     .file_size = (uint32_t)file_size,
     .reserved1 = 0,
     .reserved2 = 0,
-    .offset = (uint32_t)offset,
+    .offset = (uint32_t)V4_DATA_OFFSET,
   };
 
   bmp_v4_header v4_header = {
