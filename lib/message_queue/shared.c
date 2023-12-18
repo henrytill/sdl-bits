@@ -1,7 +1,8 @@
+#include "shared.h"
+
 #include <stddef.h>
 
 #include "message_queue.h"
-#include "shared.h"
 
 static const char *const MSGQ_FAILURE_STR[] = {
 #define X(variant, i, str) [-(MSGQ_FAILURE_##variant)] = (str),

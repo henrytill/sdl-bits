@@ -1,3 +1,5 @@
+#include "message_queue.h"
+
 #include <errno.h>
 #include <stdlib.h>
 
@@ -5,7 +7,6 @@
 #include <semaphore.h>
 
 #include "compat.h"
-#include "message_queue.h"
 #include "shared.h"
 
 struct message_queue {

@@ -1,6 +1,7 @@
+#include "message_queue.h"
+
 #include <SDL.h>
 
-#include "message_queue.h"
 #include "shared.h"
 
 struct message_queue {

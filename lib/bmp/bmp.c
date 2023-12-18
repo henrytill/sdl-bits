@@ -1,8 +1,8 @@
+#include "bmp.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "bmp.h"
 
 enum {
   DWORD_BITS = 32,
