@@ -84,9 +84,8 @@ static void render_bitmap_char(FT_GlyphSlot slot, char *target, const size_t cod
       for (size_t j = 0, x; j < CHAR_BIT; ++j) {
         bit = GET_BIT(buffer[p + i], j);
         x = j + (i * CHAR_BIT);
-        if (x < width) {
-          target[(y * stride) + (x + (offset * width))] = bit;
-        }
+        if (x >= width) { continue; }
+        target[(y * stride) + (x + (offset * width))] = bit;
       }
     }
   }
