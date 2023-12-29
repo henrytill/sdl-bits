@@ -3,19 +3,19 @@
 #include <stdint.h>
 
 #define MSG_TAG_VARIANTS \
-  X(NONE, 0, "NONE")     \
-  X(SOME, 1, "SOME")     \
-  X(QUIT, 2, "QUIT")
+    X(NONE, 0, "NONE")   \
+    X(SOME, 1, "SOME")   \
+    X(QUIT, 2, "QUIT")
 
 enum {
 #define X(variant, i, str) MSG_TAG_##variant = (i),
-  MSG_TAG_VARIANTS
+    MSG_TAG_VARIANTS
 #undef X
 };
 
 struct message {
-  int tag;
-  intptr_t value;
+    int tag;
+    intptr_t value;
 };
 
 /// A thread-safe bounded message queue

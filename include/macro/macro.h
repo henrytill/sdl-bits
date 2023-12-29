@@ -27,11 +27,11 @@
 
 #define SAME_TYPE(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 
-#define CONTAINER_OF_(ptr, type, member) ({                                        \
-  void *__mptr = (void *)(ptr);                                                    \
-  static_assert(SAME_TYPE(*(ptr), ((type *)0)->member) || SAME_TYPE(*(ptr), void), \
-                "pointer type mismatch");                                          \
-  ((type *)(__mptr - offsetof(type, member)));                                     \
+#define CONTAINER_OF_(ptr, type, member) ({                                          \
+    void *__mptr = (void *)(ptr);                                                    \
+    static_assert(SAME_TYPE(*(ptr), ((type *)0)->member) || SAME_TYPE(*(ptr), void), \
+                  "pointer type mismatch");                                          \
+    ((type *)(__mptr - offsetof(type, member)));                                     \
 })
 
 // clang-format off
@@ -46,16 +46,16 @@
 #endif
 // clang-format on
 
-#define SEND(obj, method, ...) ({      \
-  typeof(obj) __obj = (obj);           \
-  __obj->method(__obj, ##__VA_ARGS__); \
+#define SEND(obj, method, ...) ({        \
+    typeof(obj) __obj = (obj);           \
+    __obj->method(__obj, ##__VA_ARGS__); \
 })
 
 // Cleanup
 
-#define AT_EXIT(func) ({                                 \
-  if (atexit(func) != 0) {                               \
-    (void)fprintf(stderr, "atexit(%s) failed\n", #func); \
-    exit(EXIT_FAILURE);                                  \
-  }                                                      \
+#define AT_EXIT(func) ({                                     \
+    if (atexit(func) != 0) {                                 \
+        (void)fprintf(stderr, "atexit(%s) failed\n", #func); \
+        exit(EXIT_FAILURE);                                  \
+    }                                                        \
 })
