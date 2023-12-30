@@ -10,7 +10,7 @@ typedef enum bmp_header_size {
     BITMAPV2INFOHEADER = 52,
     BITMAPV3INFOHEADER = 56,
     BITMAPV4HEADER = 108,
-    BITMAPV5HEADER = 124
+    BITMAPV5HEADER = 124,
 } bmp_header_size;
 
 typedef struct bmp_file_header {

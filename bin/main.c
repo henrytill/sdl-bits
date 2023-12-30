@@ -23,7 +23,7 @@ enum {
 
 enum events {
     EVENT_0 = SDL_USEREVENT,
-    EVENT_MAX
+    EVENT_MAX,
 };
 
 struct args {

@@ -59,7 +59,7 @@ enum {
     HEIGHT = 20,
     LOW = '!',
     HIGH = '~',
-    CODES_SIZE = (HIGH - LOW) + 1
+    CODES_SIZE = (HIGH - LOW) + 1,
 };
 
 static const char *const FONT_FILE = "./assets/ucs-fonts/10x20.bdf";

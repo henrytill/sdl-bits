@@ -8,7 +8,7 @@
 #include <lua.h>
 
 enum {
-    APP = SDL_LOG_CATEGORY_CUSTOM
+    APP = SDL_LOG_CATEGORY_CUSTOM,
 };
 
 static void log_freetype_version(void) {
