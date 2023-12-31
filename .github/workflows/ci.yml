@@ -1,13 +1,13 @@
-name: Build & Test
+name: CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ['master']
   pull_request:
-    branches: ["master"]
+    branches: ['master']
+  workflow_dispatch:
 
 env:
-  BUILD_TYPE: Release
   TEST_TAG: henrytill/sdl-bits:test
 
 jobs:
@@ -15,13 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - { cc: gcc }
-          - { cc: clang }
+        compiler: [gcc, clang]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - uses: hendrikmuhs/ccache-action@v1.2.10
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.compiler }}
       - name: Install dependencies
         run: |
           sudo apt install -yyq --no-install-recommends \
@@ -29,8 +30,9 @@ jobs:
             libdrm-dev libgbm-dev \
             libsdl2-dev libfreetype-dev
       - name: Configure
-        run: |
-          meson setup ${{github.workspace}}/build
+        run: meson setup ${{github.workspace}}/build
+        env:
+          CC: ccache ${{ matrix.compiler }}
       - name: Build
         working-directory: ${{github.workspace}}/build
         run: ninja -j0
