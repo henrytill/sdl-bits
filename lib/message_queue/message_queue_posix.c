@@ -20,6 +20,9 @@ struct message_queue {
 };
 
 static int message_queue_init(struct message_queue *queue, uint32_t capacity) {
+    if (queue == NULL) {
+        return MSGQ_FAILURE_NULL_POINTER;
+    }
     queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
     if (queue->buffer == NULL) {
         return MSGQ_FAILURE_MALLOC;

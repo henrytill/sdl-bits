@@ -19,7 +19,7 @@ static const char *const MSG_TAG_STR[] = {
 const char *message_queue_failure(int rc) {
     extern const char *const MSGQ_FAILURE_STR[];
 
-    if (rc > MSGQ_FAILURE_MALLOC || rc < MSGQ_FAILURE_MUTEX_UNLOCK) {
+    if (rc >= 0 || rc <= MSGQ_FAILURE_MIN) {
         return NULL;
     }
     return MSGQ_FAILURE_STR[-rc];
