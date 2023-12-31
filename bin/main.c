@@ -127,9 +127,7 @@ static int parse_args(int argc, char *argv[], struct args *as) {
     for (int i = 0; i < argc;) {
         char *arg = argv[i++];
         if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
-            if (i + 1 >= argc) {
-                return -1;
-            }
+            if (i + 1 >= argc) { return -1; }
             as->config_file = argv[i++];
         }
     }
@@ -143,12 +141,11 @@ static int parse_args(int argc, char *argv[], struct args *as) {
 /// @param b The second path
 /// @return A new path, or NULL on failure
 ///
-static char *join_path(const char *a, const char *b) {
-    size_t len = (size_t)snprintf(NULL, 0, "%s/%s", a, b);
+static char *joinpath2(const char *a, const char *b) {
+    const char separator = '/';
+    size_t len = (size_t)snprintf(NULL, 0, "%s%c%s", a, separator, b);
     char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
-    if (ret == NULL) {
-        return NULL;
-    }
+    if (ret == NULL) { return NULL; }
     (void)snprintf(ret, len, "%s/%s", a, b);
     return ret;
 }
@@ -416,7 +413,6 @@ static int handle(void *data) {
             .data2 = NULL,
         },
     };
-
     const int rc = SDL_PushEvent(&event);
     if (rc == 0) {
         SDL_LogDebug(APP, "SDL_PushEvent filtered");
@@ -424,7 +420,6 @@ static int handle(void *data) {
         log_sdl_error("SDL_PushEvent failed");
         return -1;
     }
-
     return 0;
 }
 
@@ -449,6 +444,7 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
     }
 }
 
+///
 /// Handle user events.
 ///
 /// @param event The user event.
@@ -556,14 +552,14 @@ int main(int argc, char *argv[]) {
         goto out_close_audio_device;
     }
 
-    SDL_Rect win_rect = {0, 0, 0, 0};
+    SDL_Rect win_rect = {0};
     rc = get_rect(win, &win_rect);
     if (rc != 0) {
         goto out_destroy_window;
     }
 
     const char *const test_bmp = "test.bmp";
-    char *bmp_file = join_path(cfg.asset_dir, test_bmp);
+    char *bmp_file = joinpath2(cfg.asset_dir, test_bmp);
     if (bmp_file == NULL) {
         goto out_destroy_window;
     }
