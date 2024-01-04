@@ -607,10 +607,10 @@ int main(int argc, char *argv[]) {
     SDL_PauseAudioDevice(st.audio_device, 1);
 
     ret = EXIT_SUCCESS;
-out_message_queue_destroy:
-    message_queue_destroy(queue);
 out_wait_thread:
     SDL_WaitThread(handler, NULL);
+out_message_queue_destroy:
+    message_queue_destroy(queue);
 out_destroy_texture:
     SDL_DestroyTexture(texture);
 out_destroy_window:
