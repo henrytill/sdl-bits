@@ -577,7 +577,7 @@ int main(int argc, char *argv[]) {
 
     SDL_Thread *handler = SDL_CreateThread(handle, "handler", queue);
     if (handler == NULL) {
-        goto out_destroy_texture;
+        goto out_message_queue_destroy;
     }
 
     const double frame_time = calc_frame_time(cfg.frame_rate);
@@ -607,6 +607,8 @@ int main(int argc, char *argv[]) {
     SDL_PauseAudioDevice(st.audio_device, 1);
 
     ret = EXIT_SUCCESS;
+out_message_queue_destroy:
+    message_queue_destroy(queue);
 out_wait_thread:
     SDL_WaitThread(handler, NULL);
 out_destroy_texture:
