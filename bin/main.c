@@ -260,6 +260,7 @@ static double calc_delta(const uint64_t begin, const uint64_t end) {
 /// @param begin The timestamp in ticks when the frame started
 ///
 static void delay_frame(const double frame_time, const uint64_t begin) {
+    assert(frame_time > 0);
     if (calc_delta(begin, now()) >= frame_time) {
         return;
     }
