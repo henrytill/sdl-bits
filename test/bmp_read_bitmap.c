@@ -11,7 +11,8 @@
 
 #include "bmp.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     bmp_file_header file_header = {0};
     bmp_info_header info_header = {0};
     char *image = NULL;

@@ -15,12 +15,14 @@ static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 
 static const size_t V4_DATA_OFFSET = sizeof(bmp_file_header) + sizeof(bmp_v4_header);
 
-size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width) {
+size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width)
+{
     const double pixel_bits = (double)bits_per_pixel * width;
     return (size_t)(ceil(pixel_bits / DWORD_BITS)) * DWORD_BYTES;
 }
 
-int bmp_read(const char *file, bmp_file_header *file_header, bmp_info_header *info_header, char **image) {
+int bmp_read(const char *file, bmp_file_header *file_header, bmp_info_header *info_header, char **image)
+{
     int ret = -1;
 
     FILE *file_handle = fopen(file, "r");
@@ -77,7 +79,8 @@ out_fclose_file_handle:
     return ret;
 }
 
-int bmp_v4_read(const char *file, bmp_file_header *file_header, bmp_v4_header *v4_header, char **image) {
+int bmp_v4_read(const char *file, bmp_file_header *file_header, bmp_v4_header *v4_header, char **image)
+{
     int ret = -1;
 
     FILE *file_handle = fopen(file, "r");
@@ -134,7 +137,8 @@ out_fclose_file_handle:
     return ret;
 }
 
-int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const char *file) {
+int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const char *file)
+{
     if (buffer == NULL || file == NULL) {
         return -1;
     }

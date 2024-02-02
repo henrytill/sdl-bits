@@ -18,7 +18,8 @@ static const bmp_pixel32 BUF[] = {
     {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     extern const bmp_pixel32 BUF[];
 
     if (argc != 2) {

@@ -19,7 +19,8 @@ struct message_queue {
     pthread_mutex_t *lock;  // Mutex lock to protect buffer access
 };
 
-static int message_queue_init(struct message_queue *queue, uint32_t capacity) {
+static int message_queue_init(struct message_queue *queue, uint32_t capacity)
+{
     if (queue == NULL) {
         return MSGQ_FAILURE_NULL_POINTER;
     }
@@ -51,7 +52,8 @@ static int message_queue_init(struct message_queue *queue, uint32_t capacity) {
     return 0;
 }
 
-static void message_queue_finish(struct message_queue *queue) {
+static void message_queue_finish(struct message_queue *queue)
+{
     if (queue == NULL) {
         return;
     }
@@ -76,7 +78,8 @@ static void message_queue_finish(struct message_queue *queue) {
     }
 }
 
-struct message_queue *message_queue_create(uint32_t capacity) {
+struct message_queue *message_queue_create(uint32_t capacity)
+{
     struct message_queue *queue = calloc(1, sizeof(*queue));
     if (queue == NULL) {
         return NULL;
@@ -89,7 +92,8 @@ struct message_queue *message_queue_create(uint32_t capacity) {
     return queue;
 }
 
-void message_queue_destroy(struct message_queue *queue) {
+void message_queue_destroy(struct message_queue *queue)
+{
     if (queue == NULL) {
         return;
     }
@@ -97,7 +101,8 @@ void message_queue_destroy(struct message_queue *queue) {
     free(queue);
 }
 
-int message_queue_put(struct message_queue *queue, struct message *in) {
+int message_queue_put(struct message_queue *queue, struct message *in)
+{
     int rc = sem_trywait(queue->empty);
     if (rc == -1 && errno == EAGAIN) {
         return 1;
@@ -122,7 +127,8 @@ int message_queue_put(struct message_queue *queue, struct message *in) {
     return 0;
 }
 
-int message_queue_get(struct message_queue *queue, struct message *out) {
+int message_queue_get(struct message_queue *queue, struct message *out)
+{
     int rc = sem_wait(queue->full);
     if (rc == -1) {
         return MSGQ_FAILURE_SEM_WAIT;
@@ -144,7 +150,8 @@ int message_queue_get(struct message_queue *queue, struct message *out) {
     return 0;
 }
 
-uint32_t message_queue_size(struct message_queue *queue) {
+uint32_t message_queue_size(struct message_queue *queue)
+{
     if (queue == NULL) {
         return 0;
     }

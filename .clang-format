@@ -11,6 +11,7 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 BasedOnStyle: LLVM
 BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: true
 ColumnLimit: 0
 ContinuationIndentWidth: 4

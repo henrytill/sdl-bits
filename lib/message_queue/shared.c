@@ -16,7 +16,8 @@ static const char *const MSG_TAG_STR[] = {
 #undef X
 };
 
-const char *message_queue_failure(int rc) {
+const char *message_queue_failure(int rc)
+{
     extern const char *const MSGQ_FAILURE_STR[];
 
     if (rc >= 0 || rc <= MSGQ_FAILURE_MIN) {
@@ -25,7 +26,8 @@ const char *message_queue_failure(int rc) {
     return MSGQ_FAILURE_STR[-rc];
 }
 
-const char *message_queue_tag(int tag) {
+const char *message_queue_tag(int tag)
+{
     extern const char *const MSG_TAG_STR[];
 
     if (tag > MSG_TAG_QUIT || tag < MSG_TAG_NONE) {

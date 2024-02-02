@@ -11,7 +11,8 @@ enum {
     APP = SDL_LOG_CATEGORY_CUSTOM,
 };
 
-static void log_freetype_version(void) {
+static void log_freetype_version(void)
+{
     FT_Library lib = NULL;
     int rc = FT_Init_FreeType(&lib);
     if (rc != 0) {
@@ -27,7 +28,8 @@ static void log_freetype_version(void) {
     FT_Done_FreeType(lib);
 }
 
-static void log_lua_version(void) {
+static void log_lua_version(void)
+{
     lua_State *state = luaL_newstate();
     if (state == NULL) {
         SDL_LogError(APP, "Failed to initialize Lua");
@@ -37,7 +39,8 @@ static void log_lua_version(void) {
     lua_close(state);
 }
 
-static void log_sdl_version(void) {
+static void log_sdl_version(void)
+{
     SDL_version compiled = {0};
     SDL_version linked = {0};
     SDL_VERSION(&compiled);
@@ -48,7 +51,8 @@ static void log_sdl_version(void) {
                 linked.major, linked.minor, linked.patch);
 }
 
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
+{
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
     log_freetype_version();
     log_lua_version();

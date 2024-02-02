@@ -45,13 +45,15 @@ static const uint32_t DELAY = 2000U;
 static const uint32_t QUEUE_CAP = 1U;
 
 /// Log a message_queue error message and exit.
-static void message_queue_fail(int rc, const char *msg) {
+static void message_queue_fail(int rc, const char *msg)
+{
     SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
     exit(EXIT_FAILURE);
 }
 
 /// Log a SDL error message and exit.
-static void sdl_fail(const char *msg) {
+static void sdl_fail(const char *msg)
+{
     log_sdl_error(msg);
     exit(EXIT_FAILURE);
 }
@@ -65,7 +67,8 @@ static void sdl_fail(const char *msg) {
 /// @return 0 on success, 1 on failure.
 /// @see consume()
 ///
-static int produce(void *data) {
+static int produce(void *data)
+{
     struct message_queue *queue = data;
     struct message msg = {.tag = MSG_TAG_SOME, .value = 42};
 
@@ -109,7 +112,8 @@ static int produce(void *data) {
 /// @return 0 on success, 1 on failure.
 /// @see produce()
 ///
-static int consume(struct message_queue *queue) {
+static int consume(struct message_queue *queue)
+{
     extern const uint32_t DELAY;
 
     struct message a = {0};
@@ -141,7 +145,8 @@ static int consume(struct message_queue *queue) {
 /// Initialize SDL and a message_queue, run the producer thread, consume,
 /// and clean up.
 ///
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
+{
     extern const uint32_t QUEUE_CAP;
 
     int ret = EXIT_FAILURE;

@@ -2,7 +2,8 @@
 
 #include "macro.h"
 
-static int log_current_mode(int i, SDL_DisplayMode *mode) {
+static int log_current_mode(int i, SDL_DisplayMode *mode)
+{
     const int rc = SDL_GetCurrentDisplayMode(i, mode);
     if (rc != 0) {
         const char *err = SDL_GetError();
@@ -13,7 +14,8 @@ static int log_current_mode(int i, SDL_DisplayMode *mode) {
     return 0;
 }
 
-static int log_display_modes(void) {
+static int log_display_modes(void)
+{
     const int num_displays = SDL_GetNumVideoDisplays();
     if (num_displays < 0) {
         const char *err = SDL_GetError();
@@ -31,7 +33,8 @@ static int log_display_modes(void) {
     return 0;
 }
 
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[]) {
+int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
+{
     int rc = SDL_Init(SDL_INIT_VIDEO);
     if (rc != 0) {
         return EXIT_FAILURE;

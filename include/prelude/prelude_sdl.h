@@ -37,7 +37,8 @@ enum {
 ///
 /// @param msg The message to log
 ///
-static inline void log_sdl_error(const char *msg) {
+static inline void log_sdl_error(const char *msg)
+{
     const char *err = SDL_GetError();
     if (strlen(err) != 0) {
         SDL_LogError(ERR, "%s (%s)", msg, err);

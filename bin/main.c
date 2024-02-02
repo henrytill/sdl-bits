@@ -123,7 +123,8 @@ static struct state st = {
 /// @param argv The arguments
 /// @param as The args struct to populate
 ///
-static int parse_args(int argc, char *argv[], struct args *as) {
+static int parse_args(int argc, char *argv[], struct args *as)
+{
     for (int i = 0; i < argc;) {
         char *arg = argv[i++];
         if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
@@ -141,7 +142,8 @@ static int parse_args(int argc, char *argv[], struct args *as) {
 /// @param b The second path
 /// @return A new path, or NULL on failure
 ///
-static char *joinpath2(const char *a, const char *b) {
+static char *joinpath2(const char *a, const char *b)
+{
     const char separator = '/';
     size_t len = (size_t)snprintf(NULL, 0, "%s%c%s", a, separator, b);
     char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
@@ -157,7 +159,8 @@ static char *joinpath2(const char *a, const char *b) {
 /// @param cfg The config struct to populate
 /// @return 0 on success, -1 on failure
 ///
-static int load_config(const char *file, struct config *cfg) {
+static int load_config(const char *file, struct config *cfg)
+{
     int ret = -1;
     lua_State *state = luaL_newstate();
     if (state == NULL) {
@@ -201,7 +204,8 @@ out_close_state:
 /// @param stream The stream to write to
 /// @param len The length of the stream
 ///
-static void calc_sine(void *userdata, uint8_t *stream, int len) {
+static void calc_sine(void *userdata, uint8_t *stream, int len)
+{
     struct audio_state *as = userdata;
     float *fstream = (float *)stream;
 
@@ -229,7 +233,8 @@ static void calc_sine(void *userdata, uint8_t *stream, int len) {
 /// @param frame_rate The frame rate
 /// @return The time in milliseconds for a frame
 ///
-static double calc_frame_time(const int frame_rate) {
+static double calc_frame_time(const int frame_rate)
+{
     extern const double SECOND;
 
     assert((double)frame_rate > 0);
@@ -243,7 +248,8 @@ static double calc_frame_time(const int frame_rate) {
 /// @param end A final timestamp in ticks
 /// @return The time in milliseconds between the two timestamps
 ///
-static double calc_delta(const uint64_t begin, const uint64_t end) {
+static double calc_delta(const uint64_t begin, const uint64_t end)
+{
     extern const double SECOND;
     extern uint64_t perf_freq;
 
@@ -259,7 +265,8 @@ static double calc_delta(const uint64_t begin, const uint64_t end) {
 /// @param frame_time The desired time in milliseconds for a frame
 /// @param begin The timestamp in ticks when the frame started
 ///
-static void delay_frame(const double frame_time, const uint64_t begin) {
+static void delay_frame(const double frame_time, const uint64_t begin)
+{
     assert(frame_time > 0);
     if (calc_delta(begin, now()) >= frame_time) {
         return;
@@ -279,7 +286,8 @@ static void delay_frame(const double frame_time, const uint64_t begin) {
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int window_init(struct config *cfg, const char *title, struct window *win) {
+static int window_init(struct config *cfg, const char *title, struct window *win)
+{
     extern const uint32_t WINDOW_TYPE_FLAGS[];
     extern const char *const WINDOW_TYPE_STR[];
 
@@ -313,7 +321,8 @@ static int window_init(struct config *cfg, const char *title, struct window *win
 ///
 /// @param win The window to destroy.
 ///
-static void window_finish(struct window *win) {
+static void window_finish(struct window *win)
+{
     if (win == NULL) {
         return;
     }
@@ -332,7 +341,8 @@ static void window_finish(struct window *win) {
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
 ///
-static struct window *window_create(struct config *cfg, const char *title) {
+static struct window *window_create(struct config *cfg, const char *title)
+{
     struct window *win = emalloc(sizeof(struct window));
     const int rc = window_init(cfg, title, win);
     if (rc != 0) {
@@ -347,7 +357,8 @@ static struct window *window_create(struct config *cfg, const char *title) {
 ///
 /// @param win The window to destroy.
 ///
-static void window_destroy(struct window *win) {
+static void window_destroy(struct window *win)
+{
     if (win == NULL) {
         return;
     }
@@ -362,7 +373,8 @@ static void window_destroy(struct window *win) {
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
 ///
-static int get_rect(struct window *win, SDL_Rect *rect) {
+static int get_rect(struct window *win, SDL_Rect *rect)
+{
     if (win == NULL || win->renderer == NULL) {
         return -1;
     }
@@ -381,7 +393,8 @@ static int get_rect(struct window *win, SDL_Rect *rect) {
 /// @param path The path to the bitmap file.
 /// @return The texture on success, NULL on failure.
 ///
-static SDL_Texture *create_texture(struct window *win, const char *path) {
+static SDL_Texture *create_texture(struct window *win, const char *path)
+{
     SDL_Surface *surface = SDL_LoadBMP(path);
     if (surface == NULL) {
         log_sdl_error("SDL_LoadBMP failed");
@@ -402,7 +415,8 @@ static SDL_Texture *create_texture(struct window *win, const char *path) {
 /// @param data The data passed to the thread.
 /// @return 0 on success, -1 on failure.
 ///
-static int handle(void *data) {
+static int handle(void *data)
+{
     struct message_queue *queue = data;
     (void)queue;
 
@@ -430,7 +444,8 @@ static int handle(void *data) {
 /// @param key The keydown event.
 /// @param st The state.
 ///
-static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
+static void handle_keydown(SDL_KeyboardEvent *key, struct state *st)
+{
     switch (key->keysym.sym) {
     case SDLK_ESCAPE:
         st->loop_stat = 0;
@@ -451,7 +466,8 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
 /// @param event The user event.
 /// @param st The state.
 ///
-static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct state *st) {
+static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct state *st)
+{
     SDL_LogDebug(APP, "EVENT_0: %d", event->timestamp);
 }
 
@@ -460,7 +476,8 @@ static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct sta
 ///
 /// @param st The state.
 ///
-static void handle_events(struct state *st) {
+static void handle_events(struct state *st)
+{
     SDL_Event event = {0};
     while (SDL_PollEvent(&event) != 0) {
         switch (event.type) {
@@ -487,7 +504,8 @@ static void update(__attribute__((unused)) double delta) {}
 /// @param win_rect The window rectangle
 /// @return 0 on success, -1 on failure.
 ///
-static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_rect) {
+static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_rect)
+{
     int rc = SDL_RenderClear(renderer);
     if (rc != 0) {
         log_sdl_error("SDL_RenderClear failed");
@@ -502,7 +520,8 @@ static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_re
     return 0;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     extern uint64_t perf_freq;
     extern struct args as;
     extern struct config cfg;
