@@ -147,7 +147,6 @@ static char *joinpath2(const char *a, const char *b)
     const char separator = '/';
     size_t len = (size_t)snprintf(NULL, 0, "%s%c%s", a, separator, b);
     char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
-    if (ret == NULL) { return NULL; }
     (void)snprintf(ret, len, "%s%c%s", a, separator, b);
     return ret;
 }
