@@ -187,7 +187,7 @@ int main(void)
 
     const size_t width = (size_t)WIDTH * CODES_SIZE;
     const size_t height = HEIGHT;
-    char *image = calloc(width * height, sizeof(char));
+    char *image = calloc(width * height, sizeof(*image));
     if (image == NULL) {
         (void)fprintf(stderr, "alloc_image failed.");
         return EXIT_FAILURE;
@@ -200,7 +200,7 @@ int main(void)
 
     draw_image(image, width, height);
 
-    bmp_pixel32 *buffer = calloc(width * height, sizeof(bmp_pixel32));
+    bmp_pixel32 *buffer = calloc(width * height, sizeof(*buffer));
     if (buffer == NULL) {
         goto out_free_image;
     }

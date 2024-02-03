@@ -14,7 +14,7 @@
 ///
 static inline sem_t *create_semaphore(uint32_t value)
 {
-    sem_t *sem = calloc(1, sizeof(sem_t));
+    sem_t *sem = calloc(1, sizeof(*sem));
     if (sem == NULL) {
         return NULL;
     }
@@ -33,7 +33,7 @@ static inline sem_t *create_semaphore(uint32_t value)
 ///
 static inline pthread_mutex_t *create_mutex(void)
 {
-    pthread_mutex_t *mutex = calloc(1, sizeof(pthread_mutex_t));
+    pthread_mutex_t *mutex = calloc(1, sizeof(*mutex));
     if (mutex == NULL) {
         return NULL;
     }

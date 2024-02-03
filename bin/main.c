@@ -146,7 +146,7 @@ static char *joinpath2(const char *a, const char *b)
 {
     const char separator = '/';
     size_t len = (size_t)snprintf(NULL, 0, "%s%c%s", a, separator, b);
-    char *ret = ecalloc(++len, sizeof(char)); // incr for terminator
+    char *ret = ecalloc(++len, sizeof(*ret)); // incr for terminator
     (void)snprintf(ret, len, "%s%c%s", a, separator, b);
     return ret;
 }
@@ -342,7 +342,7 @@ static void window_finish(struct window *win)
 ///
 static struct window *window_create(struct config *cfg, const char *title)
 {
-    struct window *win = emalloc(sizeof(struct window));
+    struct window *win = emalloc(sizeof(*win));
     const int rc = window_init(cfg, title, win);
     if (rc != 0) {
         free(win);
