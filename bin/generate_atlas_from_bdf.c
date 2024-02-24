@@ -76,17 +76,15 @@ static void render_bitmap_char(FT_GlyphSlot slot, char *target, const size_t cod
     const size_t width = (size_t)slot->bitmap.width;
     const size_t pitch = (size_t)abs(slot->bitmap.pitch);
     const size_t stride = width * code_size;
-    char bit = 0;
 
     assert(width == WIDTH);
 
     for (size_t y = 0, p = 0; y < rows; ++y, p += pitch) {
         for (size_t i = 0; i < pitch; ++i) {
             for (size_t j = 0, x; j < CHAR_BIT; ++j) {
-                bit = GET_BIT(buffer[p + i], j);
                 x = j + (i * CHAR_BIT);
                 if (x >= width) { continue; }
-                target[(y * stride) + (x + (offset * width))] = bit;
+                target[(y * stride) + (x + (offset * width))] = GET_BIT(buffer[p + i], j);
             }
         }
     }
