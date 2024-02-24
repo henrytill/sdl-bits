@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install -yyq --no-install-recommends \
-            build-essential cmake gcovr meson ninja-build \
+            meson ninja-build \
             libdrm-dev libgbm-dev \
             libsdl2-dev libfreetype-dev
       - name: Configure
