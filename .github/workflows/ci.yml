@@ -28,7 +28,8 @@ jobs:
           sudo apt install -yyq --no-install-recommends \
             meson ninja-build \
             libdrm-dev libgbm-dev \
-            libsdl2-dev libfreetype-dev
+            libsdl2-dev libfreetype-dev \
+            liblua5.1-0-dev
       - name: Configure
         run: meson setup ${{github.workspace}}/build
         env:
@@ -84,6 +85,7 @@ jobs:
             mingw-w64-${{matrix.env}}-toolchain
             mingw-w64-${{matrix.env}}-ninja
             mingw-w64-${{matrix.env}}-cmake
+            mingw-w64-${{matrix.env}}-lua51
             mingw-w64-${{matrix.env}}-meson
             mingw-w64-${{matrix.env}}-SDL2
             mingw-w64-${{matrix.env}}-freetype

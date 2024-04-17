@@ -13,17 +13,12 @@ m_dep = cc.find_library('m', required: true)
 
 freetype_dep = dependency('freetype2', required: true)
 
+lua_dep = dependency('lua5.1', required: true)
+
 sdl_dep = dependency('sdl2', required: true)
 
 thread_dep = dependency('threads', required: true)
 
-# subproject dependencies
-
-cmake = import('cmake')
-
-lua_subproj = cmake.subproject('lua')
-
-lua_dep = lua_subproj.dependency('lua')
 
 # libraries
 
