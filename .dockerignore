@@ -1,6 +1,6 @@
 /.cache/
 /.devcontainer/
-/.github/
+/.git*
 /.vscode/
 /build/
 /builddir/
