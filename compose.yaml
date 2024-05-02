@@ -16,11 +16,11 @@ services:
       - SYS_NICE
       - SYS_RESOURCE
     working_dir: /home/build/sdl-bits
-    command: ./build/main
+    command: ./_bin/main
 
   test:
     build:
       context: .
       dockerfile: ./Dockerfile
-    working_dir: /home/build/sdl-bits/build
-    command: ninja test
+    working_dir: /home/build/sdl-bits
+    command: make check

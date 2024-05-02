@@ -8,14 +8,10 @@ RUN useradd -m build -u 1000 -U -s /bin/bash
 
 USER build
 
-RUN mkdir -p /home/build/sdl-bits/build
+RUN mkdir -p /home/build/sdl-bits
 
-WORKDIR /home/build/sdl-bits/build
+WORKDIR /home/build/sdl-bits
 
 COPY --chown=build:build . /home/build/sdl-bits/
 
-RUN meson setup . ../.
-
-RUN ninja
-
-WORKDIR /home/build/sdl-bits
+RUN make

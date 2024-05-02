@@ -2,9 +2,12 @@
 /.devcontainer/
 /.git*
 /.vscode/
+/_bin/
 /build/
 /builddir/
 /misc/
 .dir-locals.el
 .dockerignore
 Dockerfile
+/src/*.o
+/test/*.o

@@ -5,3 +5,7 @@
 /assets/10x20.bmp
 /assets/test.bmp
 *.bat
+src/*.o
+test/*.o
+_bin/
+config.mk
