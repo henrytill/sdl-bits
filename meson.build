@@ -22,93 +22,89 @@ thread_dep = dependency('threads', required: true)
 
 # libraries
 
-macro_include_dir = include_directories('include/macro')
+include_dir = include_directories('include')
 
-macro_dep = declare_dependency(include_directories: macro_include_dir)
-
-prelude_include_dir = include_directories('include/prelude')
+macro_dep = declare_dependency(include_directories: include_dir)
 
 prelude_dep = declare_dependency(
-  include_directories: prelude_include_dir,
+  include_directories: include_dir,
   dependencies: [sdl_dep],
 )
 
-bmp_include_dir = include_directories('include/bmp')
-
 bmp = static_library(
   'bmp',
-  'lib/bmp/bmp.c',
-  include_directories: bmp_include_dir,
+  'src/bmp.c',
+  include_directories: include_dir,
   dependencies: [m_dep],
   install: false,
 )
 
 bmp_dep = declare_dependency(
   link_with: [bmp],
-  include_directories: bmp_include_dir,
+  include_directories: include_dir,
 )
 
-message_queue_include_dir = include_directories('include/message_queue')
+message_queue_include_dir = include_directories('include')
 
 message_queue_sdl = static_library(
   'message_queue_sdl',
-  sources: ['lib/message_queue/message_queue_sdl.c', 'lib/message_queue/shared.c'],
-  include_directories: message_queue_include_dir,
+  sources: ['src/message_queue_sdl.c', 'src/shared.c'],
+  include_directories: include_dir,
   dependencies: [sdl_dep, macro_dep],
   install: false,
 )
 
 message_queue_sdl_dep = declare_dependency(
   link_with: [message_queue_sdl],
-  include_directories: message_queue_include_dir,
+  include_directories: include_dir,
 )
 
 message_queue_posix = static_library(
   'message_queue_posix',
-  sources: ['lib/message_queue/message_queue_posix.c', 'lib/message_queue/shared.c'],
-  include_directories: message_queue_include_dir,
+  sources: ['src/message_queue_posix.c', 'src/shared.c'],
+  include_directories: include_dir,
   dependencies: [thread_dep, macro_dep],
   install: false,
 )
 
 message_queue_posix_dep = declare_dependency(
   link_with: [message_queue_posix],
-  include_directories: message_queue_include_dir,
+  include_directories: include_dir,
 )
 
 # executables
 
 executable(
   'generate_atlas_from_bdf',
-  'bin/generate_atlas_from_bdf.c',
+  'src/generate_atlas_from_bdf.c',
   dependencies: [freetype_dep, bmp_dep],
   install: false,
 )
 
 generate_test_bmp = executable(
   'generate_test_bmp',
-  'bin/generate_test_bmp.c',
+  'src/generate_test_bmp.c',
   dependencies: [bmp_dep],
   install: false,
 )
 
 executable(
   'get_displays',
-  'bin/get_displays.c',
+  'src/get_displays.c',
   dependencies: [macro_dep, sdl_dep],
   install: false,
 )
 
 executable(
   'library_versions',
-  'bin/library_versions.c',
+  'src/library_versions.c',
   dependencies: [freetype_dep, lua_dep, sdl_dep],
   install: false,
 )
 
 executable(
   'main',
-  'bin/main.c',
+  'src/main.c',
   dependencies: [prelude_dep, macro_dep, lua_dep, m_dep, message_queue_sdl_dep],
   install: true,
 )
