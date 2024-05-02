@@ -16,6 +16,8 @@ HEADERS += include/macro.h
 HEADERS += include/message_queue.h
 HEADERS += include/prelude_sdl.h
 HEADERS += include/prelude_stdlib.h
+HEADERS += src/compat.h
+HEADERS += src/shared.h
 
 OBJECTS =
 OBJECTS += src/bmp.o
