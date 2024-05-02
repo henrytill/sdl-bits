@@ -83,22 +83,22 @@ $(BINOUT)/main: src/main.o src/message_queue_sdl.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/bmp_read_bitmap: LDLIBS += -lm
-$(BINOUT)/bmp_read_bitmap: src/bmp.o test/bmp_read_bitmap.o
+$(BINOUT)/bmp_read_bitmap: test/bmp_read_bitmap.o src/bmp.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/bmp_read_bitmap_v4: LDLIBS += -lm
-$(BINOUT)/bmp_read_bitmap_v4: src/bmp.o test/bmp_read_bitmap_v4.o
+$(BINOUT)/bmp_read_bitmap_v4: test/bmp_read_bitmap_v4.o src/bmp.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/message_queue_basic: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_basic: src/shared.o src/message_queue_sdl.o test/message_queue_basic.o
+$(BINOUT)/message_queue_basic: test/message_queue_basic.o src/shared.o src/message_queue_sdl.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/message_queue_copies: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_copies: src/shared.o src/message_queue_sdl.o test/message_queue_copies.o
+$(BINOUT)/message_queue_copies: test/message_queue_copies.o src/shared.o src/message_queue_sdl.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
