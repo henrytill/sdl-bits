@@ -26,27 +26,24 @@ OBJECTS += src/main.o
 OBJECTS += src/message_queue_posix.o
 OBJECTS += src/message_queue_sdl.o
 OBJECTS += src/shared.o
-
-TEST_OBJECTS =
-TEST_OBJECTS += src/bmp.o
-TEST_OBJECTS += src/message_queue_posix.o
-TEST_OBJECTS += src/message_queue_sdl.o
+OBJECTS += test/bmp_read_bitmap.o
+OBJECTS += test/bmp_read_bitmap_v4.o
+OBJECTS += test/message_queue_basic.o
+OBJECTS += test/message_queue_copies.o
 
 BINARIES =
 BINARIES += $(BINOUT)/generate_atlas_from_bdf
 BINARIES += $(BINOUT)/generate_test_bmp
 BINARIES += $(BINOUT)/get_displays
 BINARIES += $(BINOUT)/main
-
-TEST_BINARIES =
-TEST_BINARIES += $(BINOUT)/bmp_read_bitmap
-TEST_BINARIES += $(BINOUT)/bmp_read_bitmap_v4
-TEST_BINARIES += $(BINOUT)/message_queue_basic
-TEST_BINARIES += $(BINOUT)/message_queue_copies
+BINARIES += $(BINOUT)/bmp_read_bitmap
+BINARIES += $(BINOUT)/bmp_read_bitmap_v4
+BINARIES += $(BINOUT)/message_queue_basic
+BINARIES += $(BINOUT)/message_queue_copies
 
 -include config.mk
 
-all: $(BINARIES) $(TEST_BINARIES)
+all: $(OBJECTS) $(BINARIES)
 
 $(OBJECTS): $(HEADERS)
 
@@ -109,4 +106,4 @@ check:
 
 .PHONY: clean
 clean:
-	rm -f -- $(BINARIES) $(TEST_BINARIES) $(OBJECTS)
+	rm -f -- $(BINARIES) $(OBJECTS)
