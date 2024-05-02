@@ -125,8 +125,9 @@ static struct state st = {
 ///
 static int parse_args(int argc, char *argv[], struct args *as)
 {
+    char *arg = NULL;
     for (int i = 0; i < argc;) {
-        char *arg = argv[i++];
+        arg = argv[i++];
         if (strcmp(arg, "-c") == 0 || strcmp(arg, "--config") == 0) {
             if (i + 1 >= argc) { return -1; }
             as->config_file = argv[i++];
