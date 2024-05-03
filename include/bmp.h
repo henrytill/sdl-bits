@@ -83,14 +83,14 @@ typedef struct bmp_pixel32 {
     uint8_t a;
 } __attribute__((packed)) bmp_pixel32;
 
-/// Calculate the number of bytes per row.
+/// Calculates the number of bytes per row.
 ///
 /// @param bits_per_pixel Bits per pixel.
 /// @param width Image width.
 /// @return Number of bytes per row.
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width);
 
-/// Read a BMP file.
+/// Reads a BMP file.
 ///
 /// @param file Path to the BMP file.
 /// @param file_header The file header structure to be filled.
@@ -108,7 +108,7 @@ int bmp_read(const char *file, bmp_file_header *file_header, bmp_info_header *in
 /// @return 0 on success, -1 on error.
 int bmp_v4_read(const char *file, bmp_file_header *file_header, bmp_v4_header *v4_header, char **image);
 
-/// Write a BMP file with a V4 header.
+/// Writes a BMP file with a V4 header.
 ///
 /// @param buffer The image data.
 /// @param width Image width in pixels.

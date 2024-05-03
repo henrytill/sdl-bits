@@ -22,28 +22,28 @@ static const int COUNT = 100;
 /// Capacity of the message_queue.
 static const uint32_t QUEUE_CAP = 4U;
 
-/// Log an error message and exit.
+/// Logs an error message and exit.
 static void fail(const char *msg)
 {
     SDL_LogError(ERR, "%s", msg);
     exit(EXIT_FAILURE);
 }
 
-/// Log a message_queue error message and exit.
+/// Logs a message_queue error message and exit.
 static void message_queue_fail(int rc, const char *msg)
 {
     SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
     exit(EXIT_FAILURE);
 }
 
-/// Log a SDL error message and exit.
+/// Logs a SDL error message and exit.
 static void sdl_fail(const char *msg)
 {
     log_sdl_error(msg);
     exit(EXIT_FAILURE);
 }
 
-/// Produce messages with values from 0 to COUNT. The last message has tag MSG_TAG_QUIT.
+/// Produces messages with values from 0 to COUNT. The last message has tag MSG_TAG_QUIT.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
 ///
@@ -84,7 +84,7 @@ static int produce(void *data)
     return 0;
 }
 
-/// Consume messages until a message with tag MSG_TAG_QUIT is received.
+/// Consumes messages until a message with tag MSG_TAG_QUIT is received.
 ///
 /// This function is meant to be run on the main thread.
 ///
@@ -103,8 +103,8 @@ static int consume(struct message_queue *queue, struct message *out)
     return out->tag != MSG_TAG_QUIT;
 }
 
-/// Initialize SDL and a message_queue, run the producer thread, consume,
-/// and clean up.
+/// Initializes SDL and a message_queue, runs the producer thread, consumes,
+/// and cleans up.
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
     extern const uint32_t QUEUE_CAP;
