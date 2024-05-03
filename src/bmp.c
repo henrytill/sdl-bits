@@ -181,7 +181,7 @@ int bmp_v4_write(const bmp_pixel32 *buffer, size_t width, size_t height, const c
         .b_mask = 0x000000FF,
         .a_mask = 0xFF000000,
         .colorspace_type = LCS_WINDOWS_COLOR_SPACE,
-        .colorspace = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+        .colorspace = {0},
         .r_gamma = 0,
         .g_gamma = 0,
         .b_gamma = 0,
