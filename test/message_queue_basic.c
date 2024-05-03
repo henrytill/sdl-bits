@@ -1,4 +1,3 @@
-///
 /// Test basic message queue functionality.
 ///
 /// The producer thread produces messages with values from 0 to COUNT.
@@ -9,7 +8,6 @@
 /// @see message_queue_put()
 /// @see message_queue_get()
 /// @see message_queue_destroy()
-///
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -45,7 +43,6 @@ static void sdl_fail(const char *msg)
     exit(EXIT_FAILURE);
 }
 
-///
 /// Produce messages with values from 0 to COUNT. The last message has tag MSG_TAG_QUIT.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
@@ -53,7 +50,6 @@ static void sdl_fail(const char *msg)
 /// @param data Pointer to a message_queue.
 /// @return 0 on success
 /// @see consume()
-///
 static int produce(void *data)
 {
     extern const int COUNT;
@@ -88,7 +84,6 @@ static int produce(void *data)
     return 0;
 }
 
-///
 /// Consume messages until a message with tag MSG_TAG_QUIT is received.
 ///
 /// This function is meant to be run on the main thread.
@@ -97,7 +92,6 @@ static int produce(void *data)
 /// @param out Pointer to a message.
 /// @return 0 when a message with tag MSG_TAG_QUIT is received, 1 otherwise
 /// @see produce()
-///
 static int consume(struct message_queue *queue, struct message *out)
 {
     const int rc = message_queue_get(queue, out);
@@ -109,10 +103,8 @@ static int consume(struct message_queue *queue, struct message *out)
     return out->tag != MSG_TAG_QUIT;
 }
 
-///
 /// Initialize SDL and a message_queue, run the producer thread, consume,
 /// and clean up.
-///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
     extern const uint32_t QUEUE_CAP;

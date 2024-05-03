@@ -5,12 +5,10 @@
 
 #define ALLOCATION_FAILURE_MSG "Failed to allocate.\n"
 
-///
 /// Allocate or die.
 ///
 /// @param size The size in bytes to allocate.
 /// @return A pointer to the allocated memory.
-///
 static inline void *emalloc(size_t size)
 {
     void *ret = malloc(size);
@@ -21,13 +19,11 @@ static inline void *emalloc(size_t size)
     return ret;
 }
 
-///
 /// Allocate and zero or die.
 ///
 /// @param nmemb The number of elements to allocate.
 /// @param size The size in bytes of each element.
 /// @return A pointer to the allocated memory.
-///
 static inline void *ecalloc(size_t nmemb, size_t size)
 {
     void *ret = calloc(nmemb, size);

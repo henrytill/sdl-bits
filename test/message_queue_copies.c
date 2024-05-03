@@ -1,4 +1,3 @@
-///
 /// Test that values are copied into and out of the message queue.
 ///
 /// The producer thread produces messages with values 42, 0, and 1.
@@ -9,7 +8,6 @@
 /// @see message_queue_put()
 /// @see message_queue_get()
 /// @see message_queue_destroy()
-///
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -58,7 +56,6 @@ static void sdl_fail(const char *msg)
     exit(EXIT_FAILURE);
 }
 
-///
 /// Produce messages.
 ///
 /// This function is meant to be run in its own thread by passing it to SDL_CreateThread().
@@ -66,7 +63,6 @@ static void sdl_fail(const char *msg)
 /// @param data Pointer to a message_queue.
 /// @return 0 on success, 1 on failure.
 /// @see consume()
-///
 static int produce(void *data)
 {
     struct message_queue *queue = data;
@@ -103,7 +99,6 @@ static int produce(void *data)
     return 0;
 }
 
-///
 /// Consume messages produced by produce() after a delay and check their values.
 ///
 /// This function is meant to be run in the main thread.
@@ -111,7 +106,6 @@ static int produce(void *data)
 /// @param queue Pointer to a message_queue.
 /// @return 0 on success, 1 on failure.
 /// @see produce()
-///
 static int consume(struct message_queue *queue)
 {
     extern const uint32_t DELAY;
@@ -141,10 +135,8 @@ static int consume(struct message_queue *queue)
     return 0;
 }
 
-///
 /// Initialize SDL and a message_queue, run the producer thread, consume,
 /// and clean up.
-///
 int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
 {
     extern const uint32_t QUEUE_CAP;

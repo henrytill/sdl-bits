@@ -1,11 +1,9 @@
-///
 /// Test for bmp_read_bitmap_v4() function.
 ///
 /// This test reads a 32-bit bitmap file and checks that the first pixel is
 /// semi-transparent red.
 ///
 /// @see bmp_v4_read()
-///
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

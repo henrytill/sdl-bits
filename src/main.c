@@ -116,13 +116,11 @@ static struct state st = {
     .tone_stat = 0,
 };
 
-///
 /// Parse command line arguments and populate args with the results.
 ///
 /// @param argc The number of arguments
 /// @param argv The arguments
 /// @param as The args struct to populate
-///
 static int parse_args(int argc, char *argv[], struct args *as)
 {
     char *arg = NULL;
@@ -136,13 +134,11 @@ static int parse_args(int argc, char *argv[], struct args *as)
     return 0;
 }
 
-///
 /// Join two paths together.  Caller is responsible for freeing the returned object.
 ///
 /// @param a The first path
 /// @param b The second path
 /// @return A new path, or NULL on failure
-///
 static char *joinpath2(const char *a, const char *b)
 {
     const char separator = '/';
@@ -152,13 +148,11 @@ static char *joinpath2(const char *a, const char *b)
     return ret;
 }
 
-///
 /// Load and parse a config file and populate config with the results.
 ///
 /// @param file The config file to load
 /// @param cfg The config struct to populate
 /// @return 0 on success, -1 on failure
-///
 static int load_config(const char *file, struct config *cfg)
 {
     int ret = -1;
@@ -197,13 +191,11 @@ out_close_state:
     return ret;
 }
 
-///
 /// Calculate a sine wave and write it to the stream.
 ///
 /// @param userdata The userdata passed to SDL_OpenAudioDevice
 /// @param stream The stream to write to
 /// @param len The length of the stream
-///
 static void calc_sine(void *userdata, uint8_t *stream, int len)
 {
     struct audio_state *as = userdata;
@@ -228,12 +220,10 @@ static void calc_sine(void *userdata, uint8_t *stream, int len)
     as->elapsed += 1;
 }
 
-///
 /// Calculate the time in milliseconds for a frame.
 ///
 /// @param frame_rate The frame rate
 /// @return The time in milliseconds for a frame
-///
 static double calc_frame_time(const int frame_rate)
 {
     extern const double SECOND;
@@ -242,13 +232,11 @@ static double calc_frame_time(const int frame_rate)
     return SECOND / (double)frame_rate;
 }
 
-///
 /// Calculate the time in milliseconds between two timestamps.
 ///
 /// @param begin An initial timestamp in ticks
 /// @param end A final timestamp in ticks
 /// @return The time in milliseconds between the two timestamps
-///
 static double calc_delta(const uint64_t begin, const uint64_t end)
 {
     extern const double SECOND;
@@ -260,12 +248,10 @@ static double calc_delta(const uint64_t begin, const uint64_t end)
     return (delta_ticks * SECOND) / (double)perf_freq;
 }
 
-///
 /// Wait until the current frame end before returning.
 ///
 /// @param frame_time The desired time in milliseconds for a frame
 /// @param begin The timestamp in ticks when the frame started
-///
 static void delay_frame(const double frame_time, const uint64_t begin)
 {
     assert(frame_time > 0);
@@ -279,14 +265,12 @@ static void delay_frame(const double frame_time, const uint64_t begin)
     while (calc_delta(begin, now()) < frame_time) {}
 }
 
-///
 /// Initialize a window and renderer.
 ///
 /// @param cfg The configuration.
 /// @param title The window title.
 /// @param win The window to initialize.
 /// @return 0 on success, -1 on failure.
-///
 static int window_init(struct config *cfg, const char *title, struct window *win)
 {
     extern const uint32_t WINDOW_TYPE_FLAGS[];
@@ -317,11 +301,9 @@ static int window_init(struct config *cfg, const char *title, struct window *win
     return 0;
 }
 
-///
 /// De-initialize a window and renderer.
 ///
 /// @param win The window to destroy.
-///
 static void window_finish(struct window *win)
 {
     if (win == NULL) {
@@ -335,13 +317,11 @@ static void window_finish(struct window *win)
     }
 }
 
-///
 /// Create a window and renderer.
 ///
 /// @param cfg The configuration.
 /// @param title The window title.
 /// @return The window on success, NULL on failure.
-///
 static struct window *window_create(struct config *cfg, const char *title)
 {
     struct window *win = emalloc(sizeof(*win));
@@ -353,11 +333,9 @@ static struct window *window_create(struct config *cfg, const char *title)
     return win;
 }
 
-///
 /// Destroy a window and renderer.
 ///
 /// @param win The window to destroy.
-///
 static void window_destroy(struct window *win)
 {
     if (win == NULL) {
@@ -367,13 +345,11 @@ static void window_destroy(struct window *win)
     free(win);
 }
 
-///
 /// Get the window's rectangle.
 ///
 /// @param win The window.
 /// @param rect The rectangle to initialize.
 /// @return 0 on success, -1 on failure.
-///
 static int get_rect(struct window *win, SDL_Rect *rect)
 {
     if (win == NULL || win->renderer == NULL) {
@@ -387,13 +363,11 @@ static int get_rect(struct window *win, SDL_Rect *rect)
     return 0;
 }
 
-///
 /// Create a tecture from a bitmap file.
 ///
 /// @param win The window.
 /// @param path The path to the bitmap file.
 /// @return The texture on success, NULL on failure.
-///
 static SDL_Texture *create_texture(struct window *win, const char *path)
 {
     SDL_Surface *surface = SDL_LoadBMP(path);
@@ -410,12 +384,10 @@ static SDL_Texture *create_texture(struct window *win, const char *path)
     return texture;
 }
 
-///
 /// Thread handler.
 ///
 /// @param data The data passed to the thread.
 /// @return 0 on success, -1 on failure.
-///
 static int handle(void *data)
 {
     struct message_queue *queue = data;
@@ -439,12 +411,10 @@ static int handle(void *data)
     return 0;
 }
 
-///
 /// Handle keydown events.
 ///
 /// @param key The keydown event.
 /// @param st The state.
-///
 static void handle_keydown(SDL_KeyboardEvent *key, struct state *st)
 {
     switch (key->keysym.sym) {
@@ -461,22 +431,18 @@ static void handle_keydown(SDL_KeyboardEvent *key, struct state *st)
     }
 }
 
-///
 /// Handle user events.
 ///
 /// @param event The user event.
 /// @param st The state.
-///
 static void handle_user(SDL_UserEvent *event, __attribute__((unused)) struct state *st)
 {
     SDL_LogDebug(APP, "EVENT_0: %d", event->timestamp);
 }
 
-///
 /// Handle SDL events.
 ///
 /// @param st The state.
-///
 static void handle_events(struct state *st)
 {
     SDL_Event event = {0};
@@ -497,14 +463,12 @@ static void handle_events(struct state *st)
 
 static void update(__attribute__((unused)) double delta) {}
 
-///
 /// Render the texture to the window.
 ///
 /// @param renderer The renderer
 /// @param texture The texture
 /// @param win_rect The window rectangle
 /// @return 0 on success, -1 on failure.
-///
 static int render(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *win_rect)
 {
     int rc = SDL_RenderClear(renderer);
