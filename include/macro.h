@@ -34,17 +34,15 @@
     ((type *)(__mptr - offsetof(type, member)));                                     \
 })
 
-// clang-format off
 #ifdef HAS_GENERIC
-#define CONTAINER_OF(ptr, type, member)                                       \
-  _Generic(                                                                   \
-    ptr,                                                                      \
-    const typeof(*(ptr)) *: ((const type *)CONTAINER_OF_(ptr, type, member)), \
-    default: ((type *)CONTAINER_OF_(ptr, type, member)))
+#define CONTAINER_OF(ptr, type, member)                                           \
+    _Generic(                                                                     \
+        ptr,                                                                      \
+        const typeof(*(ptr)) *: ((const type *)CONTAINER_OF_(ptr, type, member)), \
+        default: ((type *)CONTAINER_OF_(ptr, type, member)))
 #else
 #define CONTAINER_OF CONTAINER_OF_
 #endif
-// clang-format on
 
 #define SEND(obj, method, ...) ({        \
     typeof(obj) __obj = (obj);           \
