@@ -24,6 +24,7 @@ OBJECTS += src/bmp.o
 OBJECTS += src/generate_atlas_from_bdf.o
 OBJECTS += src/generate_test_bmp.o
 OBJECTS += src/get_displays.o
+OBJECTS += src/library_versions.o
 OBJECTS += src/main.o
 OBJECTS += src/message_queue_posix.o
 OBJECTS += src/message_queue_sdl.o
@@ -37,6 +38,7 @@ BINARIES =
 BINARIES += $(BINOUT)/generate_atlas_from_bdf
 BINARIES += $(BINOUT)/generate_test_bmp
 BINARIES += $(BINOUT)/get_displays
+BINARIES += $(BINOUT)/library_versions
 BINARIES += $(BINOUT)/main
 BINARIES += $(BINOUT)/bmp_read_bitmap
 BINARIES += $(BINOUT)/bmp_read_bitmap_v4
@@ -53,6 +55,8 @@ src/generate_atlas_from_bdf.o: CFLAGS += $(FREETYPE_CFLAGS)
 src/generate_atlas_from_bdf.o: src/bmp.o
 
 src/get_displays.o: CFLAGS += $(SDL_CFLAGS)
+
+src/library_versions.o: CFLAGS += $(FREETYPE_CFLAGS) $(LUA_CFLAGS) $(SDL_CFLAGS)
 
 src/main.o: CFLAGS += $(LUA_CFLAGS) $(SDL_CFLAGS)
 
@@ -74,6 +78,11 @@ $(BINOUT)/generate_test_bmp: src/generate_test_bmp.o src/bmp.o
 
 $(BINOUT)/get_displays: LDLIBS += $(SDL_LDLIBS)
 $(BINOUT)/get_displays: src/get_displays.o
+	@mkdir -p -- $(BINOUT)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(BINOUT)/library_versions: LDLIBS += $(FREETYPE_LDLIBS) $(LUA_LDLIBS) $(SDL_LDLIBS)
+$(BINOUT)/library_versions: src/library_versions.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
