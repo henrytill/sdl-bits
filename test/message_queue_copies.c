@@ -16,22 +16,22 @@
 #include "message_queue.h"
 #include "prelude_sdl.h"
 
-#define LOG(_msg) ({                                        \
-    struct message __msg = (_msg);                          \
-    SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",            \
-                __func__, #_msg,                            \
-                message_queue_tag(__msg.tag), __msg.value); \
+#define LOG(_msg) ({                                      \
+    struct message __msg = (_msg);                        \
+    SDL_LogInfo(APP, "%s: %s{%s, %" PRIdPTR "}",          \
+                __func__, #_msg,                          \
+                message_tag_str(__msg.tag), __msg.value); \
 })
 
 #define CHECK(_msg, _tag, _value) ({                               \
     struct message __msg = (_msg);                                 \
-    int __tag = (_tag);                                            \
+    enum message_tag __tag = (_tag);                               \
     typeof(_value) __value = (_value);                             \
     if (__msg.tag != __tag || __msg.value != __value) {            \
         SDL_LogError(ERR, "%s: %s{%s, %" PRIdPTR "} != {%s, %ld}", \
                      __func__, #_msg,                              \
-                     message_queue_tag(__msg.tag), __msg.value,    \
-                     message_queue_tag(__tag), __value);           \
+                     message_tag_str(__msg.tag), __msg.value,      \
+                     message_tag_str(__tag), __value);             \
         exit(EXIT_FAILURE);                                        \
     }                                                              \
 });
@@ -45,7 +45,7 @@ static const uint32_t QUEUE_CAP = 1U;
 /// Logs a message_queue error message and exit.
 static void message_queue_fail(int rc, const char *msg)
 {
-    SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
+    SDL_LogError(ERR, "%s: %s", msg, message_queue_failure_str((enum message_queue_failure)(-rc)));
     exit(EXIT_FAILURE);
 }
 

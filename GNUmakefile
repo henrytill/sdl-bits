@@ -17,7 +17,6 @@ HEADERS += include/message_queue.h
 HEADERS += include/prelude_sdl.h
 HEADERS += include/prelude_stdlib.h
 HEADERS += src/compat.h
-HEADERS += src/shared.h
 
 OBJECTS =
 OBJECTS += src/bmp.o
@@ -28,7 +27,7 @@ OBJECTS += src/library_versions.o
 OBJECTS += src/main.o
 OBJECTS += src/message_queue_posix.o
 OBJECTS += src/message_queue_sdl.o
-OBJECTS += src/shared.o
+OBJECTS += src/message_queue_shared.o
 OBJECTS += test/bmp_read_bitmap.o
 OBJECTS += test/bmp_read_bitmap_v4.o
 OBJECTS += test/message_queue_basic.o
@@ -102,12 +101,12 @@ $(BINOUT)/bmp_read_bitmap_v4: test/bmp_read_bitmap_v4.o src/bmp.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/message_queue_basic: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_basic: test/message_queue_basic.o src/shared.o src/message_queue_sdl.o
+$(BINOUT)/message_queue_basic: test/message_queue_basic.o src/message_queue_shared.o src/message_queue_sdl.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(BINOUT)/message_queue_copies: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_copies: test/message_queue_copies.o src/shared.o src/message_queue_sdl.o
+$(BINOUT)/message_queue_copies: test/message_queue_copies.o src/message_queue_shared.o src/message_queue_sdl.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 

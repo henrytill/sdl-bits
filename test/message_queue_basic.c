@@ -32,7 +32,7 @@ static void fail(const char *msg)
 /// Logs a message_queue error message and exit.
 static void message_queue_fail(int rc, const char *msg)
 {
-    SDL_LogError(ERR, "%s: %s", msg, message_queue_failure(rc));
+    SDL_LogError(ERR, "%s: %s", msg, message_queue_failure_str((enum message_queue_failure)(-rc)));
     exit(EXIT_FAILURE);
 }
 
@@ -66,7 +66,7 @@ static int produce(void *data)
     for (intptr_t value = 0; value <= COUNT;) {
         msg.tag = (value < COUNT) ? MSG_TAG_SOME : MSG_TAG_QUIT;
         msg.value = value;
-        tag_str = message_queue_tag(msg.tag);
+        tag_str = message_tag_str(msg.tag);
 
         rc = message_queue_put(queue, &msg);
         if (rc < 0) {
@@ -99,7 +99,7 @@ static int consume(struct message_queue *queue, struct message *out)
         message_queue_fail(rc, "message_queue_get failed");
     }
     SDL_LogInfo(APP, "Consumed {%s, %" PRIdPTR "}",
-                message_queue_tag(out->tag), out->value);
+                message_tag_str(out->tag), out->value);
     return out->tag != MSG_TAG_QUIT;
 }
 

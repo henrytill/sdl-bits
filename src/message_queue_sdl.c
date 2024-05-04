@@ -2,8 +2,6 @@
 
 #include <SDL.h>
 
-#include "shared.h"
-
 struct message_queue {
     struct message *buffer; // Buffer to hold messages
     uint32_t capacity;      // Maximum size of the buffer
@@ -17,11 +15,11 @@ struct message_queue {
 static int message_queue_init(struct message_queue *queue, uint32_t capacity)
 {
     if (queue == NULL) {
-        return MSGQ_FAILURE_NULL_POINTER;
+        return -MSGQ_FAILURE_NULL_POINTER;
     }
     queue->buffer = calloc((size_t)capacity, sizeof(*queue->buffer));
     if (queue->buffer == NULL) {
-        return MSGQ_FAILURE_MALLOC;
+        return -MSGQ_FAILURE_MALLOC;
     }
     queue->capacity = capacity;
     queue->front = 0;
@@ -29,20 +27,20 @@ static int message_queue_init(struct message_queue *queue, uint32_t capacity)
     queue->empty = SDL_CreateSemaphore(capacity);
     if (queue->empty == NULL) {
         free(queue->buffer);
-        return MSGQ_FAILURE_SEM_CREATE;
+        return -MSGQ_FAILURE_SEM_CREATE;
     }
     queue->full = SDL_CreateSemaphore(0);
     if (queue->full == NULL) {
         SDL_DestroySemaphore(queue->empty);
         free(queue->buffer);
-        return MSGQ_FAILURE_SEM_CREATE;
+        return -MSGQ_FAILURE_SEM_CREATE;
     }
     queue->lock = SDL_CreateMutex();
     if (queue->lock == NULL) {
         SDL_DestroySemaphore(queue->full);
         SDL_DestroySemaphore(queue->empty);
         free(queue->buffer);
-        return MSGQ_FAILURE_MUTEX_CREATE;
+        return -MSGQ_FAILURE_MUTEX_CREATE;
     }
     return 0;
 }
@@ -103,21 +101,21 @@ int message_queue_put(struct message_queue *queue, struct message *in)
         return 1;
     }
     if (rc < 0) {
-        return MSGQ_FAILURE_SEM_TRY_WAIT;
+        return -MSGQ_FAILURE_SEM_TRY_WAIT;
     }
     rc = SDL_LockMutex(queue->lock);
     if (rc == -1) {
-        return MSGQ_FAILURE_MUTEX_LOCK;
+        return -MSGQ_FAILURE_MUTEX_LOCK;
     }
     queue->buffer[queue->rear] = *in;
     queue->rear = (queue->rear + 1) % queue->capacity;
     rc = SDL_UnlockMutex(queue->lock);
     if (rc == -1) {
-        return MSGQ_FAILURE_MUTEX_UNLOCK;
+        return -MSGQ_FAILURE_MUTEX_UNLOCK;
     }
     rc = SDL_SemPost(queue->full);
     if (rc < 0) {
-        return MSGQ_FAILURE_SEM_POST;
+        return -MSGQ_FAILURE_SEM_POST;
     }
     return 0;
 }
@@ -126,21 +124,21 @@ int message_queue_get(struct message_queue *queue, struct message *out)
 {
     int rc = SDL_SemWait(queue->full);
     if (rc < 0) {
-        return MSGQ_FAILURE_SEM_WAIT;
+        return -MSGQ_FAILURE_SEM_WAIT;
     }
     rc = SDL_LockMutex(queue->lock);
     if (rc == -1) {
-        return MSGQ_FAILURE_MUTEX_LOCK;
+        return -MSGQ_FAILURE_MUTEX_LOCK;
     }
     *out = queue->buffer[queue->front];
     queue->front = (queue->front + 1) % queue->capacity;
     rc = SDL_UnlockMutex(queue->lock);
     if (rc == -1) {
-        return MSGQ_FAILURE_MUTEX_UNLOCK;
+        return -MSGQ_FAILURE_MUTEX_UNLOCK;
     }
     rc = SDL_SemPost(queue->empty);
     if (rc < 0) {
-        return MSGQ_FAILURE_SEM_POST;
+        return -MSGQ_FAILURE_SEM_POST;
     }
     return 0;
 }
