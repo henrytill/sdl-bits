@@ -1,4 +1,4 @@
-CFLAGS = -g -std=gnu11 -Iinclude -Wall -Wextra -Wconversion -Wsign-conversion
+CFLAGS = -g -std=gnu11 -Wall -Wextra -Wconversion -Wsign-conversion -Iinclude
 BINOUT = _bin
 
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.1)
