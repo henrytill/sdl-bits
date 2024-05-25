@@ -51,7 +51,6 @@ all: $(OBJECTS) $(BINARIES)
 $(OBJECTS): $(HEADERS)
 
 src/generate_atlas_from_bdf.o: CFLAGS += $(FREETYPE_CFLAGS)
-src/generate_atlas_from_bdf.o: src/bmp.o
 
 src/get_displays.o: CFLAGS += $(SDL_CFLAGS)
 
