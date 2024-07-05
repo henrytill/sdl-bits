@@ -405,16 +405,16 @@ static int handle(void *data) {
 /// @param st The state.
 static void handle_keydown(SDL_KeyboardEvent *key, struct state *st) {
   switch (key->keysym.sym) {
-  case SDLK_ESCAPE:
-    st->loop_stat = 0;
-    break;
-  case SDLK_F1:
-    st->tone_stat = (st->tone_stat == 1) ? 0 : 1;
-    SDL_LockAudioDevice(st->audio_device);
-    st->audio.volume = st->tone_stat * st->audio.max_volume;
-    st->audio.elapsed = 0;
-    SDL_UnlockAudioDevice(st->audio_device);
-    break;
+    case SDLK_ESCAPE:
+      st->loop_stat = 0;
+      break;
+    case SDLK_F1:
+      st->tone_stat = (st->tone_stat == 1) ? 0 : 1;
+      SDL_LockAudioDevice(st->audio_device);
+      st->audio.volume = st->tone_stat * st->audio.max_volume;
+      st->audio.elapsed = 0;
+      SDL_UnlockAudioDevice(st->audio_device);
+      break;
   }
 }
 
@@ -433,15 +433,15 @@ static void handle_events(struct state *st) {
   SDL_Event event = {0};
   while (SDL_PollEvent(&event) != 0) {
     switch (event.type) {
-    case SDL_QUIT:
-      st->loop_stat = 0;
-      break;
-    case SDL_KEYDOWN:
-      handle_keydown(&event.key, st);
-      break;
-    case EVENT_0:
-      handle_user(&event.user, st);
-      break;
+      case SDL_QUIT:
+        st->loop_stat = 0;
+        break;
+      case SDL_KEYDOWN:
+        handle_keydown(&event.key, st);
+        break;
+      case EVENT_0:
+        handle_user(&event.user, st);
+        break;
     }
   }
 }

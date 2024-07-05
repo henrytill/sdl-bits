@@ -17,7 +17,7 @@ BreakBeforeTernaryOperators: true
 ColumnLimit: 0
 ContinuationIndentWidth: 2
 DerivePointerAlignment: false
-IndentCaseLabels: false
+IndentCaseLabels: true
 IndentWidth: 2
 PointerAlignment: Right
 ReflowComments: true
