@@ -11,3 +11,4 @@
 Dockerfile
 /src/*.o
 /test/*.o
+config.mk
