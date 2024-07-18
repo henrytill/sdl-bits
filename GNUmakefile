@@ -38,8 +38,6 @@ BINARIES += $(BINOUT)/library_versions
 BINARIES += $(BINOUT)/main
 BINARIES += $(BINOUT)/bmp_read_bitmap
 BINARIES += $(BINOUT)/bmp_read_bitmap_v4
-BINARIES += $(BINOUT)/message_queue_basic
-BINARIES += $(BINOUT)/message_queue_copies
 
 -include config.mk
 
@@ -56,10 +54,6 @@ src/library_versions.o: CFLAGS += $(FREETYPE_CFLAGS) $(LUA_CFLAGS) $(SDL_CFLAGS)
 src/main.o: CFLAGS += $(LUA_CFLAGS) $(SDL_CFLAGS)
 
 src/message_queue_sdl.o: CFLAGS += $(SDL_CFLAGS)
-
-test/message_queue_basic.o: CFLAGS += $(SDL_CFLAGS)
-
-test/message_queue_copies.o: CFLAGS += $(SDL_CFLAGS)
 
 $(BINOUT)/generate_atlas_from_bdf: LDLIBS += -lm $(FREETYPE_LDLIBS)
 $(BINOUT)/generate_atlas_from_bdf: src/generate_atlas_from_bdf.o src/bmp.o
@@ -93,16 +87,6 @@ $(BINOUT)/bmp_read_bitmap: test/bmp_read_bitmap.o src/bmp.o
 
 $(BINOUT)/bmp_read_bitmap_v4: LDLIBS += -lm
 $(BINOUT)/bmp_read_bitmap_v4: test/bmp_read_bitmap_v4.o src/bmp.o
-	@mkdir -p -- $(BINOUT)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-$(BINOUT)/message_queue_basic: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_basic: test/message_queue_basic.o src/message_queue_sdl.o
-	@mkdir -p -- $(BINOUT)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
-
-$(BINOUT)/message_queue_copies: LDLIBS += $(SDL_LDLIBS)
-$(BINOUT)/message_queue_copies: test/message_queue_copies.o src/message_queue_sdl.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
