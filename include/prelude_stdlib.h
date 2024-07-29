@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SDL_BITS_INCLUDE_PRELUDE_STDLIB_H
+#define SDL_BITS_INCLUDE_PRELUDE_STDLIB_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,3 +32,5 @@ static inline void *ecalloc(size_t nmemb, size_t size) {
   }
   return ret;
 }
+
+#endif // SDL_BITS_INCLUDE_PRELUDE_STDLIB_H

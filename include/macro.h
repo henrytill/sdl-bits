@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SDL_BITS_INCLUDE_MACRO_H
+#define SDL_BITS_INCLUDE_MACRO_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -57,3 +58,5 @@
     exit(EXIT_FAILURE);                                  \
   }                                                      \
 })
+
+#endif // SDL_BITS_INCLUDE_MACRO_H

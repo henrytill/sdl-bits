@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SDL_BITS_INCLUDE_PRELUDE_SDL_H
+#define SDL_BITS_INCLUDE_PRELUDE_SDL_H
 
 #include <SDL.h>
 #include <SDL_audio.h>
@@ -43,3 +44,5 @@ static inline void log_sdl_error(const char *msg) {
     SDL_LogError(ERR, "%s", msg);
   }
 }
+
+#endif // SDL_BITS_INCLUDE_PRELUDE_SDL_H
