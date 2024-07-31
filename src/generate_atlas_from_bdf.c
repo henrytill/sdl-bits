@@ -8,6 +8,8 @@
 
 #include "bmp.h"
 
+#define eprintf(...) (void)fprintf(stderr, __VA_ARGS__)
+
 #define STATIC_ASSERT(e) _Static_assert((e), #e)
 
 STATIC_ASSERT(CHAR_BIT == 8);
@@ -94,7 +96,7 @@ static void render_bitmap_char(FT_GlyphSlot slot, char *target, const size_t cod
 static int render_bitmap_chars(FT_Face face, const char codes[CODES_SIZE], char *image) {
   int rc = FT_Set_Pixel_Sizes(face, WIDTH, HEIGHT);
   if (rc != 0) {
-    (void)fprintf(stderr, "FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
+    eprintf("FT_Set_Pixel_Sizes failed.  Error code: %d", rc);
     return -1;
   }
 
@@ -102,13 +104,13 @@ static int render_bitmap_chars(FT_Face face, const char codes[CODES_SIZE], char 
   for (size_t i = 0; i < CODES_SIZE; ++i) {
     rc = FT_Load_Char(face, (FT_ULong)codes[i], FT_LOAD_NO_SCALE | FT_LOAD_MONOCHROME);
     if (rc != 0) {
-      (void)fprintf(stderr, "FT_Load_Char failed.  Error code: %d", rc);
+      eprintf("FT_Load_Char failed.  Error code: %d", rc);
       return -1;
     }
     slot = face->glyph;
     rc = FT_Render_Glyph(slot, FT_RENDER_MODE_MONO);
     if (rc != 0) {
-      (void)fprintf(stderr, "FT_Render_Glyph failed.  Error code: %d", rc);
+      eprintf("FT_Render_Glyph failed.  Error code: %d", rc);
       return -1;
     }
     assert(slot->format == FT_GLYPH_FORMAT_BITMAP);
@@ -125,14 +127,14 @@ static int render_chars(const char codes[CODES_SIZE], char *image) {
   FT_Library lib = NULL;
   int rc = FT_Init_FreeType(&lib);
   if (rc != 0) {
-    (void)fprintf(stderr, "FT_Init_FreeType failed.  Error code: %d", rc);
+    eprintf("FT_Init_FreeType failed.  Error code: %d", rc);
     return -1;
   }
 
   FT_Face face = NULL;
   rc = FT_New_Face(lib, FONT_FILE, 0, &face);
   if (rc != 0) {
-    (void)fprintf(stderr, "FT_New_Face failed.  Error code: %d", rc);
+    eprintf("FT_New_Face failed.  Error code: %d", rc);
     goto out_done_lib;
   }
 
@@ -183,7 +185,7 @@ int main(void) {
   const size_t height = HEIGHT;
   char *image = calloc(width * height, sizeof(*image));
   if (image == NULL) {
-    (void)fprintf(stderr, "alloc_image failed.");
+    eprintf("alloc_image failed.");
     return EXIT_FAILURE;
   }
 
@@ -207,7 +209,7 @@ int main(void) {
 
   rc = bmp_v4_write(buffer, width, height, BMP_FILE);
   if (rc != 0) {
-    (void)fprintf(stderr, "bmp_v4_write failed.  Error code: %d", rc);
+    eprintf("bmp_v4_write failed.  Error code: %d", rc);
     goto out_free_buffer;
   }
 
