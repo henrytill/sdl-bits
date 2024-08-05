@@ -39,6 +39,10 @@ BINARIES += $(BINOUT)/main
 BINARIES += $(BINOUT)/bmp_read_bitmap
 BINARIES += $(BINOUT)/bmp_read_bitmap_v4
 
+TEST_BINARIES =
+TEST_BINARIES += $(BINOUT)/bmp_read_bitmap
+TEST_BINARIES += $(BINOUT)/bmp_read_bitmap_v4
+
 -include config.mk
 
 all: $(OBJECTS) $(BINARIES)
@@ -90,10 +94,15 @@ $(BINOUT)/bmp_read_bitmap_v4: test/bmp_read_bitmap_v4.o src/bmp.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
+assets/test.bmp: $(BINOUT)/generate_test_bmp
+	$< $@
+
 .PHONY: check
-check:
-	@echo Hello
+check: $(TEST_BINARIES) assets/test.bmp
+	$(BINOUT)/bmp_read_bitmap_v4 assets/test.bmp
+	$(BINOUT)/bmp_read_bitmap assets/sample_24bit.bmp
 
 .PHONY: clean
 clean:
 	rm -f -- $(BINARIES) $(OBJECTS)
+	rm -f assets/test.bmp
