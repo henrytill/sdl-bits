@@ -1,5 +1,6 @@
 #include "bmp.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +17,8 @@ static const uint32_t LCS_WINDOWS_COLOR_SPACE = 0x57696E20;
 static const size_t V4_DATA_OFFSET = sizeof(bmp_file_header) + sizeof(bmp_v4_header);
 
 size_t bmp_row_size(uint16_t bits_per_pixel, int32_t width) {
+  assert(bits_per_pixel > 0);
+  assert(width > 0);
   const double pixel_bits = (double)bits_per_pixel * width;
   return (size_t)(ceil(pixel_bits / DWORD_BITS)) * DWORD_BYTES;
 }
