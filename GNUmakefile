@@ -94,6 +94,9 @@ $(BINOUT)/bmp_read_bitmap_v4: test/bmp_read_bitmap_v4.o src/bmp.o
 	@mkdir -p -- $(BINOUT)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
+assets/10x20.bmp: $(BINOUT)/generate_atlas_from_bdf
+	$< $@
+
 assets/test.bmp: $(BINOUT)/generate_test_bmp
 	$< $@
 
