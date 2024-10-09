@@ -5,21 +5,21 @@
 #include <stdio.h>
 
 #ifndef NDEBUG
-#define DEBUG
+#  define DEBUG
 #endif
 
 // C2X compatibility
 
 #ifndef static_assert
-#define static_assert _Static_assert
+#  define static_assert _Static_assert
 #endif
 
 // General
 
 #ifdef DEBUG
-#define debug_printf(fmt, ...) (void)printf(fmt, ##__VA_ARGS__)
+#  define debug_printf(fmt, ...) (void)printf(fmt, ##__VA_ARGS__)
 #else
-#define debug_printf(fmt, ...) ({})
+#  define debug_printf(fmt, ...) ({})
 #endif
 
 // OOP
@@ -36,13 +36,13 @@
 })
 
 #ifdef HAS_GENERIC
-#define CONTAINER_OF(ptr, type, member)                                       \
-  _Generic(                                                                   \
-    ptr,                                                                      \
-    const typeof(*(ptr)) *: ((const type *)CONTAINER_OF_(ptr, type, member)), \
-    default: ((type *)CONTAINER_OF_(ptr, type, member)))
+#  define CONTAINER_OF(ptr, type, member)                                       \
+    _Generic(                                                                   \
+      ptr,                                                                      \
+      const typeof(*(ptr)) *: ((const type *)CONTAINER_OF_(ptr, type, member)), \
+      default: ((type *)CONTAINER_OF_(ptr, type, member)))
 #else
-#define CONTAINER_OF CONTAINER_OF_
+#  define CONTAINER_OF CONTAINER_OF_
 #endif
 
 #define SEND(obj, method, ...) ({      \
